@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "single-instance": true,
   "window": {
-    "width": 800,
-    "height": 500,
+    "width": 400,
+    "height": 550,
     "toolbar": true
   },
   "dependencies": {
