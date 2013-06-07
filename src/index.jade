@@ -7,13 +7,22 @@ html
 		link(rel='stylesheet', href='assets/css/crimson.css')
 		title crimson
 	body
-		.container-fluid
-			.row-fluid
-				.span12
-					p Hello world! &nbsp;
-					span#version
+		.l
+			nav
+				p nav
+		.r
+			header
+				.container-fluid
+					.row-fluid
+						.span12
+							img.whoami(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+							textarea(rows='3')
 
-		footer
-			script(src='assets/js/jquery.min.js')
-			script(src='assets/js/bootstrap.min.js')
-			script(src='assets/js/crimson.js')
+			.main
+				p Hello world! &nbsp;
+			footer
+				span#version
+				script(src='assets/js/jquery.min.js')
+				script(src='assets/js/bootstrap.min.js')
+				script(src='assets/js/crimson.js')
+
