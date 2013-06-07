@@ -1,0 +1,9 @@
+{
+  "name": "crimson-dev",
+  "private": true,
+  "devDependencies": {
+    "uglify-js": "~2.3.6",
+    "jade": "~0.31.1",
+    "which": "~1.0.5"
+  }
+}
