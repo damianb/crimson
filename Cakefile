@@ -16,16 +16,24 @@ lessOpts = '--no-ie-compat -x'
 
 # files to build/watch, etc.
 files =
-	jade:
-		'src/index.jade': 'build/index.html'
-	less:
-		'src/crimson.less': 'build/assets/css/crimson.css'
-	coffee:
-		'src/crimson.coffee': 'build/assets/js/crimson.js'
-	uglify:
-		'build/assets/js/crimson.js': 'build/assets/js/crimson.min.js'
-	uglycoffee:
-		'src/crimson.coffee': 'build/assets/js/crimson.min.js'
+	jade: [
+		'index'
+	]
+	less: [
+		'crimson'
+	]
+	coffee: [
+		'crimson'
+		'client'
+	]
+	uglify: [
+		'crimson'
+		'client'
+	]
+	uglycoffee: [
+		'crimson'
+		'client'
+	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:less'
@@ -52,23 +60,23 @@ task 'watch:uglify', 'watch js files for changes and compress', -> watch 'uglify
 task 'watch:uglycoffee', 'watch less files for changes and rebuild', -> watch 'uglycoffee'
 
 build = (type) ->
-	for file, dest of files[type]
-		compile type,file,dest
+	for file in files[type]
+		compile type,file
 
 watch = (type) ->
 	invoke 'build:'+type
-	for file, dest of files[type]
+	for file in files[type]
 		fs.watchFile file, (curr, prev) ->
 			if +curr.mtime isnt +prev.mtime
-				compile type,file,dest
+				compile type,file
 
-compile = (type, file, dest) ->
+compile = (type, file) ->
 	cmdLine = switch
-		when type is 'less' then "lessc #{lessOpts} #{file} #{dest}"
-		when type is 'jade' then "jade #{jadeOpts} < #{file} > #{dest}"
-		when type is 'coffee' then "coffee #{coffeeOpts} -cs < #{file} > #{dest}"
-		when type is 'uglify' then "uglifyjs #{uglifyOpts} < #{file} > #{dest}"
-		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < #{file} | uglifyjs #{uglifyOpts} > #{dest}"
+		when type is 'less' then "lessc #{lessOpts} src/#{file}.less build/assets/css/#{file}.css"
+		when type is 'jade' then "jade #{jadeOpts} < src/#{file}.jade > build/#{file}.html"
+		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/#{file}.coffee > build/assets/js/#{file}.js"
+		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
+		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
 		else throw new Error 'unknown compile type'
 	exec cmdLine, (err, stdout, stderr) ->
 		if err
