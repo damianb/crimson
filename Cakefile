@@ -71,7 +71,14 @@ watch = (type) ->
 		when type is 'uglycoffee' then 'coffee'
 		else type
 	for file in files[fileset]
-		fs.watchFile file, (curr, prev) ->
+		path = switch
+			when type is 'less' then "src/less/#{file}.less"
+			when type is 'jade' then "src/jade/#{file}.jade"
+			when type is 'coffee' then "src/coffee/#{file}.coffee"
+			when type is 'uglify' then "build/assets/js/#{file}.js"
+			when type is 'uglycoffee' then "src/coffee/#{file}.coffee"
+			when type is 'copy' then "src/#{file}"
+		fs.watchFile path, (curr, prev) ->
 			if +curr.mtime isnt +prev.mtime
 				compile type,file
 
