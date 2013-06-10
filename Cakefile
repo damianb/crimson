@@ -64,12 +64,13 @@ watch = (type) ->
 
 compile = (type, file, dest) ->
 	cmdLine = switch
-		when type is 'lessc' then "lessc #{lessOpts} #{file} #{dest}"
+		when type is 'less' then "lessc #{lessOpts} #{file} #{dest}"
 		when type is 'jade' then "jade #{jadeOpts} < #{file} > #{dest}"
 		when type is 'coffee' then "coffee #{coffeeOpts} -cs < #{file} > #{dest}"
 		when type is 'uglify' then "uglifyjs #{uglifyOpts} < #{file} > #{dest}"
 		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < #{file} | uglifyjs #{uglifyOpts} > #{dest}"
-	exec cmdline, (err, stdout, stderr) ->
+		else throw new Error 'unknown compile type'
+	exec cmdLine, (err, stdout, stderr) ->
 		if err
 			log type + ': ' + err, stderr, true
 		else
