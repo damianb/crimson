@@ -26,6 +26,9 @@ files =
 		'crimson'
 		'client'
 	]
+	copy: [
+		# todo
+	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:less'
@@ -42,7 +45,8 @@ task 'build:jade', 'build jade files into html', -> build 'jade'
 task 'build:less', 'build less files into css', -> build 'less'
 task 'build:coffee', 'build coffeescript files into js', -> build 'coffee'
 task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
-task 'build:uglycoffee', 'uglify coffeescript files', -> build 'uglycoffee'
+task 'build:uglycoffee', 'build coffescript files & minify', -> build 'uglycoffee'
+task 'build:copy', 'copy necessary files to build dir', -> build 'copy'
 
 # individual watch tasks
 task 'watch:jade', 'watch jade files for changes and rebuild', -> watch 'jade'
@@ -50,6 +54,7 @@ task 'watch:less', 'watch less files for changes and rebuild', -> watch 'less'
 task 'watch:coffee', 'watch coffee files for changes and rebuild', -> watch 'coffee'
 task 'watch:uglify', 'watch js files for changes and compress', -> watch 'uglify'
 task 'watch:uglycoffee', 'watch less files for changes and rebuild', -> watch 'uglycoffee'
+task 'watch:copy', 'watch for misc changes and copy to build dir', -> watch 'copy'
 
 build = (type) ->
 	fileset = switch
@@ -72,11 +77,13 @@ watch = (type) ->
 
 compile = (type, file) ->
 	cmdLine = switch
-		when type is 'less' then "lessc #{lessOpts} src/#{file}.less build/assets/css/#{file}.css"
-		when type is 'jade' then "jade #{jadeOpts} < src/#{file}.jade > build/#{file}.html"
-		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/#{file}.coffee > build/assets/js/#{file}.js"
+		when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less build/assets/css/#{file}.css"
+		when type is 'jade' then "jade #{jadeOpts} < src/jade/#{file}.jade > build/#{file}.html"
+		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/#{file}.js"
 		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
-		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
+		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
+		when type is 'copy' and process.platform.match(/^win/) then "" # todo windows copy command
+		when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/#{file}"
 		else throw new Error 'unknown compile type'
 	exec cmdLine, (err, stdout, stderr) ->
 		if err
