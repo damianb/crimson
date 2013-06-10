@@ -10,7 +10,7 @@ red = '\x1b[0;31m'
 
 jadeOpts = '-P'
 coffeeOpts = '-b'
-uglifyOpts = '-mce'
+uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
 
 files =
@@ -25,24 +25,17 @@ files =
 	uglycoffee:
 		'src/crimson.coffee': 'build/assets/js/crimson.min.js'
 
-try
-	which = require('which').sync
-catch err
-	if process.platform.match(/^win/)?
-		console.log 'WARNING: the which module is required for windows\ntry: npm install which'
-	which = null
-
 task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:less'
 	invoke 'build:jade'
-	#invoke 'build:uglycoffee'
-	invoke 'build:coffee'
+	invoke 'build:uglycoffee'
+	#invoke 'build:coffee'
 
 task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:less'
 	invoke 'watch:jade'
-	#invoke 'watch:uglycoffee'
-	invoke 'watch:coffee'
+	invoke 'watch:uglycoffee'
+	#invoke 'watch:coffee'
 
 task 'build:jade', 'build jade files into html', ->
 	for file, dest of files.jade
