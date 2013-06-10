@@ -19,6 +19,7 @@
   },
 
   "dependencies": {
+	"jade": "~0.31.2",
     "heello": "~1.0.3"
   }
 }
