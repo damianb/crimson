@@ -7,22 +7,42 @@ html
 		link(rel='stylesheet', href='assets/css/crimson.css')
 		title crimson
 	body
-		.l
-			nav
-				p nav
-		.r
-			header
-				.container-fluid
-					.row-fluid
-						.span12
-							img.whoami(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
-							textarea(rows='3')
+		.client
+			span.nib
+			.l
+				.whoami(title='Logged in as @Katana')
+					img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb', title='Logged in as @Katana')
+				.ident @katana
 
-			.main
-				p Hello world! &nbsp;
-			footer
-				span#version
-				script(src='assets/js/jquery.min.js')
-				script(src='assets/js/bootstrap.min.js')
-				script(src='assets/js/crimson.js')
+				nav
+					ul
+						li home
+						li noti
+						li prof
+						li sett
+			.r
+				header
+					textarea#pingText(placeholder="What's going on?")
+					// todo: turn into proper form
+
+				.toolbar
+					p upload - ping - toggleprivate - charcount
+
+
+				.main
+					.entry
+						.ping
+							.profile
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+							.post Example ping text
+							.controls
+							.meta
+								span.time 21 minutes ago
+					.stretch &nbsp;
+
+				footer
+					span#version
+					script(src='assets/js/jquery.min.js')
+					script(src='assets/js/bootstrap.min.js')
+					script(src='assets/js/crimson.min.js')
 
