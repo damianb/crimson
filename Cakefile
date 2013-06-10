@@ -8,11 +8,13 @@ green = '\x1b[0;32m'
 reset = '\x1b[0m'
 red = '\x1b[0;31m'
 
+# options for our various tools
 jadeOpts = '-P'
 coffeeOpts = '-b'
 uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
 
+# files to build/watch, etc.
 files =
 	jade:
 		'src/index.jade': 'build/index.html'
@@ -29,106 +31,49 @@ task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:less'
 	invoke 'build:jade'
 	invoke 'build:uglycoffee'
-	#invoke 'build:coffee'
 
 task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:less'
 	invoke 'watch:jade'
 	invoke 'watch:uglycoffee'
-	#invoke 'watch:coffee'
 
-task 'build:jade', 'build jade files into html', ->
-	for file, dest of files.jade
-		compileJade file,dest
+# individual build tasks
+task 'build:jade', 'build jade files into html', -> build 'jade'
+task 'build:less', 'build less files into css', -> build 'less'
+task 'build:coffee', 'build coffeescript files into js', -> build 'coffee'
+task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
+task 'build:uglycoffee', 'uglify coffeescript files', -> build 'uglycoffee'
 
-task 'build:less', 'build less files into css', ->
-	for file, dest of files.less
-		compileLess file,dest
+# individual watch tasks
+task 'watch:jade', 'watch jade files for changes and rebuild', -> watch 'jade'
+task 'watch:less', 'watch less files for changes and rebuild', -> watch 'less'
+task 'watch:coffee', 'watch coffee files for changes and rebuild', -> watch 'coffee'
+task 'watch:uglify', 'watch js files for changes and compress', -> watch 'uglify'
+task 'watch:uglycoffee', 'watch less files for changes and rebuild', -> watch 'uglycoffee'
 
-task 'build:coffee', 'build coffeescript files into js', ->
-	for file, dest of files.coffee
-		compileCoffee file,dest
+build = (type) ->
+	for file, dest of files[type]
+		compile type,file,dest
 
-task 'build:uglify', 'uglify/minify js files', ->
-	for file, dest of files.uglify
-		compileUglify file,dest
-
-# warning: uglifyjs seems to be broken atm
-task 'build:uglycoffee', 'uglify coffeescript files', ->
-	for file, dest of files.uglycoffee
-		compileUglyCoffee file,dest
-
-task 'watch:jade', 'watch jade files for changes and rebuild', ->
-	invoke 'build:jade'
-	for file, dest of files.jade
+watch = (type) ->
+	invoke 'build:'+type
+	for file, dest of files[type]
 		fs.watchFile file, (curr, prev) ->
 			if +curr.mtime isnt +prev.mtime
-				compileJade file,dest
+				compile type,file,dest
 
-task 'watch:less', 'watch less files for changes and rebuild', ->
-	invoke 'build:less'
-	for file, dest of files.less
-		fs.watchFile file, (curr, prev) ->
-			if +curr.mtime isnt +prev.mtime
-				compileLess file,dest
-
-task 'watch:coffee', 'watch coffee files for changes and rebuild', ->
-	invoke 'build:coffee'
-	for file, dest of files.coffee
-		fs.watchFile file, (curr, prev) ->
-			if +curr.mtime isnt +prev.mtime
-				compileCoffee file,dest
-
-task 'watch:uglify', 'watch js files for changes and compress', ->
-	invoke 'build:uglify'
-	for file, dest of files.uglify
-		fs.watchFile file, (curr, prev) ->
-			if +curr.mtime isnt +prev.mtime
-				compileUglify file,dest
-
-task 'watch:uglycoffee', 'watch less files for changes and rebuild', ->
-	invoke 'build:uglycoffee'
-	for file, dest of files.uglycoffee
-		fs.watchFile file, (curr, prev) ->
-			if +curr.mtime isnt +prev.mtime
-				compileUglyCoffee file,dest
-
-
-compileLess = (file, dest) ->
-	exec "lessc #{lessOpts} #{file} #{dest}", (err, stdout, stderr) ->
+compile = (type, file, dest) ->
+	cmdLine = switch
+		when type is 'lessc' then "lessc #{lessOpts} #{file} #{dest}"
+		when type is 'jade' then "jade #{jadeOpts} < #{file} > #{dest}"
+		when type is 'coffee' then "coffee #{coffeeOpts} -cs < #{file} > #{dest}"
+		when type is 'uglify' then "uglifyjs #{uglifyOpts} < #{file} > #{dest}"
+		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < #{file} | uglifyjs #{uglifyOpts} > #{dest}"
+	exec cmdline, (err, stdout, stderr) ->
 		if err
-			log 'lessc: ' + err, stderr, true
+			log type + ': ' + err, stderr, true
 		else
-			log "lessc: compiled #{file} successfully"
-
-compileJade = (file, dest) ->
-	exec "jade #{jadeOpts} < #{file} > #{dest}", (err, stdout, stderr) ->
-		if err
-			log 'jade: ' + err, stderr, true
-		else
-			log "jade: compiled #{file} successfully"
-
-compileCoffee = (file, dest) ->
-	exec "coffee #{coffeeOpts} -cs < #{file} > #{dest}", (err, stdout, stderr) ->
-		if err
-			log 'coffee: ' + err, stderr, true
-		else
-			log "coffee: compiled #{file} successfully"
-
-compileUglify = (file, dest) ->
-	exec "uglifyjs #{uglifyOpts} < #{file} > #{dest}", (err, stdout, stderr) ->
-		if err
-			log 'uglifyjs: ' + err, stderr, true
-		else
-			log "uglifyjs: compiled #{file} successfully"
-
-compileUglyCoffee = (file, dest) ->
-	exec "coffee #{coffeeOpts} -cs < #{file} | uglifyjs #{uglifyOpts} > #{dest}", (err, stdout, stderr) ->
-		if err
-			log 'uglycoffee: ' + err, stderr, true
-		else
-			log "uglycoffee: compiled #{file} successfully"
-
+			log "#{type}: compiled #{file} successfully"
 
 log = (message, explanation, isError = false) ->
 	if isError
