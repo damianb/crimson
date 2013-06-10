@@ -32,12 +32,33 @@ html
 				.main
 					.entry
 						.ping
-							.profile
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
-							.post Example ping text
-							.controls
-							.meta
-								span.time 21 minutes ago
+							.body
+								.profile
+									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+								.post
+									.meta
+										span.who
+											a(href='#') @katana
+										span.time &nbsp;21 minutes ago
+									p Example ping text
+							.controls.hide
+								span.reply a
+								span.repeat b
+					.entry
+						.ping
+							.body
+								.profile
+									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+								.post
+									.meta
+										span.who
+											a(href='#') @katana
+										span.time &nbsp;15 minutes ago
+									p Example ping text 2
+							.controls.hide
+								span.reply a
+								span.repeat b
+
 					.stretch &nbsp;
 
 				footer

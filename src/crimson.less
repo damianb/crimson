@@ -139,11 +139,49 @@ body {
 			bottom: @footerHeight;
 			overflow-y: scroll;
 
+			@bgColor: #666;
+			background-color: @bgColor;
+
 			.entry {
-				// asdf
+				background-color: @bgColor;
+				color: #fff;
+				position: relative;
+				width: 100%;
+
+				.post {
+					@bgColor: #eee;
+
+					position:relative;
+
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					padding:4px;
+					margin: 14px 4px 3px 58px;
+					color:#333;
+					background-color: @bgColor;
+					border-radius: 5px;
+					.who {
+						font-weight: bold;
+					}
+					&:after {
+						content:"";
+						position:absolute;
+						top:10px; /* controls vertical position */
+						left:-6px; /* controls horizontal position */
+						bottom:auto;
+						border-width:6px 6px 6px 0;
+						border-style:solid;
+						border-color:transparent @bgColor;
+					}
+				}
+
 				.profile {
-					position: relative;
-					top: 5px;
+					position: absolute;
+					top: -10px;
+					bottom: 0;
+					left: 2px;
 
 					@size: 46px;
 					@padding: 4px;
@@ -151,7 +189,6 @@ body {
 					margin: 3px;
 					width: @size;
 					height: @size;
-					display: inline-block;
 					background-color: #ccc;
 
 					img.avatar {
@@ -182,7 +219,7 @@ body {
 
 			.stretch {
 				height: 800px;
-				background-color: #fff;
+				background-color: @bgColor;
 			}
 		}
 
