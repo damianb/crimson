@@ -82,7 +82,7 @@ compile = (type, file) ->
 		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/#{file}.js"
 		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
 		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
-		when type is 'copy' and process.platform.match(/^win/) then "" # todo windows copy command
+		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src/#{file} build/#{file}" # todo windows copy command
 		when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/#{file}"
 		else throw new Error 'unknown compile type'
 	exec cmdLine, (err, stdout, stderr) ->
