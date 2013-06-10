@@ -8,6 +8,7 @@
   "devDependencies": {
     "uglify-js": "~2.3.6",
     "jade": "~0.31.1",
+    "less": "~1.4.0",
     "coffee-script": "~1.6.3"
   }
 }
