@@ -23,3 +23,9 @@ requires node-webkit 0.5.1 (at least)
 to build latest changes, cd to project directory and use `cake build` or `cake watch` to build coffeescript, less, jade files used by crimson.
 
 to run the application, cd to project directory and launch the build directory with the `nw` executable provided by node-webkit
+
+### todo
+
+storage? sqlite, websql, indexdb?
+
+plugin struct or ignore plugins?
