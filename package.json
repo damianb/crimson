@@ -1,6 +1,10 @@
 {
-  "name": "crimson-dev",
   "private": true,
+  "name": "crimson-dev",
+  "author": "Damian Bushong <katana@codebite.net>",
+  "description":"desktop heello client - development codebase",
+  "homepage": "https://github.com/damianb/crimson",
+  "repository": { "type": "git", "url": "http://github.com/damianb/crimson.git" },
   "devDependencies": {
     "uglify-js": "~2.3.6",
     "jade": "~0.31.1",

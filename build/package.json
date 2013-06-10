@@ -1,8 +1,14 @@
 {
-  "name": "crimson",
   "private": true,
-  "main": "index.html",
+  "name": "crimson",
+  "author": "Damian Bushong <katana@codebite.net>",
+  "description":"desktop heello client",
+  "homepage": "https://github.com/damianb/crimson",
+  "repository": { "type": "git", "url": "http://github.com/damianb/crimson.git" },
+
   "version": "0.1.0",
+
+  "main": "index.html",
   "single-instance": true,
   "window": {
     "width": 400,
@@ -11,6 +17,7 @@
     "min_height": 515,
     "toolbar": true
   },
+
   "dependencies": {
     "heello": "~1.0.3"
   }
