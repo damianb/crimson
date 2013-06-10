@@ -26,14 +26,6 @@ files =
 		'crimson'
 		'client'
 	]
-	uglify: [
-		'crimson'
-		'client'
-	]
-	uglycoffee: [
-		'crimson'
-		'client'
-	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:less'
@@ -60,12 +52,20 @@ task 'watch:uglify', 'watch js files for changes and compress', -> watch 'uglify
 task 'watch:uglycoffee', 'watch less files for changes and rebuild', -> watch 'uglycoffee'
 
 build = (type) ->
-	for file in files[type]
+	fileset = switch
+		when type is 'uglify' then 'coffee'
+		when type is 'uglycoffee' then 'coffee'
+		else type
+	for file in files[fileset]
 		compile type,file
 
 watch = (type) ->
 	invoke 'build:'+type
-	for file in files[type]
+	fileset = switch
+		when type is 'uglify' then 'coffee'
+		when type is 'uglycoffee' then 'coffee'
+		else type
+	for file in files[fileset]
 		fs.watchFile file, (curr, prev) ->
 			if +curr.mtime isnt +prev.mtime
 				compile type,file
