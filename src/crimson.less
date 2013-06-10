@@ -158,28 +158,26 @@ body {
 					left: 0;
 					right: 0;
 					padding:4px;
-					margin: 14px 4px 3px 58px;
+					margin: 26px 5px 5px 30px;
 					color:#333;
 					background-color: @bgColor;
-					border-radius: 5px;
-					.who {
-						font-weight: bold;
+					border-radius: 6px;
+					z-index: 20;
+					.meta {
+						margin-left: 20px;
+						.who {
+							font-weight: bold;
+						}
 					}
-					&:after {
-						content:"";
-						position:absolute;
-						top:10px; /* controls vertical position */
-						left:-6px; /* controls horizontal position */
-						bottom:auto;
-						border-width:6px 6px 6px 0;
-						border-style:solid;
-						border-color:transparent @bgColor;
+					p {
+						margin: 2px 0 0 6px;
 					}
+
 				}
 
 				.profile {
 					position: absolute;
-					top: -10px;
+					top: -22px;
 					bottom: 0;
 					left: 2px;
 
@@ -190,6 +188,7 @@ body {
 					width: @size;
 					height: @size;
 					background-color: #ccc;
+					z-index: 30;
 
 					img.avatar {
 						background-color: #fff;
@@ -199,6 +198,7 @@ body {
 						width: @isize;
 						height: @isize;
 						margin: @padding / 4;
+						z-index: 40;
 					}
 				}
 			}
