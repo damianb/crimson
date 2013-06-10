@@ -7,9 +7,11 @@
   "window": {
     "width": 400,
     "height": 550,
+    "min_width": 370,
+    "min_height": 515,
     "toolbar": true
   },
   "dependencies": {
-    "heello": "~1.0.2"
+    "heello": "~1.0.3"
   }
 }
