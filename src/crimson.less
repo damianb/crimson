@@ -3,69 +3,196 @@ body {
 	//height: 100%;
 	//background-color: #030308;
 	//font-family: "Inconsolata", "Droid Sans Mono Slashed", "Droid Sans Mono", monospace;
-}
-
-@globalPadding: 5px;
-@headerHeight: 80px;
-@footerHeight: 20px;
-@navWidth: 60px;
-
-header, footer, .main, body>.l, body>.r {
-	overflow: hidden;
-	position: absolute;
-}
-
-body>.l, body>.r {
-	top: 0;
-	bottom: 0;
-	height: 100%;
-}
-
-header, .main, footer {
-	left: 0;
-	right: 0;
-}
-
-body>.l {
-	width: @navWidth;
-	left: 0;
-	paddding-left: @globalPadding;
-	background-color: #5FE550;
-}
-
-body>.r {
-	left: @navWidth;
-	right: 0;
-	padding-right: @globalPadding;
-}
-
-header {
-	height: @headerHeight;
-	top: 0;
-	padding-top: @globalPadding;
-	background-color: #4F71E2;
-}
-
-.main {
-	top: @headerHeight;
-	bottom: @footerHeight;
-}
-
-footer {
-	height: @footerHeight;
-	bottom: 0;
-	padding-bottom: @globalPadding;
+	font-family: "Droid Sans", sans-serif;
 	font-size: 11px;
-	font-weight: bold;
 }
 
-nav {
-	//background-color: #5FE550;
-}
+.client {
+	@headerHeight: 52px;
+	@toolbarHeight: 20px;
+	@footerHeight: 20px;
+	@navWidth: 52px;
+	@bgColor: #ddd;
+	header, footer, .toolbar, .main, .l, .r {
+		overflow: hidden;
+		position: absolute;
+	}
 
-img.whoami {
-	@size: 60px;
-	border-radius: 32.5px 32.5px 32.5px 32.5px;
-	width: @size;
-	height: @size;
+	.nib {
+		position: relative;
+		top: 20px;
+		left: 49px;
+		height: 11px;
+		width: 8px;
+		background-repeat: no-repeat;
+		display: block;
+		background-image: url('../img/nib.png');
+		z-index: 200;
+	}
+
+	.l, .r {
+		top: 0;
+		bottom: 0;
+		height: 100%;
+	}
+
+	.l {
+		left: 0;
+		background-color: @bgColor;
+		width: @navWidth;
+		.whoami {
+			@size: 46px;
+			@padding: 4px;
+			border-radius: (@size / 2) (@size / 2) (@size / 2) (@size / 2);
+			margin: 3px;
+			width: @size;
+			height: @size;
+			display: inline-block;
+			background-color: #ccc;
+
+			img.avatar {
+				background-color: #fff;
+				@isize: @size - @padding;
+				border-radius: (@isize / 2) (@isize / 2) (@isize / 2) (@isize / 2);
+				border: 1px solid #aaa;
+				width: @isize;
+				height: @isize;
+				margin: @padding / 4;
+			}
+		}
+		.ident {
+			// meh
+		}
+		nav {
+			// asdf
+			ul {
+				list-style-type: none;
+				margin: 1px;
+				li {
+					@size: 30px;
+					margin: 9px;
+					width: @size;
+					height: @size;
+					background-color: #a99;
+					&:hover {
+						background-color: #b99;
+					}
+				}
+			}
+		}
+	}
+
+	.r {
+		left: @navWidth;
+		right: 0;
+
+		header, .toolbar, .main, footer {
+			left: 0;
+			right: 0;
+		}
+
+		header {
+			top: 0;
+			height: @headerHeight;
+
+			// debug
+			//background-color: #4F71E2;
+			background-color: @bgColor;
+			box-sizing: border-box;
+			padding: 4px 3px;
+
+			textarea#pingText {
+				height: 100%;
+				width: 100%;
+				box-sizing: border-box;
+				resize: none;
+				font-size: 11px;
+
+				// disable transition
+				transition: none;
+			}
+
+			textarea:hover, input:hover, textarea:active, input:active, textarea:focus, input:focus {
+				// no effects!
+				border: 1px solid #ccc;
+				box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+			}
+
+			textarea::-webkit-input-placeholder {
+				//color: #444;
+				font-style: italic;
+			}
+		}
+
+		.toolbar {
+			top: @headerHeight;
+			height: @toolbarHeight;
+
+			// debug
+			//background-color: #4F71E2;
+			background-color: @bgColor;
+			padding: 0 4px;
+		}
+
+		.main {
+			top: @headerHeight + @toolbarHeight;
+			bottom: @footerHeight;
+			overflow-y: scroll;
+
+			.entry {
+				// asdf
+				.profile {
+					position: relative;
+					top: 5px;
+
+					@size: 46px;
+					@padding: 4px;
+					border-radius: (@size / 2) (@size / 2) (@size / 2) (@size / 2);
+					margin: 3px;
+					width: @size;
+					height: @size;
+					display: inline-block;
+					background-color: #ccc;
+
+					img.avatar {
+						background-color: #fff;
+						@isize: @size - @padding;
+						border-radius: (@isize / 2) (@isize / 2) (@isize / 2) (@isize / 2);
+						border: 1px solid #aaa;
+						width: @isize;
+						height: @isize;
+						margin: @padding / 4;
+					}
+				}
+			}
+
+			&::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			&::-webkit-scrollbar-track {
+				background-color: @bgColor; // @todo change to normal bg color for .main
+			}
+
+			&::-webkit-scrollbar-thumb {
+				border-radius: 10px;
+				background-color: #777;
+				-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5);
+			}
+
+			.stretch {
+				height: 800px;
+				background-color: #fff;
+			}
+		}
+
+		footer {
+			height: @footerHeight;
+			bottom: 0;
+			font-size: 11px;
+			font-weight: bold;
+
+			background-color: #DDA0F7;
+		}
+	}
 }
