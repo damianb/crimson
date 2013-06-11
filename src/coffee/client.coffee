@@ -1,3 +1,4 @@
+
 crimson = new _crimson()
 crimson.timelines.home.on 'newPing', (ping) ->
 	# todo react, append!

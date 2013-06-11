@@ -12,7 +12,9 @@ body {
 	@toolbarHeight: 20px;
 	@footerHeight: 20px;
 	@navWidth: 52px;
-	@bgColor: #ddd;
+	@bgColor: #494949;
+	@subColor: #ddd;
+	@subBorder: #333;
 	header, footer, .toolbar, .main, .l, .r {
 		overflow: hidden;
 		position: absolute;
@@ -26,7 +28,7 @@ body {
 		width: 8px;
 		background-repeat: no-repeat;
 		display: block;
-		background-image: url('../img/nib.png');
+		background-image: data-uri('../img/nib.png');
 		z-index: 200;
 	}
 
@@ -48,7 +50,7 @@ body {
 			width: @size;
 			height: @size;
 			display: inline-block;
-			background-color: #ccc;
+			background-color: #888;
 
 			img.avatar {
 				background-color: #fff;
@@ -60,17 +62,16 @@ body {
 				margin: @padding / 4;
 			}
 		}
-		.ident {
-			// meh
-		}
 		nav {
-			// asdf
+			position: absolute;
+			bottom: 0px;
+			left: 0;
 			ul {
 				list-style-type: none;
-				margin: 1px;
+				margin: 28px 1px 1px;
 				li {
-					@size: 30px;
-					margin: 9px;
+					@size: 38px;
+					margin: 12px 5px;
 					width: @size;
 					height: @size;
 					background-color: #a99;
@@ -127,52 +128,69 @@ body {
 		.toolbar {
 			top: @headerHeight;
 			height: @toolbarHeight;
-
-			// debug
-			//background-color: #4F71E2;
 			background-color: @bgColor;
 			padding: 0 4px;
+			color: #ddd;
+
+			span {
+				display: inline-block;
+				margin: 0 5px;
+			}
+		}
+
+		.corner, .inside {
+			position: relative;
+			left: 0;
+			height: 6px;
+			width: 6px;
+		}
+		.corner {
+			top: @headerHeight + @toolbarHeight;
+			background-color: @bgColor;
+			z-index: 50;
+			.inside {
+				top: 0;
+				border-top-left-radius: 6px;
+				border-top: 1px solid @subBorder;
+				border-left: 1px solid @subBorder;
+				background-color: @subColor;
+				z-index: 40;
+			}
 		}
 
 		.main {
 			top: @headerHeight + @toolbarHeight;
 			bottom: @footerHeight;
 			overflow-y: scroll;
-
-			@bgColor: #666;
-			background-color: @bgColor;
-
+			background-color: @subColor;
+			z-index: 15;
+			border-top: 1px solid @subBorder;
+			border-left: 1px solid @subBorder;
 			.entry {
-				background-color: @bgColor;
+				background-color: @subColor;
 				color: #fff;
 				position: relative;
 				width: 100%;
 
 				.post {
 					@bgColor: #eee;
-
 					position:relative;
-
 					top: 0;
 					bottom: 0;
 					left: 0;
 					right: 0;
 					padding:4px;
-					margin: 26px 5px 5px 30px;
+					margin: 26px 6px 5px 30px;
 					color:#333;
 					background-color: @bgColor;
+					border: 1px solid #aaa;
 					border-radius: 6px;
 					z-index: 20;
 					.meta {
 						margin-left: 20px;
-						.who {
-							font-weight: bold;
-						}
+						.who { font-weight: bold; }
 					}
-					p {
-						margin: 2px 0 0 6px;
-					}
-
+					p { margin: 2px 0 0 6px; }
 				}
 
 				.profile {
@@ -208,7 +226,7 @@ body {
 			}
 
 			&::-webkit-scrollbar-track {
-				background-color: @bgColor; // @todo change to normal bg color for .main
+				background-color: @subColor; // @todo change to normal bg color for .main
 			}
 
 			&::-webkit-scrollbar-thumb {
@@ -219,7 +237,7 @@ body {
 
 			.stretch {
 				height: 800px;
-				background-color: @bgColor;
+				background-color: @subColor;
 			}
 		}
 
@@ -228,8 +246,22 @@ body {
 			bottom: 0;
 			font-size: 11px;
 			font-weight: bold;
+			border-left: 1px solid @subBorder;
+			padding: 0 4px;
 
 			background-color: #DDA0F7;
 		}
+	}
+}
+
+.length {
+	font-size: 16px;
+	&.lengthWarn {
+		color: #FF8E56;
+		font-weight: bold;
+	}
+	&.lengthOver {
+		color: #F71D1D !important;
+		font-weight: bold;
 	}
 }

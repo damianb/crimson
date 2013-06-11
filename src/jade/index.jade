@@ -7,28 +7,34 @@ html
 		link(rel='stylesheet', href='assets/css/crimson.css')
 		title crimson
 	body
-		.client
+		.client.hide
 			span.nib
 			.l
 				.whoami(title='Logged in as @Katana')
 					img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb', title='Logged in as @Katana')
-				.ident @katana
+				//.ident @katana
 
 				nav
 					ul
 						li home
-						li noti
-						li prof
-						li sett
+						li notify
+						li search
+						li profile
+						li setting
+						li logout
 			.r
 				header
 					textarea#pingText(placeholder="What's going on?")
 					// todo: turn into proper form
 
 				.toolbar
-					p upload - ping - toggleprivate - charcount
+					span#charcount.length
+					span upload
+					span ping
+					span private?
 
-
+				.corner
+					.inside
 				.main
 					.entry
 						.ping
@@ -58,12 +64,11 @@ html
 							.controls.hide
 								span.reply a
 								span.repeat b
-
 					.stretch &nbsp;
-
 				footer
 					span#version
 					script(src='assets/js/jquery.min.js')
 					script(src='assets/js/bootstrap.min.js')
-					script(src='assets/js/crimson.min.js')
+					script(src='assets/js/crimson.js')
+					script(src='assets/js/ui.js')
 
