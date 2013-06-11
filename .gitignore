@@ -3,5 +3,6 @@ node_modules/
 nw/
 build/assets/js/crimson.*js
 build/assets/js/client.*js
+build/assets/js/ui.*js
 build/assets/css/crimson.css
 build/*.html

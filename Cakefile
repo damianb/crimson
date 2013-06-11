@@ -25,6 +25,7 @@ files =
 	coffee: [
 		'crimson'
 		'client'
+		'ui'
 	]
 	copy: [
 		# todo
@@ -33,12 +34,15 @@ files =
 task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:less'
 	invoke 'build:jade'
-	invoke 'build:uglycoffee'
+	#invoke 'build:uglycoffee'
+	invoke 'build:coffee'
+
 
 task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:less'
 	invoke 'watch:jade'
-	invoke 'watch:uglycoffee'
+	#invoke 'watch:uglycoffee'
+	invoke 'watch:coffee'
 
 # individual build tasks
 task 'build:jade', 'build jade files into html', -> build 'jade'
@@ -70,17 +74,18 @@ watch = (type) ->
 		when type is 'uglify' then 'coffee'
 		when type is 'uglycoffee' then 'coffee'
 		else type
-	for file in files[fileset]
+	for file in files[fileset] then do ->
+		_file = file
 		path = switch
-			when type is 'less' then "src/less/#{file}.less"
-			when type is 'jade' then "src/jade/#{file}.jade"
-			when type is 'coffee' then "src/coffee/#{file}.coffee"
-			when type is 'uglify' then "build/assets/js/#{file}.js"
-			when type is 'uglycoffee' then "src/coffee/#{file}.coffee"
-			when type is 'copy' then "src/#{file}"
+			when type is 'less' then "src/less/#{_file}.less"
+			when type is 'jade' then "src/jade/#{_file}.jade"
+			when type is 'coffee' then "src/coffee/#{_file}.coffee"
+			when type is 'uglify' then "build/assets/js/#{_file}.js"
+			when type is 'uglycoffee' then "src/coffee/#{_file}.coffee"
+			when type is 'copy' then "src/#{_file}"
 		fs.watchFile path, (curr, prev) ->
 			if +curr.mtime isnt +prev.mtime
-				compile type,file
+				compile type,_file
 
 compile = (type, file) ->
 	cmdLine = switch
@@ -89,12 +94,12 @@ compile = (type, file) ->
 		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/#{file}.js"
 		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
 		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
-		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src/#{file} build/#{file}" # todo windows copy command
-		when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/#{file}"
+		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src/#{file} build/assets/#{file}" # todo windows copy command
+		when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/assets/#{file}"
 		else throw new Error 'unknown compile type'
 	exec cmdLine, (err, stdout, stderr) ->
 		if err
-			log type + ': ' + err, stderr, true
+			log "#{type}: failed to compile #{file}; #{err}", stderr, true
 		else
 			log "#{type}: compiled #{file} successfully"
 
