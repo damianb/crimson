@@ -9,20 +9,10 @@ html
 	body
 		.client.hide
 			span.nib
-			.l
+			.l.top
 				.whoami(title='Logged in as @Katana')
 					img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb', title='Logged in as @Katana')
-				//.ident @katana
-
-				nav
-					ul
-						li home
-						li notify
-						li search
-						li profile
-						li setting
-						li logout
-			.r
+			.r.top
 				header
 					textarea#pingText(placeholder="What's going on?")
 					// todo: turn into proper form
@@ -33,6 +23,16 @@ html
 					span ping
 					span private?
 
+			.l.bottom
+				nav
+					ul
+						li home
+						li notify
+						li search
+						li profile
+						li setting
+						li logout
+			.r.bottom
 				.corner
 					.inside
 				.main
