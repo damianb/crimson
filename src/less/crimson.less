@@ -191,6 +191,7 @@ body {
 				position: relative;
 				width: 100%;
 
+				.who { font-weight: bold; }
 				.post {
 					@bgColor: #eee;
 					position:relative;
@@ -207,7 +208,6 @@ body {
 					z-index: 20;
 					.meta {
 						margin-left: 20px;
-						.who { font-weight: bold; }
 					}
 					p { margin: 2px 0 0 6px; }
 				}
@@ -236,6 +236,13 @@ body {
 						height: @isize;
 						margin: @padding / 4;
 						z-index: 40;
+					}
+
+					&.mentioned {
+						background-color: #e66;
+						img.avatar {
+							border-color: #c33;
+						}
 					}
 				}
 			}
