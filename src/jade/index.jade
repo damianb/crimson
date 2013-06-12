@@ -10,8 +10,7 @@ html
 		.client.hide
 			span.nib
 			.l.top
-				.whoami(title='Logged in as @Katana')
-					img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb', title='Logged in as @Katana')
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb', title='Logged in as @katana')
 			.r.top
 				header
 					textarea#pingText(placeholder="What's going on?")
@@ -19,8 +18,8 @@ html
 
 				.toolbar
 					span#charcount.length
+					span.btn.btn-mini.btn-inverse#ping ping
 					span upload
-					span ping
 					span private?
 
 			.l.bottom
@@ -41,11 +40,11 @@ html
 						.ping
 							.body
 								.profile
-									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
 								.post
 									.meta
 										span.who
-											a(href='#') @katana
+											a(href='#') @heello
 										span.time &nbsp;21 mins
 									p Example ping text
 							.controls.hide
@@ -55,11 +54,11 @@ html
 						.ping
 							.body
 								.profile
-									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
 								.post
 									.meta
 										span.who
-											a(href='#') @katana
+											a(href='#') @heello
 										span.time &nbsp;15 mins
 									p Example ping text 2
 							.controls.hide
@@ -69,13 +68,26 @@ html
 						.ping
 							.body
 								.profile.mentioned
+									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+								.post
+									.meta
+										a.who(href='#') @heello
+										span.time &nbsp;12 mins
+									p This ping mentions you! - &nbsp;
+										a.who(href='#') @katana
+							.controls.hide
+								span.reply a
+								span.repeat b
+					.entry
+						.ping
+							.body
+								.profile.self
 									img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
 								.post
 									.meta
 										a.who(href='#') @katana
 										span.time &nbsp;12 mins
-									p This ping mentions you! - &nbsp;
-										a.who(href='#') @katana
+									p This ping is by you!
 							.controls.hide
 								span.reply a
 								span.repeat b
@@ -83,6 +95,7 @@ html
 				footer
 					span#version
 					script(src='assets/js/jquery.min.js')
+					script(src='assets/js/jquery.hotkeys.js')
 					script(src='assets/js/bootstrap.min.js')
 					script(src='assets/js/crimson.js')
 					script(src='assets/js/ui.js')
