@@ -13,9 +13,9 @@
   "window": {
     "width": 400,
     "height": 550,
-    "min_width": 370,
-    "min_height": 515,
-    "toolbar": true
+    "min_width": 350,
+    "min_height": 500,
+    "toolbar": false
   },
 
   "dependencies": {

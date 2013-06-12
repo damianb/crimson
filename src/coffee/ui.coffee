@@ -1,3 +1,4 @@
+gui = require 'nw.gui'
 
 counter = (field, display, max) ->
 	[display, field] = [$(display), $(field)]
@@ -23,7 +24,17 @@ counter = (field, display, max) ->
 	display.html(max)
 	display.stop().fadeTo(0, 0)
 
+$(document).on 'keydown', null, 'ctrl+j', () ->
+	win = gui.Window.get()
+	win.showDevTools()
+	return null
+$(document).on 'keydown', null, 'ctrl+r', () ->
+	win = gui.Window.get()
+	win.reloadIgnoringCache()
+	return null
 counter('#pingText', '#charcount', 200)
+
+
 $('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 $().ready(() ->
 	$('.client').removeClass 'hide'
