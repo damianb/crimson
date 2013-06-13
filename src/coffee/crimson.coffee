@@ -3,6 +3,7 @@ jade = require 'jade'
 fs = require 'fs'
 heelloApi = require 'heello'
 http = require 'http'
+url = require 'url'
 os = require 'os'
 gui = require 'nw.gui'
 
@@ -15,6 +16,7 @@ class _crimson extends EventEmitter
 			notify: null
 		@filters = {}
 
+		@tokenPort: 33233  #todo see how common this port is in use...
 		@heello = new heelloApi {
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
 			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
@@ -25,18 +27,27 @@ class _crimson extends EventEmitter
 		@data = new dataCache @
 		super()
 	connect: () ->
-		@heello.refreshTokens @data.refreshToken(), (err) =>
-			if err? return false
-				# handle error...somehow.
-			@data.setRefreshToken @heello.refreshToken
-			@emit 'connected'
+		refreshToken = @data.refreshToken()
+		# check if we need to get tokens for the client
+		if !refreshToken?
+			# application not yet authorized...let's do this!
+			tokenInterceptor @tokenPort, (code) =>
+				@heello.getTokens code, (err) =>
+					if err? then bigError err
+					@data.setRefreshToken @heello.refreshToken
+					@emit 'connected'
+			display 'auth'
+		else
+			@heello.refreshTokens refreshToken, (err) =>
+				if err? then bigError err
+				@data.setRefreshToken @heello.refreshToken
+				@emit 'connected'
 	heartbeat: () ->
 		# todo
 	parsePing: () ->
 		# todo
 	@filter: () ->
 		# todo
-	@tokenPort: 33233  #todo see how common this port is in use...
 
 #
 # todo: determine if this structure should be kept
@@ -63,10 +74,9 @@ class ping
 
 class dataCache
 	constructor: (@client) ->
-		@staleUserAge = 10 * 60 * 1000 # 10 minutes
-		@stalePingAge = 0 # todo: should we perform ping caching at *all*?
-		@staleListeningAge = 60 * 60 * 1000 # 60 minutes
-		@staleListenerAge = 60 * 60 * 1000 # 60 minutes
+		@staleUserAge = 60 * 1000 # 1 minute
+		@staleListeningAge = 10 * 60 * 1000 # 60 minutes
+		@staleListenerAge = 10 * 60 * 1000 # 60 minutes
 	refreshToken: () ->
 		if !@refresh? then @refresh = clientStorage.refreshToken
 		return @refresh
@@ -74,8 +84,7 @@ class dataCache
 		clientStorage.refreshToken = @refresh
 	ping: (pingId) ->
 		# todo
-		# fetch ping data from local storage
-		# remove?
+		# fetch pings...?
 	user: (userId) ->
 		# todo
 		# fetch user data from local storage, refresh cache if local storage too "stale"
@@ -86,7 +95,7 @@ class dataCache
 		# todo
 	notifications: () ->
 		# todo
-		# fetch latest "notifications"
+		# fetch latest "notifications"...?
 	listeners: () ->
 		# todo
 		# fetch latest "listeners"
@@ -99,10 +108,13 @@ class dataCache
 	update: (type, data) ->
 		# todo
 
-tokenIntercept = (port) ->
-	#todo refactor to make it a bit MORE useful...
+tokenInterceptor = (port, fn) ->
+	# todo refactor to make it a bit MORE useful...
 	server = http.createServer( (req, res) ->
-		res.writeHead 200, {'Content-Type': 'application/json'}
-		res.end JSON.stringify({ response: url.parse(req.url, true).query }) + '\n'
+		# obtain refresh & access token now with token exchange...
+		code = url.parse(req.url, true).query.code
+		fn(code)
+		res.writeHead 200, {'Content-Type': 'text/html'}
+		res.end '<!DOCTYPE html><html><head><title>Authorization successful</title></head><body><h2>Authorization successful</h2><p>You may now close this window.</p><script>window.close();</script></body></html>'
 		server.close()
-	).listen _crimson.tokenPort
+	).listen port
