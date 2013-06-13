@@ -48,6 +48,8 @@ loadThrob = (start = true) ->
 			$('.throbber span').removeClass 'pulse'
 			if current isnt 4
 				$('.throbber span#t' + current++).addClass 'pulse'
+			else
+				current++
 		throbInterval = setInterval throbFn, length * 1000, current
 	else
 		clearInterval throbInterval
@@ -73,4 +75,5 @@ counter('#pingText', '#charcount', 200)
 $('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 $().ready(() ->
 	display 'load'
+	crimson.connect()
 )
