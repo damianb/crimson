@@ -1,25 +1,25 @@
 {
-  "private": true,
-  "name": "crimson",
-  "author": "Damian Bushong <katana@codebite.net>",
-  "description":"desktop heello client",
-  "homepage": "https://github.com/damianb/crimson",
-  "repository": { "type": "git", "url": "http://github.com/damianb/crimson.git" },
+	"private": true,
+	"name": "crimson",
+	"author": "Damian Bushong <katana@codebite.net>",
+	"description":"desktop heello client",
+	"homepage": "https://github.com/damianb/crimson",
+	"repository": { "type": "git", "url": "http://github.com/damianb/crimson.git" },
 
-  "version": "0.1.0",
+	"version": "0.1.0",
 
-  "main": "index.html",
-  "single-instance": true,
-  "window": {
-    "width": 380,
-    "height": 550,
-    "min_width": 320,
-    "min_height": 500,
-    "toolbar": false
-  },
+	"main": "index.html",
+	"single-instance": true,
+	"window": {
+		"width": 380,
+		"height": 550,
+		"min_width": 320,
+		"min_height": 500,
+		"toolbar": false
+	},
 
-  "dependencies": {
-	"jade": "~0.31.2",
-    "heello": "~1.0.3"
-  }
+	"dependencies": {
+		"jade": "~0.31.2",
+		"heello": "~1.0.5"
+	}
 }
