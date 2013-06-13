@@ -21,7 +21,7 @@ body {
 	}
 
 	&.dis-auth {
-		background-color: #81B4EF;
+		background-image: linear-gradient(to bottom,#95BFF9,#3393BF);
 		.notice {
 			width: 16em;
 			height: 7em;
@@ -97,12 +97,14 @@ body {
 
 	&.dis-client {
 		@headerHeight: 57px;
-		@toolbarHeight: 22px;
+		@toolbarHeight: 28px;
 		@footerHeight: 20px;
-		@navWidth: 54px;
-		@bgColor: #494949;
-		@subColor: #ddd;
-		@subBorder: #333;
+		@whoamiWidth: 84px;
+		@navWidth: 40px;
+		@bgColor: #91BFEA;
+		@subColor: #E3EAED;
+		//@subBorder: #333;
+		@subBorder: #7881BF;
 		header, footer, .toolbar, .main, .l, .r {
 			overflow: hidden;
 			position: absolute;
@@ -110,8 +112,8 @@ body {
 
 		.nib {
 			position: relative;
-			top: 24px;
-			left: 54px;
+			top: 36px;
+			left: @whoamiWidth;
 			height: 11px;
 			width: 8px;
 			background-repeat: no-repeat;
@@ -133,24 +135,32 @@ body {
 		.l {
 			left: 0;
 			background-color: @bgColor;
-			width: @navWidth;
+			width: @whoamiWidth;
 		}
 
 		.l.top {
-			img.avatar {
-				background-color: #fff;
-				@size: 46px;
-				border-radius: (@size / 2) (@size / 2) (@size / 2) (@size / 2);
-				border: 1px solid rgba(50,50,50,0.5);
-				margin: 6px 3px 3px 5px;
+			.whoami {
+				@size: 76px;
 				width: @size;
 				height: @size;
-				//margin: 1px;
+				border-radius: @size / 2;
+				background-color: rgba(94, 94, 119, 0.2);
+				margin: 4px 3px 3px 4px;
+				padding: 1px;
+				img.avatar {
+					@isize: @size - 2px;
+					background-color: #fff;
+					border-radius: @isize / 2;
+					border: 1px solid #6880A5;
+					//margin: 1px;
+					width: @isize;
+					height: @isize;
+				}
 			}
 		}
 
 		.l.bottom {
-			width: @navWidth - 14;
+			width: @navWidth;
 			nav {
 				ul {
 					position: absolute;
@@ -163,9 +173,11 @@ body {
 						margin: 6px 4px;
 						width: @size;
 						height: @size;
-						background-color: #a99;
+						background-color: #9895B2;
+						color: transparent;
+						border-radius: 15px;
 						&:hover {
-							background-color: #b99;
+							background-color: #9A98BA;
 						}
 					}
 				}
@@ -176,12 +188,9 @@ body {
 			}
 		}
 
-		.r {
-			left: @navWidth;
-			right: 0;
-		}
-
 		.r.top {
+			left: @whoamiWidth;
+			right: 0;
 			header, .toolbar, .main, footer {
 				left: 0;
 				right: 0;
@@ -221,28 +230,35 @@ body {
 				top: @headerHeight;
 				height: @toolbarHeight;
 				background-color: @bgColor;
-				padding: 0 4px;
-				color: #ddd;
+				padding: 0 10px;
 
-				span {
-					display: inline-block;
-					margin: 0 5px;
+				.btn-group {
 					float: right;
-					&#charcount { float: left; }
-					&#ping {
-						padding: 0 9px;
+					button {
 						line-height: 18px;
-						border-radius: 4px;
-						color: #ccc;
-						&:hover { color: #eee; }
+						&#private {
+							padding-left: 4px;
+							padding-right: 4px;
+						}
+						&#ping {
+							padding-left: 12px;
+							padding-right: 12px;
+						}
 					}
+				}
+				span#charcount {
+					float: left;
+					font-size: 18px;
+					display: inline-block;
+					margin-top: 1px;
 				}
 				&:after { clear: both; }
 			}
 		}
 
 		.r.bottom {
-			left: @navWidth - 14;
+			left: @navWidth;
+			right: 0;
 			.corner, .inside {
 				position: relative;
 				left: 0;
@@ -279,6 +295,10 @@ body {
 					color: #fff;
 					position: relative;
 					width: 100%;
+					margin-bottom: 20px;
+					&.reping {
+						margin-bottom: 32px;
+					}
 
 					.who { font-weight: bold; }
 					.post {
@@ -288,8 +308,8 @@ body {
 						bottom: 0;
 						left: 0;
 						right: 0;
-						padding:4px;
-						margin: 26px 6px 5px 30px;
+						padding: 3px;
+						margin: 26px 6px 15px 30px;
 						color:#333;
 						background-color: @bgColor;
 						border: 1px solid #aaa;
@@ -298,15 +318,15 @@ body {
 						.meta {
 							margin-left: 20px;
 						}
-						p { margin: 2px 0 0 6px; }
+						p { margin: 2px 0 0 16px; }
 						box-shadow: inset 0 -1px 2px rgba(0,0,0,0.14), inset -1px 0 2px rgba(0,0,0,0.14);
 					}
 
-					.profile {
+					.ping-profile {
 						position: absolute;
 						top: -20px;
 						bottom: 0;
-						left: 4px;
+						left: 5px;
 
 						@size: 44px;
 						border-radius: (@size - 2) / 2;
@@ -319,12 +339,51 @@ body {
 						img.avatar {
 							background-color: #fff;
 							@isize: @size - 4px;
-							border-radius: (@isize / 2) (@isize / 2) (@isize / 2) (@isize / 2);
+							border-radius: @isize / 2;
 							border: 1px solid #aaa;
 							width: @isize;
 							height: @isize;
 							margin: 1px;
 							z-index: 40;
+						}
+
+						&.mentioned {
+							background-color: rgba(204, 51, 51, 0.5);
+							img.avatar {
+								border-color: #c33;
+							}
+						}
+						&.self {
+							background-color: rgba(122, 201, 122, 0.5);
+							img.avatar {
+								border-color: #7AC97A;
+							}
+						}
+					}
+
+					.reping-profile {
+						position: absolute;
+						top: 26px;
+						bottom: 0;
+						left: 13px;
+
+						@size: 28px;
+						border-radius: (@size - 2) / 2;
+						margin: 3px;
+						width: @size;
+						height: @size;
+						background-color: rgba(170,170,170, 0.5);
+						z-index: 25;
+
+						img.avatar {
+							background-color: #fff;
+							@isize: @size - 4px;
+							border-radius: @isize / 2;
+							border: 1px solid #aaa;
+							width: @isize;
+							height: @isize;
+							margin: 1px;
+							z-index: 28;
 						}
 
 						&.mentioned {
@@ -351,8 +410,9 @@ body {
 				}
 
 				&::-webkit-scrollbar-thumb {
-					border-radius: 10px;
-					background-color: #777;
+					border-radius: 3px;
+					background-color: #999;
+					border: 1px solid #aaa;
 					-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5);
 				}
 
@@ -369,19 +429,22 @@ body {
 				bottom: 0;
 				font-size: 11px;
 				font-weight: bold;
-				border-left: 1px solid @subBorder;
+				text-align: center;
+				margin: 0 10px;
+				border-radius: 3px 3px 0 0;
+				//border-left: 1px solid @subBorder;
 				padding: 0 4px;
-
-				background-color: rgba(173, 173, 173, 0.5);
+				z-index: 25;
+				color: rgba(51, 51, 51, 0.4);
+				background-color: rgba(173, 173, 173, 0.4);
 			}
 		}
 	}
 }
 
 .length {
-	font-size: 16px;
+	color: #6666AD;
 	&.lengthWarn {
-		color: #FF8E56;
 		font-weight: bold;
 	}
 	&.lengthOver {

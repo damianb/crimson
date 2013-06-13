@@ -51,36 +51,51 @@ class _crimson extends EventEmitter
 
 class dataCache
 	constructor: (@client) ->
-		@staleUserAge = 60 * 1000 # 1 minute
-		@staleListeningAge = 10 * 60 * 1000 # 60 minutes
-		@staleListenerAge = 10 * 60 * 1000 # 60 minutes
+		minute = 60 * 1000
+		@staleMeAge = 30 * minute
+		@staleUserAge = 5 * minute
+		@staleListeningAge = 10 * minute
+		@staleListenerAge = 10 * minute
+		@staleHomeAge = 1 * minute
+		@staleNotifyAge = 1 * minute
+		@last =
+			home: 0
+			notify: 0
+			me: 0
+			listeners: 0
+			listening: 0
+			# filters: 0
+
 	refreshToken: () ->
 		if !@refresh? then @refresh = localStorage.getItem 'refreshToken'
 		return @refresh
 	setRefreshToken: (@refresh) ->
 		localStorage.setItem 'refreshToken', @refresh
 		return null
-	ping: (pingId) ->
+	ping: (pingId, fn) ->
 		# todo
 		# fetch pings...?
-	user: (userId) ->
+	user: (user, fn) ->
 		# todo
 		# fetch user data from local storage, refresh cache if local storage too "stale"
-	userTimeline: () ->
+	userTimeline: (fn) ->
 		# todo
 		# fetch other user's previous tweets... 5 minute cache? shorter?
-	me: () ->
+	me: (fn) ->
 		# todo
-	notifications: () ->
+	home: (fn) ->
+		# todo
+
+	notifications: (fn) ->
 		# todo
 		# fetch latest "notifications"...?
-	listeners: () ->
+	listeners: (fn) ->
 		# todo
 		# fetch latest "listeners"
-	listening: () ->
+	listening: (fn) ->
 		# todo
 		# fetch latest "listening"
-	ignored: () ->
+	ignored: (fn) ->
 		# todo
 		# fetch "ignored" users from local storage...this acts as a frontend for filters against user accounts
 	update: (type, data) ->
@@ -95,3 +110,5 @@ tokenInterceptor = (port, fn) ->
 		res.end '<!DOCTYPE html><html><head><title>Authorization successful</title></head><body><h2>Authorization successful</h2><p>You may now close this window.</p><script>window.close();</script></body></html>\n'
 		server.close()
 	).listen port
+
+crimson = new _crimson()

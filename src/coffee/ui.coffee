@@ -1,15 +1,16 @@
-gui = require 'nw.gui'
-
+fieldMaximums = {}
 counter = (field, display, max) ->
 	[display, field] = [$(display), $(field)]
-	warn = max - (max / 5)
+	fieldMaximums[field] = max
 	charCount = ->
+		max = fieldMaximums[field]
+		warn = max - (max / 5)
 		text = field.val()
 		switch
 			when text.length >= max then display.addClass('lengthOver')
 			when text.length >= warn then display.removeClass('lengthOver').addClass('lengthWarn')
 			else display.removeClass('lengthOver lengthWarn')
-		display.html(max - text.length)
+		display.html max - text.length
 		display.stop().fadeTo('fast', 1)
 		return null
 
@@ -21,7 +22,7 @@ counter = (field, display, max) ->
 		if field.val().length is 0
 			display.stop().fadeTo('fast', 0)
 		return false
-	display.html(max)
+	display.html max
 	display.stop().fadeTo(0, 0)
 
 display = (state) ->
@@ -69,14 +70,16 @@ $(document).on 'keydown', null, 'ctrl+r', () ->
 	return null
 $('button#authorize').on 'click', null, () ->
 	gui.Shell.openExternal crimson.heello.getAuthURI '0000'
+$('button#private').on 'click', null, () ->
+	if !!$('button#private').hasClass 'active'
+		fieldMaximums['#pingText'] = 400
+	else
 counter('#pingText', '#charcount', 200)
-
-crimson.on 'connected', () ->
-	display 'client'
-	column 'home'
 
 $('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 $().ready(() ->
 	display 'load'
-	crimson.connect()
+	display 'client'
+	column 'home'
+	#crimson.connect()
 )
