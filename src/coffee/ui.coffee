@@ -35,7 +35,7 @@ display = (state) ->
 
 column = (column) ->
 	$('.main').addClass 'hide'
-	$('.main#col-' + column).removeClass 'hide'
+	$('.main.col-' + column).removeClass 'hide'
 
 throbInterval = null
 loadThrob = (start = true) ->
@@ -71,6 +71,9 @@ $('button#authorize').on 'click', null, () ->
 	gui.Shell.openExternal crimson.heello.getAuthURI '0000'
 counter('#pingText', '#charcount', 200)
 
+crimson.on 'connected', () ->
+	display 'client'
+	column 'home'
 
 $('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 $().ready(() ->

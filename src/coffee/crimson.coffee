@@ -32,9 +32,7 @@ class _crimson extends EventEmitter
 		if !refreshToken?
 			# application not yet authorized...let's do this!
 			tokenInterceptor @tokenPort, (code) =>
-				console.log 'got code'
 				@heello.getTokens code, (err) =>
-					console.log err
 					if err? then bigError err
 					@data.setRefreshToken @heello.refreshToken
 					@emit 'connected'
