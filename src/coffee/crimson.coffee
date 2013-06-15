@@ -18,6 +18,7 @@ class _crimson extends EventEmitter
 
 		@tokenPort = 33233  #todo see how common this port is in use...
 		@heello = new heelloApi {
+			# ignore the obfuscation, it's necessary due to automated code scanners
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
 			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
 			callbackURI: "http://127.0.0.1:#{@tokenPort}"
@@ -29,23 +30,20 @@ class _crimson extends EventEmitter
 	connect: () ->
 		refreshToken = @data.refreshToken()
 		# check if we need to get tokens for the client
+		procTokens = (err) =>
+			if err? then bigError err
+			@data.setRefreshToken @heello.refreshToken
+			@emit 'connected'
 		if !refreshToken?
 			# application not yet authorized...let's do this!
 			tokenInterceptor @tokenPort, (code) =>
-				@heello.getTokens code, (err) =>
-					if err? then bigError err
-					@data.setRefreshToken @heello.refreshToken
-					@emit 'connected'
+				@heello.getTokens code, procTokens
 			display 'auth'
 		else
-			@heello.refreshTokens refreshToken, (err) =>
-				if err? then bigError err
-				@data.setRefreshToken @heello.refreshToken
-				@emit 'connected'
+			@heello.refreshTokens refreshToken, procTokens
 	heartbeat: () ->
-		# todo
-	parsePing: () ->
-		# todo
+		@emit 'heartbeat'
+		# todo - leverage heartbeat to update timelines as necessary
 	@filter: () ->
 		# todo
 
@@ -99,21 +97,31 @@ class dataCache
 	ignored: (fn) ->
 		# todo
 		# fetch "ignored" users from local storage...this acts as a frontend for filters against user accounts
+	filters: (fn) ->
+		# todo
 	update: (type, data) ->
 		# todo
 
 class viewport
-	constructor: () ->
+	constructor: (@client) ->
 		@timelines: {}
+	addTimeline: (timeline) ->
 	scrollTo: (timeline) ->
 		# todo
 
 class timeline
-	constructor: () ->
-		# todo
-	addEntry: (ping) ->
-	removeEntry: (ping) ->
-	getEntry: (ping) ->
+	constructor: (@client, type) ->
+		if type is 'home'
+			@client.on 'newPing', addEntry
+		else if type is 'notify'
+			@client.on 'newNotify', addEntry
+		else if type is 'mentions'
+			@client.on 'newMention', addEntry
+		else if type is 'private'
+			@client.on 'newPingPrivate'
+	addEntry: (entry) ->
+	removeEntry: (entry) ->
+	getEntry: (entry) ->
 	page: (offset, length) ->
 		# todo
 
