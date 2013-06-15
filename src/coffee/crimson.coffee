@@ -52,6 +52,7 @@ class _crimson extends EventEmitter
 class dataCache
 	constructor: (@client) ->
 		minute = 60 * 1000
+		@stalePingAge = 30 * minute
 		@staleMeAge = 30 * minute
 		@staleUserAge = 5 * minute
 		@staleListeningAge = 10 * minute
@@ -99,6 +100,21 @@ class dataCache
 		# todo
 		# fetch "ignored" users from local storage...this acts as a frontend for filters against user accounts
 	update: (type, data) ->
+		# todo
+
+class viewport
+	constructor: () ->
+		@timelines: {}
+	scrollTo: (timeline) ->
+		# todo
+
+class timeline
+	constructor: () ->
+		# todo
+	addEntry: (ping) ->
+	removeEntry: (ping) ->
+	getEntry: (ping) ->
+	page: (offset, length) ->
 		# todo
 
 tokenInterceptor = (port, fn) ->

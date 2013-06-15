@@ -1,29 +1,27 @@
-fieldMaximums = {}
-counter = (field, display, max) ->
-	[display, field] = [$(display), $(field)]
-	fieldMaximums[field] = max
-	charCount = ->
-		max = fieldMaximums[field]
-		warn = max - (max / 5)
-		text = field.val()
+class counter
+	constructor: (field, display, @max) ->
+		@display = $(display)
+		@field = $(field)
+		@field.bind 'keydown keyup keypress', @charCount
+		@field.bind 'focus paste', () =>
+			setTimeout @charCount, 10
+			return null
+		@field.bind 'blur', () =>
+			if @field.val().length is 0
+				@display.stop().fadeTo('fast', 0)
+			return false
+		@display.html @max
+		@display.stop().fadeTo(0, 0)
+	charCount: () =>
+		warn = @max - (@max / 5)
+		text = @field.val()
 		switch
-			when text.length >= max then display.addClass('lengthOver')
-			when text.length >= warn then display.removeClass('lengthOver').addClass('lengthWarn')
-			else display.removeClass('lengthOver lengthWarn')
-		display.html max - text.length
-		display.stop().fadeTo('fast', 1)
+			when text.length >= @max then @display.addClass('lengthOver')
+			when text.length >= warn then @display.removeClass('lengthOver').addClass('lengthWarn')
+			else @display.removeClass('lengthOver lengthWarn')
+		@display.html @max - text.length
+		@display.stop().fadeTo('fast', 1)
 		return null
-
-	field.bind 'keydown keyup keypress', charCount
-	field.bind 'focus paste', () ->
-		setTimeout charCount, 10
-		return null
-	field.bind 'blur', () ->
-		if field.val().length is 0
-			display.stop().fadeTo('fast', 0)
-		return false
-	display.html max
-	display.stop().fadeTo(0, 0)
 
 display = (state) ->
 	throbbing = !($('.display.dis-load').hasClass 'hide')
@@ -35,8 +33,8 @@ display = (state) ->
 		loadThrob(false)
 
 column = (column) ->
-	$('.main').addClass 'hide'
-	$('.main.col-' + column).removeClass 'hide'
+	$('.column').addClass 'hide'
+	$('.column.col-' + column).removeClass 'hide'
 
 throbInterval = null
 loadThrob = (start = true) ->
@@ -70,11 +68,14 @@ $(document).on 'keydown', null, 'ctrl+r', () ->
 	return null
 $('button#authorize').on 'click', null, () ->
 	gui.Shell.openExternal crimson.heello.getAuthURI '0000'
+
+pingTextCounter = new counter('#pingText', '#charcount', 200)
 $('button#private').on 'click', null, () ->
-	if !!$('button#private').hasClass 'active'
-		fieldMaximums['#pingText'] = 400
+	if !$('button#private').hasClass 'active'
+		pingTextCounter.max = 400
 	else
-counter('#pingText', '#charcount', 200)
+		pingTextCounter.max = 200
+	pingTextCounter.charCount()
 
 $('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 $().ready(() ->

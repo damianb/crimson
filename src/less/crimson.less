@@ -103,7 +103,6 @@ body {
 		@navWidth: 40px;
 		@bgColor: #91BFEA;
 		@subColor: #E3EAED;
-		//@subBorder: #333;
 		@subBorder: #7881BF;
 		header, footer, .toolbar, .main, .l, .r {
 			overflow: hidden;
@@ -283,142 +282,170 @@ body {
 				top: 0;
 				left: 0;
 				right: 0;
-				//bottom: @footerHeight;
-				bottom: 0; // seeing if we can abuse this~
-				overflow-y: scroll;
-				background-color: @subColor;
+				bottom: 0;
 				z-index: 15;
 				border-top: 1px solid @subBorder;
 				border-left: 1px solid @subBorder;
-				.entry {
+				.column {
+					top: 0;
+					bottom: 0;
+					overflow-y: scroll;
 					background-color: @subColor;
-					color: #fff;
-					position: relative;
-					width: 100%;
-					margin-bottom: 20px;
-					&.reping {
-						margin-bottom: 32px;
+					.entry {
+						background-color: @subColor;
+						color: #fff;
+						position: relative;
+						width: 100%;
+						margin-top: 18px;
+						margin-bottom: 20px;
+						&.reping {
+							margin-bottom: 32px;
+						}
+
+						.who { font-weight: bold; }
+						.post {
+							position:relative;
+							top: 0;
+							bottom: 0;
+							left: 0;
+							right: 0;
+							padding: 3px;
+							margin: 26px 6px 15px 30px;
+							color:#333;
+							background-color: #eee;
+							border: 1px solid #aaa;
+							border-radius: 6px;
+							z-index: 20;
+							.meta {
+								margin-left: 20px;
+							}
+							p { margin: 2px 0 0 16px; }
+							box-shadow: inset 0 -1px 2px rgba(0,0,0,0.14), inset -1px 0 2px rgba(0,0,0,0.14);
+						}
+
+						.controls {
+							position: absolute;
+							top: 0;
+							right: 10px;
+							//height: 20px;
+							z-index: 25;
+
+							a {
+								margin: 2px;
+								display: block;
+							}
+
+							button {
+								@size: 26px;
+								height: @size;
+								width: @size;
+								border-radius: @size / 2;
+								border: 1px solid #AAAAAA;
+								//background-image: linear-gradient(to bottom,#f9f9f9,#e5e5e5);
+								box-shadow: inset 0 -1px 1px rgba(0,0,0,0.1), inset -1px 0 1px rgba(0,0,0,0.1);
+								padding: 3px 5px;
+								margin-left: 3px;
+							}
+						}
+
+						.ping-profile {
+							position: absolute;
+							top: -20px;
+							bottom: 0;
+							left: 5px;
+
+							@size: 44px;
+							border-radius: (@size - 2) / 2;
+							margin: 3px;
+							width: @size;
+							height: @size;
+							background-color: rgba(170,170,170, 0.5);
+							z-index: 30;
+
+							img.avatar {
+								background-color: #fff;
+								@isize: @size - 4px;
+								border-radius: @isize / 2;
+								border: 1px solid #aaa;
+								width: @isize;
+								height: @isize;
+								margin: 1px;
+								z-index: 40;
+							}
+
+							&.mentioned {
+								background-color: rgba(204, 51, 51, 0.5);
+								img.avatar {
+									border-color: #c33;
+								}
+							}
+							&.self {
+								background-color: rgba(122, 201, 122, 0.5);
+								img.avatar {
+									border-color: #7AC97A;
+								}
+							}
+						}
+
+						.reping-profile {
+							position: absolute;
+							top: 26px;
+							bottom: 0;
+							left: 13px;
+
+							@size: 28px;
+							border-radius: (@size - 2) / 2;
+							margin: 3px;
+							width: @size;
+							height: @size;
+							background-color: rgba(170,170,170, 0.5);
+							z-index: 25;
+
+							img.avatar {
+								background-color: #fff;
+								@isize: @size - 4px;
+								border-radius: @isize / 2;
+								border: 1px solid #aaa;
+								width: @isize;
+								height: @isize;
+								margin: 1px;
+								z-index: 28;
+							}
+
+							&.mentioned {
+								background-color: rgba(204, 51, 51, 0.5);
+								img.avatar {
+									border-color: #c33;
+								}
+							}
+							&.self {
+								background-color: rgba(122, 201, 122, 0.5);
+								img.avatar {
+									border-color: #7AC97A;
+								}
+							}
+						}
 					}
 
-					.who { font-weight: bold; }
-					.post {
-						@bgColor: #eee;
-						position:relative;
-						top: 0;
-						bottom: 0;
-						left: 0;
-						right: 0;
-						padding: 3px;
-						margin: 26px 6px 15px 30px;
-						color:#333;
-						background-color: @bgColor;
+					&::-webkit-scrollbar {
+						width: 8px;
+					}
+
+					&::-webkit-scrollbar-track {
+						background-color: @subColor; // @todo change to normal bg color for .main
+					}
+
+					&::-webkit-scrollbar-thumb {
+						border-radius: 3px;
+						background-color: #999;
 						border: 1px solid #aaa;
-						border-radius: 6px;
-						z-index: 20;
-						.meta {
-							margin-left: 20px;
-						}
-						p { margin: 2px 0 0 16px; }
-						box-shadow: inset 0 -1px 2px rgba(0,0,0,0.14), inset -1px 0 2px rgba(0,0,0,0.14);
+						-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5);
 					}
 
-					.ping-profile {
-						position: absolute;
-						top: -20px;
-						bottom: 0;
-						left: 5px;
-
-						@size: 44px;
-						border-radius: (@size - 2) / 2;
-						margin: 3px;
-						width: @size;
-						height: @size;
-						background-color: rgba(170,170,170, 0.5);
-						z-index: 30;
-
-						img.avatar {
-							background-color: #fff;
-							@isize: @size - 4px;
-							border-radius: @isize / 2;
-							border: 1px solid #aaa;
-							width: @isize;
-							height: @isize;
-							margin: 1px;
-							z-index: 40;
-						}
-
-						&.mentioned {
-							background-color: rgba(204, 51, 51, 0.5);
-							img.avatar {
-								border-color: #c33;
-							}
-						}
-						&.self {
-							background-color: rgba(122, 201, 122, 0.5);
-							img.avatar {
-								border-color: #7AC97A;
-							}
-						}
+					.stretch {
+						height: 800px;
+						background-color: @subColor;
 					}
-
-					.reping-profile {
-						position: absolute;
-						top: 26px;
-						bottom: 0;
-						left: 13px;
-
-						@size: 28px;
-						border-radius: (@size - 2) / 2;
-						margin: 3px;
-						width: @size;
-						height: @size;
-						background-color: rgba(170,170,170, 0.5);
-						z-index: 25;
-
-						img.avatar {
-							background-color: #fff;
-							@isize: @size - 4px;
-							border-radius: @isize / 2;
-							border: 1px solid #aaa;
-							width: @isize;
-							height: @isize;
-							margin: 1px;
-							z-index: 28;
-						}
-
-						&.mentioned {
-							background-color: rgba(204, 51, 51, 0.5);
-							img.avatar {
-								border-color: #c33;
-							}
-						}
-						&.self {
-							background-color: rgba(122, 201, 122, 0.5);
-							img.avatar {
-								border-color: #7AC97A;
-							}
-						}
-					}
-				}
-
-				&::-webkit-scrollbar {
-					width: 8px;
-				}
-
-				&::-webkit-scrollbar-track {
-					background-color: @subColor; // @todo change to normal bg color for .main
-				}
-
-				&::-webkit-scrollbar-thumb {
-					border-radius: 3px;
-					background-color: #999;
-					border: 1px solid #aaa;
-					-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5);
-				}
-
-				.stretch {
-					height: 800px;
-					background-color: @subColor;
 				}
 			}
 
