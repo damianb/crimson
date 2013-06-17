@@ -8,15 +8,42 @@ os = require 'os'
 gui = require 'nw.gui'
 
 class _crimson extends EventEmitter
-	constructor: (options) ->
-		@userId = null
-		@username = null
-		@timelines =
-			home: null
-			notify: null
-		@filters = {}
-
+	constructor: () ->
+		@users = {}
 		@tokenPort = 33233  #todo see how common this port is in use...
+		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
+		@heartbeat = null # this will hold a setInterval reference.
+		if !@tokenStore? then @tokenStore = []
+		super()
+	updateTokenStore: () ->
+		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
+	connectAll: () ->
+		@connect token for token in @tokenStore
+	connect: (refreshToken) ->
+		user = new cUser @
+		procTokens = (err) =>
+			if err? then bigError err
+			@tokenStore.push user.heello.refreshToken
+			@updateTokenStore()
+			user.heello.users.me (err, json) =>
+				id = json.response.id
+				user.profile = json.response
+				@users[id] = user
+				@emit 'connected', user
+		# check if we need to get tokens for the account
+		if !refreshToken?
+			# application not yet authorized...let's do this!
+			tokenInterceptor @tokenPort, (code) =>
+				user.heello.getTokens code, procTokens
+			@emit 'pendingAuth', user
+		else
+			user.heello.refreshTokens refreshToken, procTokens
+		# todo - leverage heartbeat to update timelines as necessary
+	@filter: () ->
+		# todo
+
+class cUser
+	constructor: (@crimson) ->
 		@heello = new heelloApi {
 			# ignore the obfuscation, it's necessary due to automated code scanners
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
@@ -26,26 +53,7 @@ class _crimson extends EventEmitter
 			# todo: somehow get current pkg.version! D:
 		}
 		@data = new dataCache @
-		super()
-	connect: () ->
-		refreshToken = @data.refreshToken()
-		# check if we need to get tokens for the client
-		procTokens = (err) =>
-			if err? then bigError err
-			@data.setRefreshToken @heello.refreshToken
-			@emit 'connected'
-		if !refreshToken?
-			# application not yet authorized...let's do this!
-			tokenInterceptor @tokenPort, (code) =>
-				@heello.getTokens code, procTokens
-			display 'auth'
-		else
-			@heello.refreshTokens refreshToken, procTokens
-	heartbeat: () ->
-		@emit 'heartbeat'
-		# todo - leverage heartbeat to update timelines as necessary
-	@filter: () ->
-		# todo
+		@profile = null
 
 class dataCache
 	constructor: (@client) ->
@@ -64,13 +72,6 @@ class dataCache
 			listeners: 0
 			listening: 0
 			# filters: 0
-
-	refreshToken: () ->
-		if !@refresh? then @refresh = localStorage.getItem 'refreshToken'
-		return @refresh
-	setRefreshToken: (@refresh) ->
-		localStorage.setItem 'refreshToken', @refresh
-		return null
 	ping: (pingId, fn) ->
 		# todo
 		# fetch pings...?
@@ -84,7 +85,6 @@ class dataCache
 		# todo
 	home: (fn) ->
 		# todo
-
 	notifications: (fn) ->
 		# todo
 		# fetch latest "notifications"...?
@@ -103,14 +103,18 @@ class dataCache
 		# todo
 
 class viewport
-	constructor: (@client) ->
+	constructor: (@user) ->
 		@timelines: {}
+		@visible = 1
+		@first = 0
 	addTimeline: (timeline) ->
+		@timelines[timeline.type + '_' + ] = timeline
+	removeTimeline: (timeline) ->
 	scrollTo: (timeline) ->
 		# todo
 
 class timeline
-	constructor: (@client, type) ->
+	constructor: (@user, type) ->
 		if type is 'home'
 			@client.on 'newPing', addEntry
 		else if type is 'notify'
@@ -118,10 +122,11 @@ class timeline
 		else if type is 'mentions'
 			@client.on 'newMention', addEntry
 		else if type is 'private'
-			@client.on 'newPingPrivate'
+			@client.on 'newPingPrivate', addEntry
 	addEntry: (entry) ->
 	removeEntry: (entry) ->
 	getEntry: (entry) ->
+	getEntries: () ->
 	page: (offset, length) ->
 		# todo
 

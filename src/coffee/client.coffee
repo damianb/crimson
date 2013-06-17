@@ -9,6 +9,18 @@ crimson.on 'connected', () ->
 crimson.on 'connected', () ->
 	console.log 'connected!'
 
+crimson.on 'connected', (client) ->
+	client.users.me (err, json, res) ->
+		if err then bigError(err)
+		client.me = json
+
+# todo - replace auth display with an entirely different window?
+crimson.on 'pendingAuth', () ->
+	if Object.keys(crimson.users).length is 0
+		display 'auth'
+	else
+		# todo
+
 ###
 crimson.timelines.home.on 'newPing', (ping) ->
 	# todo react, append!
