@@ -20,31 +20,8 @@ class _crimson extends EventEmitter
 	connectAll: () ->
 		@connect token for token in @tokenStore
 	connect: (refreshToken) ->
-		user = new cUser @
-		procTokens = (err) =>
-			if err? then bigError err
-			@tokenStore.push user.heello.refreshToken
-			@updateTokenStore()
-			user.heello.users.me (err, json) =>
-				id = json.response.id
-				user.profile = json.response
-				@users[id] = user
-				@emit 'connected', user
-		# check if we need to get tokens for the account
-		if !refreshToken?
-			# application not yet authorized...let's do this!
-			tokenInterceptor @tokenPort, (code) =>
-				user.heello.getTokens code, procTokens
-			@emit 'pendingAuth', user
-		else
-			user.heello.refreshTokens refreshToken, procTokens
-		# todo - leverage heartbeat to update timelines as necessary
-	@filter: () ->
-		# todo
-
-class cUser
-	constructor: (@crimson) ->
-		@heello = new heelloApi {
+		# init an object for the user
+		heello = new heelloApi {
 			# ignore the obfuscation, it's necessary due to automated code scanners
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
 			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
@@ -52,8 +29,31 @@ class cUser
 			userAgent: 'crimson-client'
 			# todo: somehow get current pkg.version! D:
 		}
-		@data = new dataCache @
-		@profile = null
+		user =
+			crimson: @
+			heello: heello
+			data: null
+			profile: null
+		user.data = new dataCache user
+		procTokens = (err) =>
+			if err? then bigError err
+			@tokenStore.push heello.refreshToken
+			@updateTokenStore()
+			heello.users.me (err, json) =>
+				user.profile = json.response
+				@users[json.response.id] = user
+				@emit 'connected', user
+
+		# check if we need to get tokens for the account
+		if !refreshToken?
+			# application not yet authorized...let's do this!
+			tokenInterceptor @tokenPort, (code) =>
+				heello.getTokens code, procTokens
+			@emit 'pendingAuth', user
+		else
+			heello.refreshTokens refreshToken, procToken
+	@filter: () ->
+		# todo
 
 class dataCache
 	constructor: (@client) ->
@@ -104,11 +104,11 @@ class dataCache
 
 class viewport
 	constructor: (@user) ->
-		@timelines: {}
+		@timelines = {}
 		@visible = 1
 		@first = 0
 	addTimeline: (timeline) ->
-		@timelines[timeline.type + '_' + ] = timeline
+		@timelines[timeline.type + '_' + @user.profile.id] = timeline
 	removeTimeline: (timeline) ->
 	scrollTo: (timeline) ->
 		# todo
