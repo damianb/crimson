@@ -16,9 +16,11 @@ crimson.on 'connected', (client) ->
 
 # todo - replace auth display with an entirely different window?
 crimson.on 'pendingAuth', () ->
-	if Object.keys(crimson.users).length is 0
-		display 'auth'
-	else
+
+	#if Object.keys(crimson.users).length is 0
+		#display 'auth'
+
+	#else
 		# todo
 
 ###
