@@ -7,21 +7,22 @@ url = require 'url'
 os = require 'os'
 gui = require 'nw.gui'
 
+DEBUG = true
+
 class _crimson extends EventEmitter
 	constructor: () ->
 		@users = {}
+		@interceptors = 0
 		@tokenPort = 33233  #todo see how common this port is in use...
 		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
 		@heartbeat = null # this will hold a setInterval reference.
+		# the below is for special unauthenticated stuff only
+		@heello = @getApi()
+		@authURI = @heello.getAuthURI '0000'
 		if !@tokenStore? then @tokenStore = []
 		super()
-	updateTokenStore: () ->
-		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
-	connectAll: () ->
-		@connect token for token in @tokenStore
-	connect: (refreshToken) ->
-		# init an object for the user
-		heello = new heelloApi {
+	getApi: () ->
+		return new heelloApi {
 			# ignore the obfuscation, it's necessary due to automated code scanners
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
 			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
@@ -29,31 +30,67 @@ class _crimson extends EventEmitter
 			userAgent: 'crimson-client'
 			# todo: somehow get current pkg.version! D:
 		}
+	updateTokenStore: () ->
+		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
+	connectAll: () ->
+		if Object.keys(@users).length is 0
+			@connect() # initial authorization needed
+		else
+			@connect token for token in @tokenStore
+	connect: (refreshToken) ->
+		# init an object for the user
+		api = @getApi()
 		user =
 			crimson: @
-			heello: heello
+			api: api
 			data: null
 			profile: null
+			heartbeatBinds: []
 		user.data = new dataCache user
 		procTokens = (err) =>
 			if err? then bigError err
-			@tokenStore.push heello.refreshToken
+			@tokenStore.push api.refreshToken
 			@updateTokenStore()
-			heello.users.me (err, json) =>
+			api.users.me (err, json) =>
 				user.profile = json.response
+				first = Object.keys(@users).length is 0
 				@users[json.response.id] = user
-				@emit 'connected', user
+				# rock and roll!
+				@emit 'user.ready', user, first
 
 		# check if we need to get tokens for the account
 		if !refreshToken?
 			# application not yet authorized...let's do this!
-			tokenInterceptor @tokenPort, (code) =>
-				heello.getTokens code, procTokens
-			@emit 'pendingAuth', user
+			@tokenInterceptor (code) =>
+				api.getTokens code, procTokens
+			@emit 'auth.pending', user
 		else
-			heello.refreshTokens refreshToken, procToken
+			api.refreshTokens refreshToken, procToken
+	tokenInterceptor: (fn) ->
+		# interceptor queue, so that we don't waste an HTTP server when we need one
+		if interceptors is 0
+			server = http.createServer((req, res) =>
+				# obtain refresh & access token now with token exchange...
+				code = url.parse(req.url, true).query.code
+				@emit 'auth.got'
+				fn code
+				res.writeHead 200, {'Content-Type': 'text/html'}
+				res.end '<!DOCTYPE html><html><head><title>Authorization successful</title></head><body><h2>Authorization successful</h2><p>You may now close this window.</p><script>window.close();</script></body></html>\n'
+				server.close () ->
+					interceptors--
+			).listen @tokenPort
+		@interceptors++
+	kickstart: () ->
+		if !@heartbeat?
+			@heartbeat = setInterval () =>
+				@emit 'heartbeat'
+			, 5 * 1000
+	halt: () ->
+		if @heartbeat?
+			clearInterval @heartbeat
 	@filter: () ->
 		# todo
+
 
 class dataCache
 	constructor: (@client) ->
@@ -102,6 +139,7 @@ class dataCache
 	update: (type, data) ->
 		# todo
 
+
 class viewport
 	constructor: (@user) ->
 		@timelines = {}
@@ -112,6 +150,7 @@ class viewport
 	removeTimeline: (timeline) ->
 	scrollTo: (timeline) ->
 		# todo
+
 
 class timeline
 	constructor: (@user, type) ->
@@ -129,15 +168,5 @@ class timeline
 	getEntries: () ->
 	page: (offset, length) ->
 		# todo
-
-tokenInterceptor = (port, fn) ->
-	server = http.createServer((req, res) ->
-		# obtain refresh & access token now with token exchange...
-		code = url.parse(req.url, true).query.code
-		fn code
-		res.writeHead 200, {'Content-Type': 'text/html'}
-		res.end '<!DOCTYPE html><html><head><title>Authorization successful</title></head><body><h2>Authorization successful</h2><p>You may now close this window.</p><script>window.close();</script></body></html>\n'
-		server.close()
-	).listen port
 
 crimson = new _crimson()

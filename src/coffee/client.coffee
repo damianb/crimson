@@ -1,27 +1,17 @@
-crimson.on 'connected', () ->
-	display 'client'
-	column 'home'
-	crimson.heartbeat()
-	setInterval () ->
-		crimson.heartbeat()
-	, 5 * 1000
+# todo refactor for multi-user
+crimson.on 'user.ready', (user, first) ->
+	crimson.kickstart()
+	# if the first user to connect...
+	if first
+		display 'client'
+		column 'home'
 
-crimson.on 'connected', () ->
+crimson.on 'user.ready', () ->
 	console.log 'connected!'
 
-crimson.on 'connected', (client) ->
-	client.users.me (err, json, res) ->
-		if err then bigError(err)
-		client.me = json
-
-# todo - replace auth display with an entirely different window?
-crimson.on 'pendingAuth', () ->
-
-	#if Object.keys(crimson.users).length is 0
-		#display 'auth'
-
-	#else
-		# todo
+crimson.on 'auth.pending', () ->
+	if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
+		display 'auth'
 
 ###
 crimson.timelines.home.on 'newPing', (ping) ->
