@@ -31,25 +31,27 @@ $('button#private').on 'click', null, () ->
 		crimson.ui.counters['#pingText'].max = 200
 	crimson.ui.counters['#pingText'].charCount()
 
-$().ready(() ->
+$().ready () ->
 	$('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 	display 'load'
 	display 'client'
 	column 'home'
 	#crimson.connect()
-)
+
 
 crimson.on 'user.ready', (user, first) ->
-	crimson.kickstart()
-	# if the first user to connect...
+	# if the first user to connect, we need to display the client chrome and the home column
 	if first
 		display 'client'
 		column 'home'
+	# kickstart the heart!
+	crimson.kickstart()
 
 crimson.on 'user.ready', () ->
 	console.log 'connected!'
 
 crimson.on 'auth.pending', () ->
+	# display the auth chrome if we don't have any tokens
 	if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
 		display 'auth'
 

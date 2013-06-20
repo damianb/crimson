@@ -9,11 +9,17 @@ gui = require 'nw.gui'
 
 DEBUG = true
 
+Array::remove = (from, to) ->
+	rest = @slice (to or from) + 1 or @length
+	@length = if from < 0 then @length + from else from
+	return @push.apply @, rest
+
 class _crimson extends EventEmitter
 	constructor: () ->
 		@ui = null
 		@users = {}
 		@interceptors = 0
+		@interceptor = null
 		@tokenPort = 33233  #todo see how common this port is in use...
 		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
 		@heartbeat = null # this will hold a setInterval reference.
@@ -34,16 +40,20 @@ class _crimson extends EventEmitter
 		# init an object for the user
 		api = _crimson.getApi()
 		user =
-			crimson: @
 			api: api
+			crimson: @
 			data: null
 			profile: null
-			heartbeatBinds: []
-		user.data = new dataCache user
+		user.data = new dataStream @, user, api
 		procTokens = (err) =>
 			if err? then bigError err
 			@tokenStore.push api.refreshToken
 			@updateTokenStore()
+			api.on 'newTokens', (oldRefreshToken, newRefreshToken) =>
+				if @tokenStore.indexOf(oldRefreshToken) isnt -1
+					@tokenStore.remove @tokenStore.indexOf oldRefreshToken
+				@tokenStore.push newRefreshToken
+				@updateTokenStore()
 			api.users.me (err, json) =>
 				user.profile = json.response
 				first = Object.keys(@users).length is 0
@@ -61,26 +71,39 @@ class _crimson extends EventEmitter
 			api.refreshTokens refreshToken, procToken
 	tokenInterceptor: (fn) ->
 		# interceptor queue, so that we don't waste an HTTP server when we need one
-		if interceptors is 0
-			server = http.createServer((req, res) =>
+		if @interceptors is 0
+			@interceptor = http.createServer((req, res) =>
 				# obtain refresh & access token now with token exchange...
 				code = url.parse(req.url, true).query.code
 				@emit 'auth.got'
 				fn code
 				res.writeHead 200, {'Content-Type': 'text/html'}
 				res.end '<!DOCTYPE html><html><head><title>Authorization successful</title></head><body><h2>Authorization successful</h2><p>You may now close this window.</p><script>window.close();</script></body></html>\n'
-				server.close () ->
+				@interceptor.close () ->
 					interceptors--
 			).listen @tokenPort
 		@interceptors++
+	# start client heartbeat
 	kickstart: () ->
 		if !@heartbeat?
 			@heartbeat = setInterval () =>
 				@emit 'heartbeat'
 			, 5 * 1000
+	# stop client heartbeat
 	halt: () ->
 		if @heartbeat?
 			clearInterval @heartbeat
+	# shutdown procedures - should handle cleanup
+	__destroy: () ->
+		# stop heartbeat
+		@halt()
+		# ensure token store is completely up to date
+		@updateTokenStore()
+		# nuke interceptor server if it's running
+		if @interceptor?
+			@interceptor.close () ->
+				interceptors--
+		user.data.__destroy() for user of @users
 	@getApi: () ->
 		return new heelloApi {
 			# ignore the obfuscation, it's necessary due to automated code scanners
@@ -94,23 +117,50 @@ class _crimson extends EventEmitter
 		# todo
 
 
-class dataCache
-	constructor: (@client) ->
+class dataStream extends EventEmitter
+	constructor: (@client, @_user, @api) ->
 		minute = 60 * 1000
-		@stalePingAge = 30 * minute
-		@staleMeAge = 30 * minute
-		@staleUserAge = 5 * minute
-		@staleListeningAge = 10 * minute
-		@staleListenerAge = 10 * minute
-		@staleHomeAge = 1 * minute
-		@staleNotifyAge = 1 * minute
+		@staleAge =
+			ping: 30 * minute
+			me: 30 * minute
+			home: 1 * minute
+			notify: 1 * minute
+			user: 5 * minute
+			listening: 10 * minute
+			listeners: 10 * minute
+			blocked: 30 * minute
 		@last =
 			home: 0
 			notify: 0
 			me: 0
-			listeners: 0
 			listening: 0
+			listeners: 0
+			blocked: 0
 			# filters: 0
+
+		# binds against crimson.heartbeat
+		@binds = []
+		super()
+
+		@on 'newListener', () ->
+			# todo
+	translator: (event)
+		heartbeatType = switch
+			when event is 'ping.new' or event is 'ping.new.private'
+				# heello.users.timeline
+			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new'
+				# heello.users.notifications
+			when event.match(/^user\.ping/) or event.match(/^user\.echo/)
+				# heello.users.pings
+		if EventEmitter.listenerCount(@, event) is 0
+			# bind new heartbeat event
+	__destroy: () ->
+		@emit '__destroy'
+		@client.removeListener 'heartbeat', listener for listener in @binds
+		@api = null
+		# todo
+
+###
 	ping: (pingId, fn) ->
 		# todo
 		# fetch pings...?
@@ -140,10 +190,10 @@ class dataCache
 		# todo
 	update: (type, data) ->
 		# todo
-
+###
 
 class viewport
-	constructor: (@user) ->
+	constructor: () ->
 		@timelines = {}
 		@visible = 1
 		@first = 0
@@ -151,25 +201,6 @@ class viewport
 		@timelines[timeline.type + '_' + @user.profile.id] = timeline
 	removeTimeline: (timeline) ->
 	scrollTo: (timeline) ->
-		# todo
-
-
-class timeline
-	constructor: (@user, type) ->
-		if type is 'home'
-			@client.on 'newPing', addEntry
-		else if type is 'notify'
-			@client.on 'newNotify', addEntry
-		else if type is 'mentions'
-			@client.on 'newMention', addEntry
-		else if type is 'private'
-			@client.on 'newPingPrivate', addEntry
-		@binds = {}
-	addEntry: (entry) ->
-	removeEntry: (entry) ->
-	getEntry: (entry) ->
-	getEntries: () ->
-	page: (offset, length) ->
 		# todo
 
 crimson = new _crimson()
