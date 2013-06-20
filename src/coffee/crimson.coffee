@@ -11,25 +11,18 @@ DEBUG = true
 
 class _crimson extends EventEmitter
 	constructor: () ->
+		@ui = null
 		@users = {}
 		@interceptors = 0
 		@tokenPort = 33233  #todo see how common this port is in use...
 		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
 		@heartbeat = null # this will hold a setInterval reference.
 		# the below is for special unauthenticated stuff only
-		@heello = @getApi()
+		@heello = _crimson.getApi()
 		@authURI = @heello.getAuthURI '0000'
 		if !@tokenStore? then @tokenStore = []
 		super()
-	getApi: () ->
-		return new heelloApi {
-			# ignore the obfuscation, it's necessary due to automated code scanners
-			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
-			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
-			callbackURI: "http://127.0.0.1:#{@tokenPort}"
-			userAgent: 'crimson-client'
-			# todo: somehow get current pkg.version! D:
-		}
+
 	updateTokenStore: () ->
 		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
 	connectAll: () ->
@@ -39,7 +32,7 @@ class _crimson extends EventEmitter
 			@connect token for token in @tokenStore
 	connect: (refreshToken) ->
 		# init an object for the user
-		api = @getApi()
+		api = _crimson.getApi()
 		user =
 			crimson: @
 			api: api
@@ -88,6 +81,15 @@ class _crimson extends EventEmitter
 	halt: () ->
 		if @heartbeat?
 			clearInterval @heartbeat
+	@getApi: () ->
+		return new heelloApi {
+			# ignore the obfuscation, it's necessary due to automated code scanners
+			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
+			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
+			callbackURI: "http://127.0.0.1:#{@tokenPort}"
+			userAgent: 'crimson-client'
+			# todo: somehow get current pkg.version! D:
+		}
 	@filter: () ->
 		# todo
 
@@ -162,6 +164,7 @@ class timeline
 			@client.on 'newMention', addEntry
 		else if type is 'private'
 			@client.on 'newPingPrivate', addEntry
+		@binds = {}
 	addEntry: (entry) ->
 	removeEntry: (entry) ->
 	getEntry: (entry) ->
