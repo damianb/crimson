@@ -28,7 +28,7 @@ files =
 		'ui'
 	]
 	copy: [
-		# todo
+		'templates/timeline.jade'
 	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
