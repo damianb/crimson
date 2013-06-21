@@ -142,37 +142,43 @@ class dataStream extends EventEmitter
 		@binds = {}
 		super()
 
-		@on 'newListener', @translator
+		@on 'newListener', @bind
+		@on 'removeListener', @unbind
 	translator: (event)
-		# type is a name to prevent bind-collisions
-		# newListener is the actual listener that will be forwarding dispatch
-		[type, newListener] = switch
-			when event is 'ping.new' or event is 'ping.new.private'
-				[
-					'users.timeline',
-					() =>
-						@api.users.timeline @forwardArray
-				]
-			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine'
-				# heello.users.notifications
-				[
-					'users.notifications',
-					() =>
-						@api.users.notifications @forwardArray
-				]
+		# we're grabbing the name of the true query to prevent bind-collisions
+		return switch
+			when event is 'ping.new' or event is 'ping.new.private' then 'users.timeline'
+			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine' then 'users.notifications'
 			when event.match(/^user\.(?:ping|echo)\.([0-9]+)$/)
-				uid = user.match(/^user\.(?:ping|echo)\.([0-9]+)$/)[1]
-				[
-					'users.pings.' + uid
-					() =>
-						# todo - paging?
-						@api.users.pings { ':id': uid }, @forwardArray
-				]
+			else false
+
+				'users.pings.' + user.match(/^user\.(?:ping|echo)\.([0-9]+)$/)[1]
 			# todo more listener types
-		if EventEmitter.listenerCount(@, newListener) is 0
-			# bind new heartbeat event
+	bind (event) ->
+		type = @translator event
+		if type is false then return
+		# newListener is the actual listener that will be forwarding dispatches
+		newListener = switch
+			when event is 'users.timeline'
+				() =>
+					@api.users.timeline @forwardArray
+			when event is 'users.notifications'
+				() =>
+					@api.users.notifications @forwardArray
+			when event.match(/^users\.pings\./)
+				uid = event.split('.').pop()
+				() =>
+					# todo - paging?
+					@api.users.pings { ':id': uid }, @forwardArray
+		if !@binds[type]?
 			@binds[type] = newListener
 			@client.on 'heartbeat', newListener
+	unbind: (event) ->
+		type = @translator event
+		if type is false then return
+		if @binds[type]?
+			@client.removeListener 'heartbeat', @binds[type]
+			delete @binds[type]
 	forwardArray: (err, json, res) ->
 		if err then return @client.ui.logError err
 		# todo - iterate over json.response.[] and dispatch!
@@ -228,7 +234,9 @@ class viewport
 		# todo
 
 class timeline
-	constructor: (@user, type) ->
+	constructor: (@client, @user, type) ->
+		@binds = {}
+		@clientBinds = []
 		@bind '__destroy', @__destroy
 		if type is 'home'
 			@bind 'ping.new', addEntry
@@ -239,7 +247,7 @@ class timeline
 			@bind 'mention.new', addEntry
 		else if type is 'private'
 			@bind 'ping.new.private', addEntry
-		@binds = {}
+
 	addEntry: (entry) ->
 	removeEntry: (entry) ->
 	getEntry: (entry) ->
@@ -249,9 +257,10 @@ class timeline
 	bind: (event, listener) ->
 		# todo
 		@binds[event] = listener
-		@client.on event, listener
+		@user.data.on event, listener
 	__destroy: () ->
 		# remove listeners before we seppuku...
-		@client.removeListener bind, listener for bind, listener of @binds
+		@client.removeListener bind, listener for bind, listener of @clientBinds
+		@user.data.removeListener bind, listener for bind, listener of @clientBinds
 
 crimson = new _crimson()
