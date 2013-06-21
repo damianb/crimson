@@ -26,6 +26,8 @@ to run the application, cd to project directory and launch the build directory w
 
 ### todo
 
-storage? sqlite, websql, indexdb?
-
-plugin struct or ignore plugins?
+* finish multi-column, multi-user support
+* add NeDB support for storage
+* settings menus
+* navigation icons
+* logo

@@ -187,7 +187,7 @@ class dataStream extends EventEmitter
 	__destroy: () ->
 		@emit '__destroy'
 		@client.removeListener 'heartbeat', bindType, listener for listener in @binds
-		@api = null
+		@client = @_user = @api = null
 		# todo
 
 ###
@@ -262,5 +262,6 @@ class timeline
 		# remove listeners before we seppuku...
 		@client.removeListener bind, listener for bind, listener of @clientBinds
 		@user.data.removeListener bind, listener for bind, listener of @clientBinds
+		@client = @user = null
 
 crimson = new _crimson()
