@@ -145,15 +145,22 @@ class dataStream extends EventEmitter
 		@on 'newListener', () ->
 			# todo
 	translator: (event)
-		heartbeatType = switch
+		newListener = switch
 			when event is 'ping.new' or event is 'ping.new.private'
 				# heello.users.timeline
+				() =>
+					@api.users.timeline @forwardArray
 			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new'
 				# heello.users.notifications
 			when event.match(/^user\.ping/) or event.match(/^user\.echo/)
 				# heello.users.pings
 		if EventEmitter.listenerCount(@, event) is 0
 			# bind new heartbeat event
+	forwardArray: (err, json, res) ->
+		if err then return @client.ui.logError err
+		# todo - iterate over json.response.[] and dispatch!
+	forwardSingle: (err, json, res) ->
+		# todo
 	__destroy: () ->
 		@emit '__destroy'
 		@client.removeListener 'heartbeat', listener for listener in @binds

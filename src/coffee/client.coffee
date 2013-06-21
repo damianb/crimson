@@ -38,13 +38,16 @@ $().ready () ->
 	column 'home'
 	#crimson.connect()
 
+###
+client event binds
+###
 
 crimson.on 'user.ready', (user, first) ->
 	# if the first user to connect, we need to display the client chrome and the home column
 	if first
 		display 'client'
 		column 'home'
-	# kickstart the heart!
+	# kickstart my heart!
 	crimson.kickstart()
 
 crimson.on 'user.ready', () ->

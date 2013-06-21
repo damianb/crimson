@@ -62,6 +62,8 @@ class ui
 	bigError: (msg) ->
 		$('#errormsg').val msg
 		display 'fatal'
+	logError: (msg) ->
+		console.log "error: #{msg}"
 	insertTimeline: (template, entries) ->
 
 
