@@ -147,12 +147,14 @@ class dataStream extends EventEmitter
 	translator: (event)
 		# we're grabbing the name of the true query to prevent bind-collisions
 		return switch
-			when event is 'ping.new' or event is 'ping.new.private' then 'users.timeline'
-			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine' then 'users.notifications'
+			when event is 'ping.new' or event is 'ping.new.private' or event is 'echo.new'
+				'users.timeline'
+			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine'
+				'users.notifications'
 			when event.match(/^user\.(?:ping|echo)\.([0-9]+)$/)
+				uid = event.split('.').pop()
+				'users.pings.' + uid
 			else false
-
-				'users.pings.' + user.match(/^user\.(?:ping|echo)\.([0-9]+)$/)[1]
 			# todo more listener types
 	bind (event) ->
 		type = @translator event
@@ -179,6 +181,7 @@ class dataStream extends EventEmitter
 		if @binds[type]?
 			@client.removeListener 'heartbeat', @binds[type]
 			delete @binds[type]
+			# todo delete entry in @last if necessary
 	forwardArray: (err, json, res) ->
 		if err then return @client.ui.logError err
 		# todo - iterate over json.response.[] and dispatch!
@@ -190,59 +193,61 @@ class dataStream extends EventEmitter
 		@client = @_user = @api = null
 		# todo
 
-###
-	ping: (pingId, fn) ->
-		# todo
-		# fetch pings...?
-	user: (user, fn) ->
-		# todo
-		# fetch user data from local storage, refresh cache if local storage too "stale"
-	userTimeline: (fn) ->
-		# todo
-		# fetch other user's previous tweets... 5 minute cache? shorter?
-	me: (fn) ->
-		# todo
-	home: (fn) ->
-		# todo
-	notifications: (fn) ->
-		# todo
-		# fetch latest "notifications"...?
-	listeners: (fn) ->
-		# todo
-		# fetch latest "listeners"
-	listening: (fn) ->
-		# todo
-		# fetch latest "listening"
-	ignored: (fn) ->
-		# todo
-		# fetch "ignored" users from local storage...this acts as a frontend for filters against user accounts
-	filters: (fn) ->
-		# todo
-	update: (type, data) ->
-		# todo
-###
-
+## todo: move to ui?
 class viewport
 	constructor: () ->
 		@timelines = {}
 		@visible = 1
 		@first = 0
+		@minWidth = 150
 	addTimeline: (timeline) ->
 		@timelines[timeline.type + '_' + @user.profile.id] = timeline
 	removeTimeline: (timeline) ->
 	scrollTo: (timeline) ->
 		# todo
+	resize: () ->
+		# todo
 
+#
+# todo: refactor timeline so that it can bind to multiple users *properly*
+# perhaps this means we need to use a special structure in binds?
+#
+# binds: {
+# 'userid': {
+#   'bindname': bindfn
+#  }
+# }
+#
 class timeline
 	constructor: (@client, @user, type) ->
 		@binds = {}
-		@clientBinds = []
+		@clientBinds = {}
 		@bind '__destroy', @__destroy
-		if type is 'home'
+		# note!
+		#
+		# there is a critical design flaw with the following...
+		# superhome and supernotify bind to the main client (crimson) which will
+		# not result in translation to additional queries!
+		#
+		# this needs to be worked around somehow so that a timeline can bind to multiple or all users.
+		if type is 'superhome'
+			@clientBind 'ping.new', addEntry
+			@clientBind 'ping.new.mine', addEntry
+			@clientBind 'ping.new.private', addEntry
+			@clientBind 'echo.new', addEntry
+			@clientBind 'mention.new', addEntry
+		else if type is 'supernotify' # probably not as useful of a type...
+			@clientBind 'mention.new', addEntry
+			@clientBind 'listener.new', addEntry
+			@clientBind 'echo.new.mine', addEntry
+		else if type is 'home'
 			@bind 'ping.new', addEntry
 			@bind 'ping.new.private', addEntry
+			@bind 'echo.new', addEntry
 		else if type is 'notify'
-			@bind 'ping.notify', addEntry
+			@bind 'mention.new', addEntry
+			@bind 'listener.new', addEntry
+			@bind 'echo.new.mine', addEntry
 		else if type is 'mentions'
 			@bind 'mention.new', addEntry
 		else if type is 'private'
@@ -255,9 +260,13 @@ class timeline
 	page: (offset, length) ->
 		# todo
 	bind: (event, listener) ->
-		# todo
-		@binds[event] = listener
-		@user.data.on event, listener
+		if !@binds[event]?
+			@binds[event] = listener
+			@user.data.on event, listener
+	clientBind: (event, listener) ->
+		if !@clientBinds[event]?
+			@clientBinds[event] = listener
+			@client.on event, listener
 	__destroy: () ->
 		# remove listeners before we seppuku...
 		@client.removeListener bind, listener for bind, listener of @clientBinds
