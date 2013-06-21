@@ -139,23 +139,40 @@ class dataStream extends EventEmitter
 			# filters: 0
 
 		# binds against crimson.heartbeat
-		@binds = []
+		@binds = {}
 		super()
 
-		@on 'newListener', () ->
-			# todo
+		@on 'newListener', @translator
 	translator: (event)
-		newListener = switch
+		# type is a name to prevent bind-collisions
+		# newListener is the actual listener that will be forwarding dispatch
+		[type, newListener] = switch
 			when event is 'ping.new' or event is 'ping.new.private'
-				# heello.users.timeline
-				() =>
-					@api.users.timeline @forwardArray
-			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new'
+				[
+					'users.timeline',
+					() =>
+						@api.users.timeline @forwardArray
+				]
+			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine'
 				# heello.users.notifications
-			when event.match(/^user\.ping/) or event.match(/^user\.echo/)
-				# heello.users.pings
-		if EventEmitter.listenerCount(@, event) is 0
+				[
+					'users.notifications',
+					() =>
+						@api.users.notifications @forwardArray
+				]
+			when event.match(/^user\.(?:ping|echo)\.([0-9]+)$/)
+				uid = user.match(/^user\.(?:ping|echo)\.([0-9]+)$/)[1]
+				[
+					'users.pings.' + uid
+					() =>
+						# todo - paging?
+						@api.users.pings { ':id': uid }, @forwardArray
+				]
+			# todo more listener types
+		if EventEmitter.listenerCount(@, newListener) is 0
 			# bind new heartbeat event
+			@binds[type] = newListener
+			@client.on 'heartbeat', newListener
 	forwardArray: (err, json, res) ->
 		if err then return @client.ui.logError err
 		# todo - iterate over json.response.[] and dispatch!
@@ -163,7 +180,7 @@ class dataStream extends EventEmitter
 		# todo
 	__destroy: () ->
 		@emit '__destroy'
-		@client.removeListener 'heartbeat', listener for listener in @binds
+		@client.removeListener 'heartbeat', bindType, listener for listener in @binds
 		@api = null
 		# todo
 
@@ -209,5 +226,32 @@ class viewport
 	removeTimeline: (timeline) ->
 	scrollTo: (timeline) ->
 		# todo
+
+class timeline
+	constructor: (@user, type) ->
+		@bind '__destroy', @__destroy
+		if type is 'home'
+			@bind 'ping.new', addEntry
+			@bind 'ping.new.private', addEntry
+		else if type is 'notify'
+			@bind 'ping.notify', addEntry
+		else if type is 'mentions'
+			@bind 'mention.new', addEntry
+		else if type is 'private'
+			@bind 'ping.new.private', addEntry
+		@binds = {}
+	addEntry: (entry) ->
+	removeEntry: (entry) ->
+	getEntry: (entry) ->
+	getEntries: () ->
+	page: (offset, length) ->
+		# todo
+	bind: (event, listener) ->
+		# todo
+		@binds[event] = listener
+		@client.on event, listener
+	__destroy: () ->
+		# remove listeners before we seppuku...
+		@client.removeListener bind, listener for bind, listener of @binds
 
 crimson = new _crimson()
