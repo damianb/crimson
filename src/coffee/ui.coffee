@@ -1,7 +1,7 @@
 # todo: refactor into overall "ui" object for managing the ui.
 
 class ui
-	constructor: () ->
+	constructor: ->
 		@pingTemplate = fs.readFileSync '../templates/timeline.jade'
 		@counters = {}
 		@throbInterval = null
@@ -23,7 +23,7 @@ class ui
 			field: field
 			display: display
 			max: max
-			charCount: () ->
+			charCount: ->
 				warn = counterData.max - (counterData.max / 5)
 				text = counterData.field.val()
 				switch
@@ -35,10 +35,10 @@ class ui
 				return null
 
 		field.bind 'keydown keyup keypress', counterData.charCount
-		field.bind 'focus paste', () =>
+		field.bind 'focus paste', =>
 			setTimeout counterData.charCount, 10
 			return null
-		field.bind 'blur', () =>
+		field.bind 'blur', =>
 			if field.val().length is 0
 				display.stop().fadeTo('fast', 0)
 			return false
@@ -47,7 +47,7 @@ class ui
 	loadThrob: (start = true) ->
 		if !!start
 			current = length = 1
-			throbFn = () =>
+			throbFn = =>
 				if current is 5
 					current = 1
 				$('.throbber span').removeClass 'pulse'
@@ -65,6 +65,5 @@ class ui
 	logError: (msg) ->
 		console.log "error: #{msg}"
 	insertTimeline: (template, entries) ->
-
 
 crimson.ui = new ui()

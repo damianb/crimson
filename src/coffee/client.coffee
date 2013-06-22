@@ -31,7 +31,7 @@ $('button#private').on 'click', null, () ->
 		crimson.ui.counters['#pingText'].max = 200
 	crimson.ui.counters['#pingText'].charCount()
 
-$().ready () ->
+$().ready ->
 	$('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
 	display 'load'
 	display 'client'
@@ -50,16 +50,13 @@ crimson.on 'user.ready', (user, first) ->
 	# kickstart my heart!
 	crimson.kickstart()
 
-crimson.on 'user.ready', () ->
+crimson.on 'user.ready', ->
 	console.log 'connected!'
 
-crimson.on 'auth.pending', () ->
+crimson.on 'auth.pending', ->
 	# display the auth chrome if we don't have any tokens
 	if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
 		display 'auth'
-
-
-
 
 ###
 crimson.timelines.home.on 'newPing', (ping) ->
