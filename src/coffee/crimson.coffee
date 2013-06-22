@@ -15,7 +15,7 @@ Array::remove = (from, to) ->
 	return @push.apply @, rest
 
 class _crimson extends EventEmitter
-	constructor: () ->
+	constructor: ->
 		@ui = null
 		@users = {}
 		@interceptors = 0
@@ -29,9 +29,9 @@ class _crimson extends EventEmitter
 		if !@tokenStore? then @tokenStore = []
 		super()
 
-	updateTokenStore: () ->
+	updateTokenStore: ->
 		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
-	connectAll: () ->
+	connectAll: ->
 		if Object.keys(@users).length is 0
 			@connect() # initial authorization needed
 		else
@@ -43,6 +43,7 @@ class _crimson extends EventEmitter
 			api: api
 			crimson: @
 			data: null
+			id: null
 			profile: null
 		user.data = new dataStream @, user, api
 		procTokens = (err) =>
@@ -56,8 +57,9 @@ class _crimson extends EventEmitter
 				@updateTokenStore()
 			api.users.me (err, json) =>
 				user.profile = json.response
+				user.id = user.profile.id
 				first = Object.keys(@users).length is 0
-				@users[json.response.id] = user
+				@users[user.id] = user
 				# rock and roll!
 				@emit 'user.ready', user, first
 
@@ -79,32 +81,32 @@ class _crimson extends EventEmitter
 				fn code
 				res.writeHead 200, {'Content-Type': 'text/html'}
 				res.end '<!DOCTYPE html><html><head><title>Authorization successful</title></head><body><h2>Authorization successful</h2><p>You may now close this window.</p><script>window.close();</script></body></html>\n'
-				@interceptor.close () ->
+				@interceptor.close ->
 					interceptors--
 			).listen @tokenPort
 		@interceptors++
 	# start client heartbeat
-	kickstart: () ->
+	kickstart: ->
 		if !@heartbeat?
-			@heartbeat = setInterval () =>
+			@heartbeat = setInterval =>
 				@emit 'heartbeat'
 			, 5 * 1000
 	# stop client heartbeat
-	halt: () ->
+	halt: ->
 		if @heartbeat?
 			clearInterval @heartbeat
 	# shutdown procedures - should handle cleanup
-	__destroy: () ->
+	__destroy: ->
 		# stop heartbeat
 		@halt()
 		# ensure token store is completely up to date
 		@updateTokenStore()
 		# nuke interceptor server if it's running
 		if @interceptor?
-			@interceptor.close () ->
+			@interceptor.close ->
 				interceptors--
 		user.data.__destroy() for user of @users
-	@getApi: () ->
+	@getApi: ->
 		return new heelloApi {
 			# ignore the obfuscation, it's necessary due to automated code scanners
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
@@ -113,7 +115,7 @@ class _crimson extends EventEmitter
 			userAgent: 'crimson-client'
 			# todo: somehow get current pkg.version! D:
 		}
-	@filter: () ->
+	@filter: ->
 		# todo
 
 
@@ -144,7 +146,7 @@ class dataStream extends EventEmitter
 
 		@on 'newListener', @bind
 		@on 'removeListener', @unbind
-	translator: (event)
+	translator: (event) ->
 		# we're grabbing the name of the true query to prevent bind-collisions
 		return switch
 			when event is 'ping.new' or event is 'ping.new.private' or event is 'echo.new'
@@ -155,6 +157,7 @@ class dataStream extends EventEmitter
 				uid = event.split('.').pop()
 				'users.pings.' + uid
 			else false
+		return newEvent
 			# todo more listener types
 	bind (event) ->
 		type = @translator event
@@ -162,14 +165,14 @@ class dataStream extends EventEmitter
 		# newListener is the actual listener that will be forwarding dispatches
 		newListener = switch
 			when event is 'users.timeline'
-				() =>
+				=>
 					@api.users.timeline @forwardArray
 			when event is 'users.notifications'
-				() =>
+				=>
 					@api.users.notifications @forwardArray
 			when event.match(/^users\.pings\./)
 				uid = event.split('.').pop()
-				() =>
+				=>
 					# todo - paging?
 					@api.users.pings { ':id': uid }, @forwardArray
 		if !@binds[type]?
@@ -187,7 +190,7 @@ class dataStream extends EventEmitter
 		# todo - iterate over json.response.[] and dispatch!
 	forwardSingle: (err, json, res) ->
 		# todo
-	__destroy: () ->
+	__destroy: ->
 		@emit '__destroy'
 		@client.removeListener 'heartbeat', bindType, listener for listener in @binds
 		@client = @_user = @api = null
@@ -208,50 +211,38 @@ class viewport
 	resize: () ->
 		# todo
 
-#
-# todo: refactor timeline so that it can bind to multiple users *properly*
-# perhaps this means we need to use a special structure in binds?
-#
-# binds: {
-# 'userid': {
-#   'bindname': bindfn
-#  }
-# }
-#
 class timeline
-	constructor: (@client, @user, type) ->
+	constructor: (@client, type, @uid = null) ->
+		# note: @binds structure:
+		#
+		# binds: {
+		# 'userid': [
+		#	   'bindname',
+		#    'bindname',
+		#  ]
+		# }
 		@binds = {}
-		@clientBinds = {}
-		@bind '__destroy', @__destroy
-		# note!
-		#
-		# there is a critical design flaw with the following...
-		# superhome and supernotify bind to the main client (crimson) which will
-		# not result in translation to additional queries!
-		#
-		# this needs to be worked around somehow so that a timeline can bind to multiple or all users.
+
+		if !@uid? and (type isnt 'superhome' or type isnt 'supernotify')
+			throw new Error 'All timelines except super types must be provided a user'
+
+		# if we had a user object instead, we'd still need to pull out the uid, so meh. :p
+		if @uid?
+			@user = @client.users[@uid]
+			@user.data.on '__destroy', @__destroy
+
 		if type is 'superhome'
-			@clientBind 'ping.new', addEntry
-			@clientBind 'ping.new.mine', addEntry
-			@clientBind 'ping.new.private', addEntry
-			@clientBind 'echo.new', addEntry
-			@clientBind 'mention.new', addEntry
+			@bind 'ping.new', 'ping.new.mine', 'ping.new.private', 'echo.new', 'mention.new'
 		else if type is 'supernotify' # probably not as useful of a type...
-			@clientBind 'mention.new', addEntry
-			@clientBind 'listener.new', addEntry
-			@clientBind 'echo.new.mine', addEntry
+			@bind 'mention.new', 'listener.new', 'echo.new.mine'
 		else if type is 'home'
-			@bind 'ping.new', addEntry
-			@bind 'ping.new.private', addEntry
-			@bind 'echo.new', addEntry
+			@bind 'ping.new', 'ping.new.private', 'echo.new'
 		else if type is 'notify'
-			@bind 'mention.new', addEntry
-			@bind 'listener.new', addEntry
-			@bind 'echo.new.mine', addEntry
+			@bind 'mention.new', 'listener.new', 'echo.new.mine'
 		else if type is 'mentions'
-			@bind 'mention.new', addEntry
+			@bind 'mention.new'
 		else if type is 'private'
-			@bind 'ping.new.private', addEntry
+			@bind 'ping.new.private'
 
 	addEntry: (entry) ->
 	removeEntry: (entry) ->
@@ -259,18 +250,25 @@ class timeline
 	getEntries: () ->
 	page: (offset, length) ->
 		# todo
-	bind: (event, listener) ->
-		if !@binds[event]?
-			@binds[event] = listener
-			@user.data.on event, listener
-	clientBind: (event, listener) ->
-		if !@clientBinds[event]?
-			@clientBinds[event] = listener
-			@client.on event, listener
-	__destroy: () ->
+	bind: (events...) ->
+		for event in events then =>
+			if !@user?
+				for uid, user of @client.users then =>
+					if !@binds[uid]? then @binds[uid] = []
+					@binds[uid].push event
+					user.data.on event, @addEntry
+			else
+				if !@binds[event]?
+					# todo recode
+					if !@binds[@uid]? then @binds[@uid] = []
+					@binds[@uid].push event
+					@user.data.on event, @addEntry
+	__destroy: ->
 		# remove listeners before we seppuku...
-		@client.removeListener bind, listener for bind, listener of @clientBinds
-		@user.data.removeListener bind, listener for bind, listener of @clientBinds
+		for uid, binds of @binds then =>
+			for bind in binds then =>
+				@client.users[uid].data.removeListener bind, @addEntry
+		@binds = {}
 		@client = @user = null
 
 crimson = new _crimson()
