@@ -40,7 +40,7 @@ class dataStream extends EventEmitter
 			else false
 		return newEvent
 			# todo more listener types
-	bind (event) ->
+	bind: (event) ->
 		type = @translator event
 		if type is false then return
 		# newListener is the actual listener that will be forwarding dispatches
