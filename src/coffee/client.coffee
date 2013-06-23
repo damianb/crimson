@@ -38,9 +38,10 @@ crimson.on 'auth.pending', ->
  key binds
 ###
 
+
+$(document).on 'keydown', null, 'ctrl+F12', ->
+	DEBUG = !DEBUG
 if DEBUG #todo make this pkg.version dependent somehow
-	$(document).on 'keydown', null, 'ctrl+F12', ->
-		DEBUG = true
 	$(document).on 'keydown', null, 'ctrl+j', ->
 		win = gui.Window.get()
 		win.showDevTools()
@@ -68,6 +69,10 @@ $('button#private').on 'click', null, ->
 	else
 		crimson.ui.counters['#pingText'].max = 200
 	crimson.ui.counters['#pingText'].charCount()
+
+$(window).resize ->
+	# queue a redraw
+	crimson.ui.viewport.resize()
 
 $().ready ->
 	$('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
