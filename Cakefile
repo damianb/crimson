@@ -23,9 +23,12 @@ files =
 		'crimson'
 	]
 	coffee: [
-		'crimson'
 		'client'
+		'crimson'
+		'datastream'
+		'timeline'
 		'ui'
+		'viewport'
 	]
 	copy: [
 		'templates/timeline.jade'
