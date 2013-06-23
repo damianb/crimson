@@ -7,5 +7,6 @@ build/assets/js/datastream.*js
 build/assets/js/timeline.*js
 build/assets/js/ui.*js
 build/assets/js/viewport.*js
+build/assets/templates/*.jade
 build/assets/css/crimson.css
 build/*.html
