@@ -3,7 +3,6 @@ Array::remove = (from, to) ->
 	@length = if from < 0 then @length + from else from
 	return @push.apply @, rest
 
-
 gui = require 'nw.gui'
 crimson = require './crimson'
 crimson.ui = require './ui'

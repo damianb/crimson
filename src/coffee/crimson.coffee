@@ -94,6 +94,7 @@ class crimson extends EventEmitter
 		if @interceptor?
 			@interceptor.close ->
 				interceptors--
+		@emit '__destroy'
 		user.data.__destroy() for user of @users
 	@getApi: ->
 		return new heelloApi {
