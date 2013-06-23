@@ -37,13 +37,17 @@ class viewport
 		if numTimelines < maxTimelines then maxTimelines = numTimelines
 		timelineWidth = viewportWidth / numTimelines
 		overflowWidth = viewportWidth % numTimelines
-
 		viewportOffset = first * viewportWidth
 
-		# and now, resize (without animation for now, might change later)
-		$('.column').width(timelineWidth)
+		$('.column').animate({
+			width: timelineWidth + 'px'
+		}, 500)
+		$('#viewport').animate({
+			'margin-left': viewportOffset + 'px'
+		}, 500)
+		#$('.column').width(timelineWidth)
+		#$('#viewport').css('margin-left', viewportOffset + 'px')
 		$('.column-overflow').width(overflowWidth)
-		$('#viewport').css('margin-left', viewportOffset + 'px')
 		true
 
 module.exports = viewport
