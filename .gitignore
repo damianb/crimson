@@ -1,8 +1,11 @@
 node_modules/
 *.komodoproject
 nw/
-build/assets/js/crimson.*js
 build/assets/js/client.*js
+build/assets/js/crimson.*js
+build/assets/js/datastream.*js
+build/assets/js/timeline.*js
 build/assets/js/ui.*js
+build/assets/js/viewport.*js
 build/assets/css/crimson.css
 build/*.html
