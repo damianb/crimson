@@ -28,26 +28,26 @@ class viewport
 		# throttle resizing, webkit likes to send resize events as the window is being dragged,
 		# and not wait until the very end.
 		if @resizeTimer? then clearTimeout @resizeTimer
-		setTimeout @redraw, 800
+		setTimeout @redraw, 1500
 		true
-	redraw: ->
+	redraw: =>
 		numTimelines = Object.keys(@timelines).length
 		viewportWidth = $('#viewport').width()
-		maxTimelines = Math.floor(viewportWidth / minWidth)
+		maxTimelines = Math.floor(viewportWidth / @minWidth)
 		if numTimelines < maxTimelines then maxTimelines = numTimelines
 		timelineWidth = viewportWidth / numTimelines
 		overflowWidth = viewportWidth % numTimelines
-		viewportOffset = first * viewportWidth
+		viewportOffset = @first * viewportWidth
 
-		$('.column').animate({
-			width: timelineWidth + 'px'
-		}, 500)
-		$('#viewport').animate({
-			'margin-left': viewportOffset + 'px'
-		}, 500)
-		#$('.column').width(timelineWidth)
-		#$('#viewport').css('margin-left', viewportOffset + 'px')
-		$('.column-overflow').width(overflowWidth)
+		#$('.column').animate({
+		#	width: timelineWidth + 'px'
+		#}, 500)
+		#$('#viewport').animate({
+		#	'margin-left': viewportOffset + 'px'
+		#}, 500)
+		$('.column').css('width', timelineWidth + 'px')
+		$('#viewport').css('left', viewportOffset + 'px')
+		$('.column-overflow').css('width', overflowWidth + 'px')
 		true
 
 module.exports = viewport

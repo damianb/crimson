@@ -12,6 +12,7 @@ class crimson extends EventEmitter
 		@tokenPort = 33233  #todo see how common this port is in use...
 		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
 		@heartbeat = null # this will hold a setInterval reference.
+		@pkg = require './../../package.json'
 		# the below is for special unauthenticated stuff only
 		@heello = crimson.getApi()
 		@authURI = @heello.getAuthURI '0000'

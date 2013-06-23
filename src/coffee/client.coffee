@@ -5,7 +5,7 @@ Array::remove = (from, to) ->
 
 global.localStorage = localStorage
 global.$ = $
-global.gui = require 'nw.gui'
+global.gui = gui = require 'nw.gui'
 
 crimson = require './assets/js/crimson'
 crimson.ui = require './assets/js/ui'
@@ -41,15 +41,17 @@ crimson.on 'auth.pending', ->
 
 $(document).on 'keydown', null, 'ctrl+F12', ->
 	DEBUG = !DEBUG
-if DEBUG #todo make this pkg.version dependent somehow
-	$(document).on 'keydown', null, 'ctrl+j', ->
+
+$(document).on 'keydown', null, 'ctrl+j', ->
+	if DEBUG
 		win = gui.Window.get()
 		win.showDevTools()
-		return null
-	$(document).on 'keydown', null, 'ctrl+r', ->
+	return null
+$(document).on 'keydown', null, 'ctrl+r', ->
+	if DEBUG
 		win = gui.Window.get()
 		win.reloadIgnoringCache()
-		return null
+	return null
 
 ###
  button binds
