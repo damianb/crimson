@@ -17,4 +17,4 @@ class viewport
 	resize: () ->
 		# todo
 
-modules.exports = viewport
+module.exports = viewport
