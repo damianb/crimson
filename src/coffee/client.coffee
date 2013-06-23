@@ -41,6 +41,7 @@ crimson.on 'auth.pending', ->
 
 $(document).on 'keydown', null, 'ctrl+F12', ->
 	DEBUG = !DEBUG
+	$('footer').toggle()
 
 $(document).on 'keydown', null, 'ctrl+j', ->
 	if DEBUG
@@ -77,7 +78,8 @@ $(window).resize ->
 	crimson.ui.viewport.resize()
 
 $().ready ->
-	$('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
+	$('#version').text("nw #{process.versions['node-webkit']}; node #{process.version}; crimson #{crimson.pkg.version}")
+	$('footer').hide()
 	crimson.ui.display 'load'
 	crimson.ui.display 'client'
 	crimson.ui.column 'home'
