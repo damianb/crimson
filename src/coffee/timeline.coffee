@@ -48,21 +48,23 @@ class timeline
 	page: (offset, length) ->
 		# todo
 	bind: (events...) ->
-		for event in events then =>
+		setEvent = (uid, user, event) =>
+			if !@binds[uid]? then @binds[uid] = []
+			if !@binds[uid].indexOf event
+				@binds[uid].push event
+				user.data.on event, @addEntry
+			true
+		proc = (event) =>
 			if !@user?
-				for uid, user of @client.users then =>
-					if !@binds[uid]? then @binds[uid] = []
-					@binds[uid].push event
-					user.data.on event, @addEntry
+				setEvent uid, user, event for uid, user of @client.users
 			else
-				if !@binds[event]?
-					if !@binds[@uid]? then @binds[@uid] = []
-					@binds[@uid].push event
-					@user.data.on event, @addEntry
+				setEvent @uid, @user, event
+		proc event for event in events
+		true
 	__destroy: ->
 		# remove listeners before we seppuku...
-		for uid, binds of @binds then =>
-			for bind in binds then =>
-				@client.users[uid].data.removeListener bind, @addEntry
+		proc = (uid, bind) =>
+			@client.users[uid].data.removeListener bind, @addEntry
+		proc uid, bind for bind in binds for uid, binds of @binds
 		@binds = {}
 		@client = @user = @uid = null
