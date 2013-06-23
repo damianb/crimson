@@ -104,7 +104,7 @@ compile = (type, file) ->
 		else throw new Error 'unknown compile type'
 	exec cmdLine, (err, stdout, stderr) ->
 		if err
-			log "#{type}: failed to compile #{file.replace '/','\\'}}; #{err}", stderr, true
+			log "#{type}: failed to compile #{file}; #{err}", stderr, true
 		else
 			log "#{type}: compiled #{file} successfully"
 
