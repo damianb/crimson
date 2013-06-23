@@ -1,10 +1,13 @@
-# todo: refactor into overall "ui" object for managing the ui.
+fs = require 'fs'
+gui = require 'nw.gui'
+viewport = require './viewport'
 
 class ui
 	constructor: ->
 		@pingTemplate = fs.readFileSync '../templates/timeline.jade'
 		@counters = {}
 		@throbInterval = null
+		@viewport = new viewport()
 	display: (state) ->
 		throbbing = !($('.display.dis-load').hasClass 'hide')
 		$('.display').addClass 'hide'
@@ -66,4 +69,4 @@ class ui
 		console.log "error: #{msg}"
 	insertTimeline: (template, entries) ->
 
-crimson.ui = new ui()
+module.exports = new ui()
