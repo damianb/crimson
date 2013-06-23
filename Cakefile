@@ -39,6 +39,7 @@ task 'build', 'build all - less, jade, coffeescript', ->
 	invoke 'build:jade'
 	#invoke 'build:uglycoffee'
 	invoke 'build:coffee'
+	invoke 'build:copy'
 
 
 task 'watch', 'watch and rebuild files when changed', ->
@@ -46,6 +47,7 @@ task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:jade'
 	#invoke 'watch:uglycoffee'
 	invoke 'watch:coffee'
+	invoke 'watch:copy'
 
 # individual build tasks
 task 'build:jade', 'build jade files into html', -> build 'jade'
@@ -97,12 +99,12 @@ compile = (type, file) ->
 		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/#{file}.js"
 		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
 		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
-		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src/#{file} build/assets/#{file}" # todo windows copy command
+		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src\\#{file.replace '/','\\'} build\\assets\\#{file.replace '/','\\'}" # todo windows copy command
 		when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/assets/#{file}"
 		else throw new Error 'unknown compile type'
 	exec cmdLine, (err, stdout, stderr) ->
 		if err
-			log "#{type}: failed to compile #{file}; #{err}", stderr, true
+			log "#{type}: failed to compile #{file.replace '/','\\'}}; #{err}", stderr, true
 		else
 			log "#{type}: compiled #{file} successfully"
 
