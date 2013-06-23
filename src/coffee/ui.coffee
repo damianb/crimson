@@ -1,10 +1,11 @@
 fs = require 'fs'
-gui = require 'nw.gui'
+# because node-webkit is being stupid about require & nw.gui...
+gui = global.gui
 viewport = require './viewport'
 
 class ui
 	constructor: ->
-		@pingTemplate = fs.readFileSync '../templates/timeline.jade'
+		@pingTemplate = fs.readFileSync './assets/templates/timeline.jade'
 		@counters = {}
 		@throbInterval = null
 		@viewport = new viewport()

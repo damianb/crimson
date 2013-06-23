@@ -3,11 +3,14 @@ Array::remove = (from, to) ->
 	@length = if from < 0 then @length + from else from
 	return @push.apply @, rest
 
-gui = require 'nw.gui'
-crimson = require './crimson'
-crimson.ui = require './ui'
-dataStream = require './datastream'
-timeline = require './timeline'
+global.localStorage = localStorage
+global.$ = $
+global.gui = require 'nw.gui'
+
+crimson = require './assets/js/crimson'
+crimson.ui = require './assets/js/ui'
+dataStream = require './assets/js/datastream'
+timeline = require './assets/js/timeline'
 
 DEBUG = false
 
@@ -18,8 +21,8 @@ client event binds
 crimson.on 'user.ready', (user, first) ->
 	# if the first user to connect, we need to display the client chrome and the home column
 	if first
-		display 'client'
-		column 'home'
+		crimson.ui.display 'client'
+		crimson.ui.column 'home'
 	# kickstart my heart!
 	crimson.kickstart()
 
@@ -29,7 +32,7 @@ crimson.on 'user.ready', ->
 crimson.on 'auth.pending', ->
 	# display the auth chrome if we don't have any tokens
 	if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
-		display 'auth'
+		crimson.ui.display 'auth'
 
 ###
  key binds
@@ -68,7 +71,7 @@ $('button#private').on 'click', null, ->
 
 $().ready ->
 	$('#version').text "node-webkit #{process.versions['node-webkit']}; node #{process.version}; crimson DEV build"
-	display 'load'
-	display 'client'
-	column 'home'
+	crimson.ui.display 'load'
+	crimson.ui.display 'client'
+	crimson.ui.column 'home'
 	#crimson.connect()
