@@ -35,8 +35,7 @@ class dataStream extends EventEmitter
 			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine'
 				'users.notifications'
 			when event.match(/^user\.(?:ping|echo)\.([0-9]+)$/)
-				uid = event.split('.').pop()
-				'users.pings.' + uid
+				'users.pings.' + event.split('.').pop()
 			else false
 		return newEvent
 			# todo more listener types
@@ -66,8 +65,33 @@ class dataStream extends EventEmitter
 			@client.removeListener 'heartbeat', @binds[type]
 			delete @binds[type]
 			# todo delete entry in @last if necessary
+	forwardSort: (err, json, res) ->
+		if err then return @client.ui.logError err
+		results = {}
+		proc = (response) =>
+			type = switch
+				when response.type is 'mention' then 'mention.new'
+				when response.type is 'echo' and @client.users[response.data.echo.user_id]? then 'echo.new.mine'
+				when response.type is 'echo' then 'echo.new'
+				when response.type is 'listen' then 'listener.new'
+			if results[response.type]? then results[response.type] = []
+			results[type].push(response)
+		proc response for response in json.responses
+		@emit type, response for type, response of results
 	forwardArray: (err, json, res) ->
 		if err then return @client.ui.logError err
+		results = {}
+		proc = (response) =>
+			type = switch
+				when response.echo_id? and @client.users[response.echo.user_id]? then 'echo.new.mine'
+				when response.echo_id? then 'echo.new'
+				when response.is_private? is true then 'ping.new.private'
+				else 'ping.new'
+			if results[response.type]? then results[response.type] = []
+			results[type].push(response)
+		proc response for response in json.responses
+		@emit type, response for type, response of results
+
 		# todo - iterate over json.response.[] and dispatch!
 		# todo - sort out entries by type before dispatch
 	forwardSingle: (err, json, res) ->
