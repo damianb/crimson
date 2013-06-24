@@ -83,4 +83,4 @@ $().ready ->
 	crimson.ui.display 'load'
 	crimson.ui.display 'client'
 	crimson.ui.column 'home'
-	#crimson.connect()
+	#crimson.connectAll()
