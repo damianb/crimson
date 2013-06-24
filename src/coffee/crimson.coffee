@@ -2,6 +2,8 @@
 heelloApi = require 'heello'
 http = require 'http'
 url = require 'url'
+pkg = require './../../package.json'
+tokenPort = 33233 #todo see how common this port is in use...
 
 class crimson extends EventEmitter
 	constructor: ->
@@ -9,10 +11,10 @@ class crimson extends EventEmitter
 		@users = {}
 		@interceptors = 0
 		@interceptor = null
-		@tokenPort = 33233  #todo see how common this port is in use...
+		@tokenPort = tokenPort
 		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
 		@heartbeat = null # this will hold a setInterval reference.
-		@pkg = require './../../package.json'
+		@pkg = pkg
 		# the below is for special unauthenticated stuff only
 		@heello = crimson.getApi()
 		@authURI = @heello.getAuthURI '0000'
@@ -22,7 +24,7 @@ class crimson extends EventEmitter
 	updateTokenStore: ->
 		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
 	connectAll: ->
-		if Object.keys(@users).length is 0
+		if Object.keys(@tokenStore).length is 0
 			@connect() # initial authorization needed
 		else
 			@connect token for token in @tokenStore
@@ -103,10 +105,7 @@ class crimson extends EventEmitter
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
 			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
 			callbackURI: "http://127.0.0.1:#{@tokenPort}"
-			userAgent: 'crimson-client'
-			# todo: somehow get current pkg.version! D:
+			userAgent: "crimson-client_#{pkg.version}"
 		}
-	@filter: ->
-		# todo
 
 module.exports = new crimson()
