@@ -47,6 +47,7 @@ class viewport
 		#}, 500)
 		$('.column').css('width', timelineWidth + 'px')
 		$('#viewport').css('left', viewportOffset + 'px')
+		$('.columns').css('width', (viewportWidth - overflowWidth) + 'px')
 		$('.column-overflow').css('width', overflowWidth + 'px')
 		true
 

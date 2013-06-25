@@ -7,6 +7,10 @@ global.localStorage = localStorage
 global.$ = $
 global.gui = gui = require 'nw.gui'
 
+dateFormat = require 'dateformat'
+Date::format = (mask, utc) ->
+	dateFormat @, mask, utc
+
 crimson = require './assets/js/crimson'
 crimson.ui = require './assets/js/ui'
 dataStream = require './assets/js/datastream'
@@ -71,7 +75,7 @@ $('button#private').on 'click', null, ->
 		crimson.ui.counters['#pingText'].max = 400
 	else
 		crimson.ui.counters['#pingText'].max = 200
-	crimson.ui.counters['#pingText'].charCount()
+	crimson.ui.counters['#pingText'].charCount(false)
 
 $(window).resize ->
 	# queue a redraw
@@ -83,4 +87,9 @@ $().ready ->
 	crimson.ui.display 'load'
 	crimson.ui.display 'client'
 	crimson.ui.column 'home'
+
+	$('.reldate').relatizeDateTime()
+	setInterval ->
+		$('.reldate').relatizeDateTime()
+	, 60
 	#crimson.connectAll()

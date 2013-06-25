@@ -27,7 +27,7 @@ class ui
 			field: field
 			display: display
 			max: max
-			charCount: ->
+			charCount: (visible = true) ->
 				warn = counterData.max - (counterData.max / 5)
 				text = counterData.field.val()
 				switch
@@ -35,7 +35,8 @@ class ui
 					when text.length >= warn then counterData.display.removeClass('lengthOver').addClass('lengthWarn')
 					else counterData.display.removeClass('lengthOver lengthWarn')
 				counterData.display.html counterData.max - text.length
-				counterData.display.stop().fadeTo('fast', 1)
+				counterData.display.stop()
+				if visible or text.length > 0 then counterData.display.fadeTo('fast', 1)
 				return null
 
 		field.bind 'keydown keyup keypress', counterData.charCount
