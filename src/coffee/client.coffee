@@ -93,3 +93,144 @@ $().ready ->
 		$('.reldate').relatizeDateTime()
 	, 60
 	#crimson.connectAll()
+
+sampleJSON = [
+	{
+		"id": 12188547,
+		"text": "@uppfinnarn shows just fine in my stack traces on an exception.",
+		"user_id": 1688760,
+		"echo_id": null,
+		"reply_id": 12187793,
+		"checkin": false,
+		"created_at": "2013-06-24T12:17:31Z",
+		"user": {
+			"id": 1688760,
+			"username": "katana",
+			"name": "Damian Bushong",
+			"bio": "Burning a hole through the past and lighting the path into the future.",
+			"website": "",
+			"location": "",
+			"timezone": "Central Time (US & Canada)",
+			"created_at": null,
+			"avatar": "//d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3",
+			"background": "//d2dh8keolssd5w.cloudfront.net/default.png",
+			"cover": "//d38xdbig8ajh16.cloudfront.net/default.png",
+			"metadata": {
+				"ping_count": 233,
+				"checkin_count": 0,
+				"listener_count": 26,
+				"listening_count": 6
+			}
+		},
+		"media": {},
+		"metadata": {
+			"echo_count": 0,
+			"reply_count": 0
+		}
+	},
+
+	{
+		"id": 12771311,
+		"type": "echo",
+		"created_at": "2013-06-11T05:50:53Z",
+		"data": {
+			"ping": {
+				"id": 11545705,
+				"text": null,
+				"user_id": 1984189,
+				"echo_id": 11275595,
+				"reply_id": null,
+				"checkin": false,
+				"created_at": "2013-06-11T05:50:53Z",
+				"user": {
+					"id": 1984189,
+					"username": "amarnath",
+					"name": "Amarnath Verma",
+					"bio": "",
+					"website": "",
+					"location": "",
+					"timezone": "Kolkata",
+					"created_at": "2013-05-31T05:52:28Z",
+					"avatar": "//d2trw7474qpa0b.cloudfront.net/amarnath/thumb.jpg?6e5fbb03cda86bda4dac28ad92340046",
+					"background": "//d2dh8keolssd5w.cloudfront.net/default.png",
+					"cover": "//d38xdbig8ajh16.cloudfront.net/amarnath/thumb.jpg?9ef17face99ce40dde0ccaf8b29dc873",
+					"metadata": {
+						"ping_count": 338,
+						"checkin_count": 4,
+						"listener_count": 10,
+						"listening_count": 83,
+						"listening": false,
+						"listens": false
+					}
+				},
+				"media": {},
+				"echo": {
+					"id": 11275595,
+					"text": "How not to get an audit: \r\n<malerzril> Hey all, I am looking for someone to pentest/audit my code for any noticeable security flaws\r\n<pronto> how much are you paying?\r\n<malerzril> 100$\r\n<soot> heh",
+					"user_id": 1688760,
+					"echo_id": null,
+					"reply_id": null,
+					"checkin": false,
+					"created_at": "2013-06-04T14:25:10Z",
+					"user": {
+						"id": 1688760,
+						"username": "katana",
+						"name": "Damian Bushong",
+						"bio": "Burning a hole through the past and lighting the path into the future.",
+						"website": "",
+						"location": "",
+						"timezone": "Central Time (US & Canada)",
+						"created_at": null,
+						"avatar": "//d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3",
+						"background": "//d2dh8keolssd5w.cloudfront.net/default.png",
+						"cover": "//d38xdbig8ajh16.cloudfront.net/default.png",
+						"metadata": {
+							"ping_count": 233,
+							"checkin_count": 0,
+							"listener_count": 26,
+							"listening_count": 6
+						}
+					},
+					"media": {},
+					"metadata": {
+						"echo_count": 2,
+						"reply_count": 0,
+						"can_reply": true,
+						"can_delete": true,
+						"can_echo": false,
+						"is_private": false
+					}
+				},
+				"metadata": {
+					"echo_count": 0,
+					"reply_count": 0,
+					"can_reply": true,
+					"can_delete": false,
+					"can_echo": true,
+					"is_private": false
+				}
+			},
+			"user": {
+				"id": 1984189,
+				"username": "amarnath",
+				"name": "Amarnath Verma",
+				"bio": "",
+				"website": "",
+				"location": "",
+				"timezone": "Kolkata",
+				"created_at": "2013-05-31T05:52:28Z",
+				"avatar": "//d2trw7474qpa0b.cloudfront.net/amarnath/thumb.jpg?6e5fbb03cda86bda4dac28ad92340046",
+				"background": "//d2dh8keolssd5w.cloudfront.net/default.png",
+				"cover": "//d38xdbig8ajh16.cloudfront.net/amarnath/thumb.jpg?9ef17face99ce40dde0ccaf8b29dc873",
+				"metadata": {
+					"ping_count": 338,
+					"checkin_count": 4,
+					"listener_count": 10,
+					"listening_count": 83,
+					"listening": false,
+					"listens": false
+				}
+			}
+		}
+	},
+]
