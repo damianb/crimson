@@ -1,0 +1,77 @@
+
+each entry in entries
+	- var entryClass = ['entry'], myEcho = false, entryDate = new Date(entry.created_at)
+	- if(entry.text) entryClass.push('ping')
+	- if(entry.echo) entryClass.push('echo')
+	- if(!entry.echo && entry.metadata != null && entry.echo.metadata.isMine === true) entryClass.push('own')
+	- if(entry.echo != null && entry.echo.metadata != null && entry.echo.metadata.isMine === true) myEcho = true
+	div(class=entryClass)
+		.profile
+			img.avatar(src= 'http:' + entry.user.avatar , alt='thumb', title='@' + entry.user.username)
+		if entry.echo
+			.m-profile(class= myEcho ? 'own' : '')
+				img.avatar(src= 'http:' + entry.echo.user.avatar , alt='thumb', title='@' + entry.echo.user.username)
+		.post
+			.meta
+				a.who(href='#') = '@' + entry.user.username
+				time(datetime=date.format('isoDateTime'), title=date.format('dddd, mmmm dS, yyyy HH:MM:ss'))= date.format()
+			// todo: parse text for links, usernames!
+			p= entry.text
+		.controls
+			a(href='#').reply
+				i.icon-share-alt
+			a(href='#').echo
+				i.icon-random
+			a(href='#').delete
+				i.icon-remove
+
+		.entry.ping
+			.ping-profile.mentioned
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+			.post
+				.meta
+					a.who(href='#') @heello
+					span.time &nbsp;14 mins
+				p This ping mentions you! - &nbsp;
+					a.who(href='#') @katana
+			.controls
+				a(href='#')
+					i.icon-share-alt
+				a(href='#')
+					i.icon-random
+		.entry.ping.echo
+			.ping-profile
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+			.reping-profile.self
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+			.post
+				.meta
+					a.who(href='#') @heello
+					span.time &nbsp;13 mins
+				p This is something you echoed!
+			.controls
+				a(href='#')
+					i.icon-share-alt
+				a(href='#')
+					i.icon-remove
+		.entry.ping.echo
+			.ping-profile.self
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+			.reping-profile
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+			.post
+				.meta
+					a.who(href='#') @katana
+					span.time &nbsp;13 mins
+				p Someone echoed you!
+		.entry.ping
+			.ping-profile.self
+				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
+			.post
+				.meta
+					a.who(href='#') @katana
+					span.time &nbsp;12 mins
+				p This ping is by you!
+			.controls
+				a(href='#')
+					i.icon-remove
