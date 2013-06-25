@@ -29,6 +29,9 @@ class timeline
 			@bind 'ping.new', 'ping.new.private', 'echo.new'
 		else if type is 'notify'
 			@bind 'mention.new', 'listener.new', 'echo.new.mine'
+		# shows notifications and usual home content...user-level though.
+		else if type is 'hybrid'
+			@bind 'ping.new', 'ping.new.private', 'echo.new', 'mention.new', 'listener.new', 'echo.new.mine'
 		else if type is 'mentions'
 			@bind 'mention.new'
 		else if type is 'private'
