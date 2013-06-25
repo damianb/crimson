@@ -39,7 +39,7 @@ class timeline
 		else if type is 'user'
 			if !options.uid?
 				throw new Error 'cannot use a user timeline without specifying a user id'
-			@bind 'user.ping.' + options.uid
+			@bind 'user.ping.' + options.uid, 'user.profile'
 			if options.showEchoes
 				@bind 'user.echo.' + options.uid
 		# todo more column types
