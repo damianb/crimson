@@ -5,7 +5,9 @@ viewport = require './viewport'
 
 class ui
 	constructor: ->
-		@pingTemplate = fs.readFileSync './assets/templates/timeline.jade'
+		# cache the templates to save on memory
+		@timelineTemplate = fs.readFileSync './assets/templates/timeline.jade'
+		@entryTemplate = fs.readFileSync './assets/templates/entries.jade'
 		@counters = {}
 		@throbInterval = null
 		@viewport = new viewport()
@@ -68,7 +70,8 @@ class ui
 		$('#errormsg').val msg
 		display 'fatal'
 	logError: (msg) ->
-		console.log "error: #{msg}"
+		# todo - file logging of errors? NeDB inserts? etc? *shrug*
+		console.error msg
 	insertTimeline: (template, entries) ->
 
 module.exports = new ui()
