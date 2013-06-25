@@ -65,38 +65,50 @@ class dataStream extends EventEmitter
 			@client.removeListener 'heartbeat', @binds[type]
 			delete @binds[type]
 			# todo delete entry in @last if necessary
-	forwardSort: (err, json, res) ->
-		if err then return @client.ui.logError err
-		results = {}
-		proc = (response) =>
-			type = switch
-				when response.type is 'mention' then 'mention.new'
-				when response.type is 'echo' and @client.users[response.data.echo.user_id]? then 'echo.new.mine'
-				when response.type is 'echo' then 'echo.new'
-				when response.type is 'listen' then 'listener.new'
-			if results[response.type]? then results[response.type] = []
-			results[type].push(response)
-		proc response for response in json.responses
-		@emit type, response for type, response of results
+	# note: intended for use with forwardArray and forwardSingle
+	# boils down a "response" object (something that we got back from the api) into
+	# a number of different "events" which we'll dispatch through this eventemitter
+	_processResponse: (response) ->
+		types = []
+		# if response.data exists, we're grabbing from heello.users.notifications
+		# otherwise, it is almost guaranteed to be another endpoint that we're streaming in
+		if response.data?
+			if response.type is 'mention' then types.push 'mention.new'
+			if response.type is 'echo' and @client.users[response.data.echo.user_id]? then types.push 'echo.new.mine'
+			if response.type is 'echo' then types.push 'echo.new'
+			if response.type is 'listen' then types.push 'listener.new'
+			# for some reason, heello.users.notifications is a clusterfsck
+			# and breaks the standard format they *almost* had going.
+			# ....so to semi-standardize this for display, we have to do this ugly thing.
+			# tell the velociraptors I said I'm sorry.
+			response = response.data
+		else
+			if response.echo? and @client.users[response.echo.user_id]? then types.push 'echo.new.mine'
+			if response.echo? then types.push 'echo.new'
+			# if it's not from users.notifications and not an echo, it *should* be a ping
+			if !response.echo? then types.push 'ping.new'
+			# private	pings cannot be echoed, of course
+			if response.is_private? is true then types.push 'ping.new.private'
+		return types
 	forwardArray: (err, json, res) ->
 		if err then return @client.ui.logError err
 		results = {}
-		proc = (response) =>
-			type = switch
-				when response.echo_id? and @client.users[response.echo.user_id]? then 'echo.new.mine'
-				when response.echo_id? then 'echo.new'
-				when response.is_private? is true then 'ping.new.private'
-				else 'ping.new'
-			if results[response.type]? then results[response.type] = []
+		processTypes = (type, response) ->
+			if results[type]? then results[type] = []
+			if response.data? then response = response.data
 			results[type].push(response)
-		proc response for response in json.responses
-		@emit type, response for type, response of results
-
-		# todo - iterate over json.response.[] and dispatch!
-		# todo - sort out entries by type before dispatch
+		processTypes type, response for type in @_processResponse(response) for response in json.responses
+		@emit type, responses for type, responses of results
 	forwardSingle: (err, json, res) ->
+		response = json.response
 		if err then return @client.ui.logError err
+		types = @_processResponse(response)
+		if response.data? then response = response.data
+		@emit type, [response] for type in types # we want to be able to expect arrays constantly from this forward call.
+	forward: (err, json, res) ->
 		# todo
+		# non-standard forwarding/dispatch
+		# to be used for grabbing profiles via API?
 	__destroy: ->
 		@emit '__destroy'
 		@client.removeListener 'heartbeat', bindType, listener for listener in @binds
