@@ -16,12 +16,15 @@ each entry in entries
 				a.who(href='#') = '@' + entry.user.username
 				time(datetime=date.format('isoDateTime'), title=date.format('dddd, mmmm dS, yyyy HH:MM:ss'))= date.format()
 			// todo: parse text for links, usernames!
-			p= entry.text
+			p= entry.text.autolink().autousername()
 		.controls
+			// entry.metadata.can_reply
 			a(href='#').reply
 				i.icon-share-alt
+			// entry.metadata.can_echo
 			a(href='#').echo
 				i.icon-random
+			// // entry.metadata.can_delete
 			a(href='#').delete
 				i.icon-remove
 
