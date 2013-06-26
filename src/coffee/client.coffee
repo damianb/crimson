@@ -1,15 +1,50 @@
+# - global object prototype modifications...
+
 Array::remove = (from, to) ->
 	rest = @slice (to or from) + 1 or @length
 	@length = if from < 0 then @length + from else from
 	return @push.apply @, rest
 
-global.localStorage = localStorage
-global.$ = $
-global.gui = gui = require 'nw.gui'
+# the following are based on the autolink-js tool by bryanwoods on github: https://github.com/bryanwoods/autolink-js
+
+String::autolink = ->
+	pattern = ///
+		(^|\s)
+		(
+			(?:https?|ftp):// # Look for a valid URL protocol (non-captured)
+			[\-A-Z0-9+\u0026@#/%?=~_|!:,.;]*# Valid URL characters (any number of times)
+			[\-A-Z0-9+\u0026@#/%=~_|] # String must end in a valid URL character
+		)
+	///gi
+
+	if arguments.length is 0
+		return @replace(pattern, "$1<a href='$2'>$2</a>")
+
+	options = Array::slice.call(options)
+	linkAttributes = (" #{k}='#{v}'" for k, v of options when k isnt 'callback').join ''
+	return @replace pattern, (match, space, url) ->
+		link = options.callback?(url) or "<a href='#{url}'#{linkAttributes}>#{url}</a>"
+		"#{space}#{link}"
+
+String::autousername = ->
+	pattern = /(^|\s)@([A-Z0-9_])+/gi
+	uriBase = 'https://heello.com/'
+	if arguments.length is 0
+		return @replace(pattern, "$1<a href='#{uriBase}'>$2</a>")
+
+	options = Array::slice.call(options)
+	linkAttributes = (" #{k}='#{v}'" for k, v of options when k isnt 'callback').join ''
+	return @replace pattern, (match, space, username) ->
+		link = options.callback?(url) or "<a href='#{uriBase}#{url}'#{linkAttributes}>#{username}</a>"
+		"#{space}#{link}"
 
 dateFormat = require 'dateformat'
 Date::format = (mask, utc) ->
 	dateFormat @, mask, utc
+
+global.localStorage = localStorage
+global.$ = $
+global.gui = gui = require 'nw.gui'
 
 crimson = require './assets/js/crimson'
 crimson.ui = require './assets/js/ui'
@@ -18,9 +53,7 @@ timeline = require './assets/js/timeline'
 
 DEBUG = false
 
-###
-client event binds
-###
+# - client event binds
 
 crimson.on 'user.ready', (user, first) ->
 	# if the first user to connect, we need to display the client chrome and the home column
@@ -38,10 +71,7 @@ crimson.on 'auth.pending', ->
 	if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
 		crimson.ui.display 'auth'
 
-###
- key binds
-###
-
+# - key binds
 
 $(document).on 'keydown', null, 'ctrl+F12', ->
 	DEBUG = !DEBUG
@@ -65,9 +95,7 @@ $(document).on 'keydown', null, 'ctrl+r', ->
 $('button#authorize').on 'click', null, () ->
 	gui.Shell.openExternal crimson.authURI '0000'
 
-###
- ui binds
-###
+# - ui binds
 
 crimson.ui.counter('#pingText', '#charcount', 200)
 $('button#private').on 'click', null, ->
@@ -94,7 +122,9 @@ $().ready ->
 	, 60
 	#crimson.connectAll()
 
-sampleJSON = [
+# sample data, for now
+
+global.sampleJSON = sampleJSON = [
 	{
 		"id": 12188547,
 		"text": "@uppfinnarn shows just fine in my stack traces on an exception.",
