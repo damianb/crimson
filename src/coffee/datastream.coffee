@@ -25,6 +25,7 @@ class dataStream extends EventEmitter
 		@binds = {}
 		super()
 
+		# automatically bind as per translated events
 		@on 'newListener', @bind
 		@on 'removeListener', @unbind
 	translator: (event) ->
@@ -75,13 +76,15 @@ class dataStream extends EventEmitter
 		if response.data?
 			if response.type is 'mention' then types.push 'mention.new'
 			if response.type is 'echo' and @client.users[response.data.echo.user_id]? then types.push 'echo.new.mine'
-			if response.type is 'echo' then types.push 'echo.new'
+			#if response.type is 'echo' then types.push 'echo.new'
+			# ---- the above has been commented out for a reason; it'll probably make timelines wayyyyy too spammy about
+			# ---- our own pings being echoed
 			if response.type is 'listen' then types.push 'listener.new'
 			# for some reason, heello.users.notifications is a clusterfsck
 			# and breaks the standard format they *almost* had going.
 			# ....so to semi-standardize this for display, we have to do this ugly thing.
 			# tell the velociraptors I said I'm sorry.
-			response = response.data
+			response = if response.data.ping? then response.data.ping else response.data
 		else
 			if response.echo? and @client.users[response.echo.user_id]? then types.push 'echo.new.mine'
 			if response.echo? then types.push 'echo.new'

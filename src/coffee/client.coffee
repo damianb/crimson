@@ -1,4 +1,6 @@
+#
 # - global object prototype modifications...
+#
 
 Array::remove = (from, to) ->
 	rest = @slice (to or from) + 1 or @length
@@ -42,18 +44,26 @@ dateFormat = require 'dateformat'
 Date::format = (mask, utc) ->
 	dateFormat @, mask, utc
 
+# global muckery...eugh
+
 global.localStorage = localStorage
 global.$ = $
 global.gui = gui = require 'nw.gui'
+
+# special requires
 
 crimson = require './assets/js/crimson'
 crimson.ui = require './assets/js/ui'
 dataStream = require './assets/js/datastream'
 timeline = require './assets/js/timeline'
 
+# initially, we are NOT in debug mode. we have to key-sequence our way into debug mode, and answer
+# a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.
 DEBUG = false
 
+#
 # - client event binds
+#
 
 crimson.on 'user.ready', (user, first) ->
 	# if the first user to connect, we need to display the client chrome and the home column
@@ -71,7 +81,9 @@ crimson.on 'auth.pending', ->
 	if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
 		crimson.ui.display 'auth'
 
+#
 # - key binds
+#
 
 $(document).on 'keydown', null, 'ctrl+F12', ->
 	DEBUG = !DEBUG
@@ -88,14 +100,16 @@ $(document).on 'keydown', null, 'ctrl+r', ->
 		win.reloadIgnoringCache()
 	return null
 
-###
- button binds
-###
+#
+# - button binds
+#
 
 $('button#authorize').on 'click', null, () ->
 	gui.Shell.openExternal crimson.authURI '0000'
 
+#
 # - ui binds
+#
 
 crimson.ui.counter('#pingText', '#charcount', 200)
 $('button#private').on 'click', null, ->
