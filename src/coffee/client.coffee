@@ -29,7 +29,7 @@ String::autolink = ->
 		"#{space}#{link}"
 
 String::autousername = ->
-	pattern = /(^|\s)@([A-Z\d_]){1,18}/gi
+	pattern = /(^|\s)@([\w]{1,18})/g
 	uriBase = 'https://heello.com/'
 	if arguments.length is 0
 		return @replace(pattern, "$1<a href='#{uriBase}'>$2</a>")
