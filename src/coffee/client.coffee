@@ -14,8 +14,8 @@ String::autolink = ->
 		(^|\s)
 		(
 			(?:https?|ftp):// # Look for a valid URL protocol (non-captured)
-			[\-A-Z0-9+\u0026@#/%?=~_|!:,.;]*# Valid URL characters (any number of times)
-			[\-A-Z0-9+\u0026@#/%=~_|] # String must end in a valid URL character
+			[\w\-+\u0026@#/%?=~|!:,.;]*# Valid URL characters (any number of times)
+			[\w\-+\u0026@#/%=~|] # String must end in a valid URL character
 		)
 	///gi
 
