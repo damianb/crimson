@@ -91,13 +91,11 @@ $(document).on 'keydown', null, 'ctrl+F12', ->
 
 $(document).on 'keydown', null, 'ctrl+j', ->
 	if DEBUG
-		win = gui.Window.get()
-		win.showDevTools()
+		gui.Window.get().showDevTools()
 	return null
 $(document).on 'keydown', null, 'ctrl+r', ->
 	if DEBUG
-		win = gui.Window.get()
-		win.reloadIgnoringCache()
+		gui.Window.get().reloadIgnoringCache()
 	return null
 
 #
