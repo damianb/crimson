@@ -32,6 +32,7 @@ files =
 	]
 	copy: [
 		'templates/timeline.jade'
+		'templates/entries.jade'
 	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
