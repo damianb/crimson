@@ -96,119 +96,74 @@ body {
 	}
 
 	&.dis-client {
-		@headerHeight: 57px;
-		@toolbarHeight: 28px;
+		@headerHeight: 83px;
 		@footerHeight: 20px;
-		@whoamiWidth: 84px;
-		@navWidth: 40px;
-		@bgColor: #91BFEA;
+		@whoamiWidth: 80px;
+		@avatarSize: 70px;
+		@navWidth: 38px;
+		//@bgColor: #91BFEA;
+		@bgColor: #45739B;
 		@subColor: #E3EAED;
-		@subBorder: #7881BF;
-		header, footer, .toolbar, .main, .l, .r {
-			overflow: hidden;
-			position: absolute;
-		}
+		//@subBorder: #7881BF;
+		@subBorder: #444B77;
 
-		.nib {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+
+		background-color: @bgColor;
+		background-image: data-uri("./../img/noise.png"),-webkit-linear-gradient(left, @bgColor 30%, lighten(@bgColor, 15%) 100%);
+		header, footer, .main, .l, .r { overflow: hidden; position: absolute }
+		header { top: 0; height: @headerHeight }
+		.l, .r { top: @headerHeight; bottom: 0 }
+		header {
 			position: relative;
-			top: 40px;
-			left: @whoamiWidth;
-			height: 11px;
-			width: 8px;
-			background-repeat: no-repeat;
-			display: block;
-			background-image: data-uri('../img/nib.png');
-			z-index: 200;
-		}
-
-		.l.top, .r.top {
 			top: 0;
-			height: @headerHeight + @toolbarHeight;
-		}
-
-		.l.bottom, .r.bottom {
-			top: @headerHeight + @toolbarHeight;
-			bottom: 0;
-		}
-
-		.l {
 			left: 0;
-			background-color: @bgColor;
-			width: @whoamiWidth;
-		}
-
-		.l.top {
-			.whoami {
-				@size: 76px;
-				width: @size;
-				height: @size;
-				border-radius: @size / 2;
-				background-color: rgba(138, 138, 170, 0.5);
-				margin: 4px 3px 3px 4px;
-				padding: 1px;
-				img.avatar {
-					@isize: @size - 2px;
-					//background-color: #fff;
-					border-radius: @isize / 2;
-					border: 1px solid #526A8E;
-					//margin: 1px;
-					width: @isize;
-					height: @isize;
-				}
-			}
-		}
-
-		.l.bottom {
-			width: @navWidth;
-			nav {
-				ul {
-					position: absolute;
-					top: 0;
-					left: 0;
-					list-style-type: none;
-					margin: 1px;
-					li {
-						@size: 30px;
-						margin: 6px 4px;
-						width: @size;
-						height: @size;
-						background-color: #9895B2;
-						color: transparent;
-						border-radius: 15px;
-						&:hover {
-							background-color: #9A98BA;
-						}
-					}
-				}
-				ul.bottom {
-					top: auto;
-					bottom: 0px;
-				}
-			}
-		}
-
-		.r.top {
-			left: @whoamiWidth;
 			right: 0;
-			header, .toolbar, .main, footer {
-				left: 0;
-				right: 0;
+			height: @headerHeight;
+
+			.whoami {
+				position: absolute;
+				top: 6px;
+				left: 6px;
+
+				width: @avatarSize;
+				height: @avatarSize;
+				border-radius: @avatarSize / 2;
+				border: 1px solid darken(#8c8c8c, 22%);
+				background-repeat: no-repeat;
+				background-size: contain;
+				z-index: 250;
 			}
 
-			header {
-				top: 0;
-				height: @headerHeight;
-				background-color: @bgColor;
-				box-sizing: border-box;
-				padding: 7px 5px 4px 6px;
+			.inputbox {
+				position: absolute;
+				top: 6px;
+				left: 40px;
+				right: 6px;
+
+				height: @avatarSize;
+				border: 1px solid darken(#8c8c8c, 10%);
+				background: #fff;
+				box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+				border-radius: 4px;
 
 				textarea#pingText {
-					height: 100%;
-					width: 100%;
-					box-sizing: border-box;
-					border-color: #8c8c8c;
+					position: absolute;
+					top: 4px;
+					bottom: 29px;
+					left: 38px;
+					right: 4px;
+					width: auto;
+					margin: 0;
+					border: none;
+					box-shadow: none;
 					resize: none;
 					font-size: 11px;
+					line-height: 16px;
 
 					// disable transition
 					transition: none;
@@ -224,39 +179,66 @@ body {
 					//color: #444;
 					font-style: italic;
 				}
-			}
 
-			.toolbar {
-				top: @headerHeight;
-				height: @toolbarHeight;
-				background-color: @bgColor;
-				padding: 0 10px;
-
-				.btn-group {
-					float: right;
-					button {
-						line-height: 18px;
-						&#private {
-							padding-left: 4px;
-							padding-right: 4px;
-						}
-						&#ping {
-							padding-left: 12px;
-							padding-right: 12px;
+				.toolbar {
+					position: absolute;
+					bottom: 4px;
+					left: 40px;
+					right: 4px;
+					.btn-group {
+						float: right;
+						button {
+							line-height: 15px;
+							&#private {
+								padding-left: 3px;
+								padding-right: 3px;
+							}
+							&#ping {
+								padding-left: 11px;
+								padding-right: 11px;
+							}
 						}
 					}
+					span#charcount {
+						float: left;
+						font-size: 18px;
+						display: inline-block;
+						margin-top: 1px;
+						margin-left: 3px;
+					}
+					&:after { clear: both }
 				}
-				span#charcount {
-					float: left;
-					font-size: 18px;
-					display: inline-block;
-					margin-top: 1px;
-				}
-				&:after { clear: both; }
 			}
 		}
 
-		.r.bottom {
+		.l {
+			left: 0;
+			width: @navWidth;
+			nav {
+				ul {
+					position: absolute;
+					top: 0;
+					left: 0;
+					margin: 0;
+					list-style-type: none;
+					border-top: 1px solid darken(@subBorder, 4%);
+					li {
+						@size: 30px;
+						width: @size;
+						height: @size;
+						padding: 4px;
+						border-top: 1px solid rgba(255,255,255,0.12);
+						border-bottom: 1px solid darken(@subBorder, 4%);
+						span { color: transparent }
+						&:hover { background-color: rgba(255,255,255,0.1) }
+					}
+				}
+				ul.top { top: 10px }
+				ul.bottom { top: auto; bottom: 10px }
+			}
+		}
+
+		.r {
 			left: @navWidth;
 			right: 0;
 			.corner, .inside {
@@ -287,18 +269,20 @@ body {
 				z-index: 15;
 				border-top: 1px solid @subBorder;
 				border-left: 1px solid @subBorder;
+				.columns { height: 100% }
 				.column {
 					top: 0;
 					bottom: 0;
 					height: 100%;
 					overflow-y: scroll !important;
 					background-color: @subColor;
+					background-image: data-uri("./../img/noise.png"),-webkit-linear-gradient(left, @subColor 30%, darken(@subColor, 10%) 100%);
+					.entries { height: 100% }
 					.entry {
-						background-color: @subColor;
-						color: #fff;
 						position: relative;
+						color: #fff;
 						width: 100%;
-						margin-top: 18px;
+						margin-top: 20px;
 						margin-bottom: 20px;
 
 						.who { font-weight: bold; }
@@ -317,7 +301,7 @@ body {
 							box-shadow: inset 0 -1px 2px rgba(0,0,0,0.14), inset -1px 0 2px rgba(0,0,0,0.14);
 							z-index: 20;
 
-							.meta { margin-left: 20px }
+							.meta { margin-left: 22px }
 							p { margin: 2px 0 0 16px }
 						}
 
@@ -325,7 +309,6 @@ body {
 							position: absolute;
 							top: 0;
 							right: 10px;
-							//height: 20px;
 							z-index: 25;
 
 							a {
@@ -338,7 +321,7 @@ body {
 
 						.profile, .m-profile {
 							position: absolute;
-							top: -20px;
+							top: -22px;
 							bottom: 0;
 							left: 5px;
 
@@ -364,16 +347,12 @@ body {
 
 						&.own .profile, &.echo .m-profile.own {
 							background-color: rgba(122, 201, 122, 0.5);
-							img.avatar {
-								border-color: #66C466;
-							}
+							img.avatar { border-color: #66C466 }
 						}
 
 						&.mention .profile {
 							background-color: rgba(204, 51, 51, 0.5);
-							img.avatar {
-								border-color: #c33;
-							}
+							img.avatar { border-color: #c33 }
 						}
 
 						&.echo {
@@ -398,27 +377,16 @@ body {
 								}
 							}
 						}
+
+						&.private {
+							.post {
+								background: -webkit-linear-gradient(-45deg, #fafafa 55%,#FDF3BD 100%);
+								// lock color: E9B600
+							}
+						}
 					}
 
-					&::-webkit-scrollbar {
-						width: 8px;
-					}
-
-					&::-webkit-scrollbar-track {
-						background-color: @subColor; // @todo change to normal bg color for .main
-					}
-
-					&::-webkit-scrollbar-thumb {
-						border-radius: 3px;
-						background-color: #999;
-						border: 1px solid #aaa;
-						-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5);
-					}
-
-					.stretch {
-						height: 800px;
-						background-color: @subColor;
-					}
+					.stretch { height: 800px }
 				}
 			}
 
@@ -444,11 +412,30 @@ body {
 
 .length {
 	color: #6666AD;
+	font-weight: bold;
 	&.lengthWarn {
-		font-weight: bold;
+
 	}
 	&.lengthOver {
-		color: #F71D1D !important;
+		color: #BF2020 !important;
 		font-weight: bold;
+	}
+}
+
+.scroll {
+	&::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	&::-webkit-scrollbar-track {
+		//background-color: @subColor; // @todo change to normal bg color for .main
+		background-color: transparent;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 3px;
+		background-color: #999;
+		border: 1px solid #aaa;
+		-webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.5);
 	}
 }
