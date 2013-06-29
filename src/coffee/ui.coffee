@@ -33,7 +33,7 @@ class ui
 				warn = counterData.max - (counterData.max / 5)
 				text = counterData.field.val()
 				switch
-					when text.length >= @max then counterData.display.addClass('lengthOver')
+					when text.length >= counterData.max then counterData.display.addClass('lengthOver')
 					when text.length >= warn then counterData.display.removeClass('lengthOver').addClass('lengthWarn')
 					else counterData.display.removeClass('lengthOver lengthWarn')
 				counterData.display.html counterData.max - text.length
