@@ -1,5 +1,6 @@
-.column.col-home(data-column='#{column.type}')
+.column.scbar.col-home(data-column=column.name)
 	.col-head
-		// to be used for displaying user profiles? alerts?
+		if column.type === 'user'
+			// something
 	.entries
 		include entries.jade

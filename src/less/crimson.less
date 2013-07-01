@@ -101,10 +101,8 @@ body {
 		@whoamiWidth: 80px;
 		@avatarSize: 70px;
 		@navWidth: 38px;
-		//@bgColor: #91BFEA;
 		@bgColor: #45739B;
 		@subColor: #E3EAED;
-		//@subBorder: #7881BF;
 		@subBorder: #444B77;
 
 		position: absolute;
@@ -115,10 +113,10 @@ body {
 
 		background-color: @bgColor;
 		background-image: data-uri("./../img/noise.png"),-webkit-linear-gradient(left, @bgColor 30%, lighten(@bgColor, 15%) 100%);
-		header, footer, .main, .l, .r { overflow: hidden; position: absolute }
-		header { top: 0; height: @headerHeight }
+		footer, .main, .l, .r { overflow: hidden; position: absolute }
 		.l, .r { top: @headerHeight; bottom: 0 }
 		header {
+			overflow: hidden;
 			position: relative;
 			top: 0;
 			left: 0;
@@ -276,7 +274,7 @@ body {
 					height: 100%;
 					overflow-y: scroll !important;
 					background-color: @subColor;
-					background-image: data-uri("./../img/noise.png"),-webkit-linear-gradient(left, @subColor 30%, darken(@subColor, 10%) 100%);
+					background-image: data-uri("./../img/noise.png");
 					.entries { height: 100% }
 					.entry {
 						position: relative;
@@ -422,7 +420,7 @@ body {
 	}
 }
 
-.scroll {
+.scroll, .scbar {
 	&::-webkit-scrollbar {
 		width: 6px;
 	}

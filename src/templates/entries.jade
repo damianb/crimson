@@ -1,10 +1,22 @@
 
 each entry in entries
-	- var entryClass = ['entry'], myEcho = false, entryDate = new Date(entry.created_at)
+	// temporary!
+	- if(entry.data != null && entry.data.ping != null) {
+	- 	entry = entry.data.ping
+	- } else if(entry.data != null) {
+	- 	entry = entry.data
+	- }
+	- var entryClass = ['entry'], myEcho = false, date = new Date(entry.created_at), text = null
 	- if(entry.text) entryClass.push('ping')
-	- if(entry.echo) entryClass.push('echo')
-	- if(!entry.echo && entry.metadata != null && entry.echo.metadata.isMine === true) entryClass.push('own')
-	- if(entry.echo != null && entry.echo.metadata != null && entry.echo.metadata.isMine === true) myEcho = true
+	- if(entry.metadata != null && entry.metadata.is_private === true) entryClass.push('private')
+	- if(entry.echo != null) {
+	- 	if(entry.echo.metadata != null && entry.echo.metadata.isMine === true) myEcho = true
+	- 	entryClass.push('echo')
+	- 	text = entry.echo.text
+	- } else {
+	- 	if(entry.metadata != null && entry.metadata.isMine === true) entryClass.push('own')
+	- 	text = entry.text
+	- }
 	div(class=entryClass)
 		.profile
 			img.avatar(src= 'http:' + entry.user.avatar , alt='thumb', title='@' + entry.user.username)
@@ -13,68 +25,18 @@ each entry in entries
 				img.avatar(src= 'http:' + entry.echo.user.avatar , alt='thumb', title='@' + entry.echo.user.username)
 		.post
 			.meta
-				a.who(href='#') = '@' + entry.user.username
-				time(datetime=date.format('isoDateTime'), title=date.format('dddd, mmmm dS, yyyy HH:MM:ss'))= date.format()
-			// todo: parse text for links, usernames!
-			p= entry.text.autolink().autousername()
-		.controls
-			// entry.metadata.can_reply
-			a(href='#').reply
-				i.icon-share-alt
-			// entry.metadata.can_echo
-			a(href='#').echo
-				i.icon-random
-			// // entry.metadata.can_delete
-			a(href='#').delete
-				i.icon-remove
-
-		.entry.ping
-			.ping-profile.mentioned
-				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-			.post
-				.meta
-					a.who(href='#') @heello
-					span.time &nbsp;14 mins
-				p This ping mentions you! - &nbsp;
-					a.who(href='#') @katana
+				a.who(href='#')= '@' + entry.user.username
+				span.pad &nbsp;
+				time.reldate(datetime=date.format('isoDateTime'), title=date.format('dddd, mmmm dS, yyyy HH:MM:ss'))= date.format()
+			p!= text.escapeHTML().autolink().autousername().replace("\r\n", "<br>")
+		if entry.metadata != null
 			.controls
-				a(href='#')
-					i.icon-share-alt
-				a(href='#')
-					i.icon-random
-		.entry.ping.echo
-			.ping-profile
-				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-			.reping-profile.self
-				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
-			.post
-				.meta
-					a.who(href='#') @heello
-					span.time &nbsp;13 mins
-				p This is something you echoed!
-			.controls
-				a(href='#')
-					i.icon-share-alt
-				a(href='#')
-					i.icon-remove
-		.entry.ping.echo
-			.ping-profile.self
-				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
-			.reping-profile
-				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-			.post
-				.meta
-					a.who(href='#') @katana
-					span.time &nbsp;13 mins
-				p Someone echoed you!
-		.entry.ping
-			.ping-profile.self
-				img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3', alt='thumb')
-			.post
-				.meta
-					a.who(href='#') @katana
-					span.time &nbsp;12 mins
-				p This ping is by you!
-			.controls
-				a(href='#')
-					i.icon-remove
+				if entry.metadata.can_reply === true
+					a(href='#').reply
+						i.icon-share-alt
+				if entry.metadata.can_echo === true
+					a(href='#').echo
+						i.icon-random
+				if entry.metadata.can_delete === true
+					a(href='#').delete
+						i.icon-remove
