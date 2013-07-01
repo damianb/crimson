@@ -2,14 +2,14 @@
 # - global object prototype modifications...
 #
 
-Array::remove = (from, to) ->
+global.Array::remove = (from, to) ->
 	rest = @slice (to or from) + 1 or @length
 	@length = if from < 0 then @length + from else from
 	return @push.apply @, rest
 
 # the following are based on the autolink-js tool by bryanwoods on github: https://github.com/bryanwoods/autolink-js
 
-String::autolink = ->
+global.String::autolink = ->
 	pattern = ///
 		(^|\s)
 		(
@@ -28,20 +28,24 @@ String::autolink = ->
 		link = options.callback?(url) or "<a href='#{url}'#{linkAttributes}>#{url}</a>"
 		"#{space}#{link}"
 
-String::autousername = ->
+global.String::autousername = ->
 	pattern = /(^|\s)@([\w]{1,18})/g
 	uriBase = 'https://heello.com/'
 	if arguments.length is 0
-		return @replace(pattern, "$1<a href='#{uriBase}'>$2</a>")
+		return @replace(pattern, "$1<a href='#{uriBase}'>@$2</a>")
 
 	options = Array::slice.call(options)
 	linkAttributes = (" #{k}='#{v}'" for k, v of options when k isnt 'callback').join ''
 	return @replace pattern, (match, space, username) ->
-		link = options.callback?(url) or "<a href='#{uriBase}#{url}'#{linkAttributes}>#{username}</a>"
+		link = options.callback?(url) or "<a href='#{uriBase}#{url}'#{linkAttributes}>@#{username}</a>"
 		"#{space}#{link}"
 
+escapeHTML = require 'escape-html'
+global.String::escapeHTML = ->
+	return escapeHTML @
+
 dateFormat = require 'dateformat'
-Date::format = (mask, utc) ->
+global.Date::format = (mask, utc) ->
 	dateFormat @, mask, utc
 
 # global muckery...eugh
@@ -276,3 +280,18 @@ global.sampleJSON = sampleJSON = [
 		}
 	},
 ]
+
+#
+# bootstrapping some rendering...
+#
+
+jade = require 'jade'
+fn = jade.compile crimson.ui.timelineTemplate, { filename: './assets/templates/timeline.jade' }
+$('.columns').prepend(fn({
+	dateFormat: dateFormat
+	column:
+		name: 'test'
+		type: 'home'
+	entries: sampleJSON
+}))
+$('.column[data-column="superhome"]').hide()

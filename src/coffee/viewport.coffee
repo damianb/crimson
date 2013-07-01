@@ -7,14 +7,22 @@ class viewport
 		@resizeTimer = null
 	addTimeline: (timeline) ->
 		timelineName = if timeline.user then "#{timeline.type}.#{timeline.user.id}" else timeline.type
-		if !@timelines[timelineName]? then @timelines[timelineName] = timeline else false
-		@redraw()
+		if !@timelines[timelineName]?
+			@timelines[timelineName] = timeline
+			timeline.name = timelineName
+			@redraw()
+			true
+		else
+			false
 	removeTimeline: (timeline) ->
 		timelineName = if timeline.user then "#{timeline.type}.#{timeline.user.id}" else timeline.type
-		if !@timelines[timelineName]? then delete @timelines[timelineName]
-		timeline.__destroy()
-		@redraw()
-		true
+		if !@timelines[timelineName]?
+			delete @timelines[timelineName]
+			timeline.__destroy()
+			@redraw()
+			true
+		else
+			false
 	scrollTo: (relative) ->
 		numTimelines = Object.keys(@timelines).length
 		viewportWidth = $('#viewport').width()
@@ -24,6 +32,7 @@ class viewport
 		if maxTimelines <= numTimelines then return false
 
 		# todo - determine if we can move forward or back within the viewport
+		# todo viewport scrolling
 	resize: ->
 		# throttle resizing, webkit likes to send resize events as the window is being dragged,
 		# and not wait until the very end.
@@ -39,16 +48,22 @@ class viewport
 		overflowWidth = viewportWidth % numTimelines
 		viewportOffset = @first * viewportWidth
 
+		# the below seems to be causing problems with the UI. disabled for now.
+
 		#$('.column').animate({
 		#	width: timelineWidth + 'px'
 		#}, 500)
 		#$('#viewport').animate({
 		#	'margin-left': viewportOffset + 'px'
 		#}, 500)
+
 		$('.column').css('width', timelineWidth + 'px')
 		$('#viewport').css('left', viewportOffset + 'px')
 		$('.columns').css('width', (viewportWidth - overflowWidth) + 'px')
 		$('.column-overflow').css('width', overflowWidth + 'px')
 		true
+
+	render: (entries) ->
+		# todo
 
 module.exports = viewport

@@ -80,11 +80,6 @@ class dataStream extends EventEmitter
 			# ---- the above has been commented out for a reason; it'll probably make timelines wayyyyy too spammy about
 			# ---- our own pings being echoed
 			if response.type is 'listen' then types.push 'listener.new'
-			# for some reason, heello.users.notifications is a clusterfsck
-			# and breaks the standard format they *almost* had going.
-			# ....so to semi-standardize this for display, we have to do this ugly thing.
-			# tell the velociraptors I said I'm sorry.
-			response = if response.data.ping? then response.data.ping else response.data
 		else
 			if response.echo? and @client.users[response.echo.user_id]? then types.push 'echo.new.mine'
 			if response.echo? then types.push 'echo.new'
@@ -98,7 +93,12 @@ class dataStream extends EventEmitter
 		results = {}
 		processTypes = (type, response) ->
 			if results[type]? then results[type] = []
-			if response.data? then response = response.data
+			# for some reason, heello.users.notifications is a clusterfsck
+			# and breaks the standard format they *almost* had going.
+			# ....so to semi-standardize this for display, we have to do this ugly thing.
+			# tell the velociraptors I said I'm sorry.
+			if response.data?
+				response = if response.data.ping? then response.data.ping else response.data
 			results[type].push(response)
 		processTypes type, response for type in @_processResponse(response) for response in json.responses
 		@emit type, responses for type, responses of results
@@ -106,7 +106,12 @@ class dataStream extends EventEmitter
 		response = json.response
 		if err then return @client.ui.logError err
 		types = @_processResponse(response)
-		if response.data? then response = response.data
+		# for some reason, heello.users.notifications is a clusterfsck
+		# and breaks the standard format they *almost* had going.
+		# ....so to semi-standardize this for display, we have to do this ugly thing.
+		# tell the velociraptors I said I'm sorry.
+		if response.data?
+				response = if response.data.ping? then response.data.ping else response.data
 		@emit type, [response] for type in types # we want to be able to expect arrays constantly from this forward call.
 	forward: (err, json, res) ->
 		# todo
@@ -116,6 +121,5 @@ class dataStream extends EventEmitter
 		@emit '__destroy'
 		@client.removeListener 'heartbeat', bindType, listener for listener in @binds
 		@client = @_user = @api = null
-		# todo
 
 module.exports = dataStream

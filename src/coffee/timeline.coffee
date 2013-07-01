@@ -9,6 +9,7 @@ class timeline
 		#  ]
 		# }
 		@binds = {}
+		@name = null
 
 		if !@uid? and (type isnt 'superhome' or type isnt 'supernotify')
 			throw new Error 'All timelines except super types must be provided a user'
