@@ -1,13 +1,14 @@
 fs = require 'fs'
-# because node-webkit is being stupid about require & nw.gui...
+# because node-webkit is being stupid about requiring in nw.gui...
 gui = global.gui
+jade = require 'jade'
 viewport = require './viewport'
 
 class ui
 	constructor: ->
 		# cache the templates to save on memory
-		@timelineTemplate = fs.readFileSync './assets/templates/timeline.jade'
-		@entryTemplate = fs.readFileSync './assets/templates/entries.jade'
+		@timelineTemplate = jade.compile (fs.readFileSync './assets/templates/timeline.jade'), { filename: './assets/templates/timeline.jade' }
+		@entryTemplate = jade.compile (fs.readFileSync './assets/templates/entries.jade'), { filename: './assets/templates/entries.jade' }
 		@counters = {}
 		@throbInterval = null
 		@viewport = new viewport()
