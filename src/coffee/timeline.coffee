@@ -22,17 +22,17 @@ class timeline
 			@user = null
 
 		if type is 'superhome'
-			@bind 'ping.new', 'ping.new.mine', 'ping.new.private', 'echo.new', 'mention.new'
+			@bind 'ping.new', 'ping.new.mine', 'ping.new.private', 'echo.new', 'echo.new.mine', 'mention.new'
 		# probably not as useful of a type...
 		else if type is 'supernotify'
-			@bind 'mention.new', 'listener.new', 'echo.new.mine'
+			@bind 'mention.new', 'listener.new', 'echo.new.ofmine'
 		else if type is 'home'
 			@bind 'ping.new', 'ping.new.private', 'echo.new'
 		else if type is 'notify'
-			@bind 'mention.new', 'listener.new', 'echo.new.mine'
+			@bind 'mention.new', 'listener.new', 'echo.new.ofmine'
 		# shows notifications and usual home content...user-level though.
 		else if type is 'hybrid'
-			@bind 'ping.new', 'ping.new.private', 'echo.new', 'mention.new', 'listener.new', 'echo.new.mine'
+			@bind 'ping.new', 'ping.new.private', 'echo.new', 'mention.new', 'listener.new', 'echo.new.mine', 'echo.new.ofmine'
 		else if type is 'mentions'
 			@bind 'mention.new'
 		else if type is 'private'
@@ -41,9 +41,7 @@ class timeline
 			if !options.uid?
 				throw new Error 'cannot use a user timeline without specifying a user id'
 			@bind 'user.ping.' + options.uid, 'user.profile'
-			if options.showEchoes
-				@bind 'user.echo.' + options.uid
-		# todo more column types
+			if options.showEchoes then @bind 'user.echo.' + options.uid
 	addEntry: (entry) ->
 		# todo DOM manipulation
 	removeEntry: (entry) ->
