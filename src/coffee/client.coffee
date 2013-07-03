@@ -1,3 +1,13 @@
+###
+crimson - desktop heello client
+---
+author: Damian Bushong <katana@codebite.net>
+license: MIT license
+url: https://github.com/damianb/crimson
+heello: https://heello.com/katana
+twitter: https://twitter.com/burningcrimson
+###
+
 #
 # - global object prototype modifications...
 #
@@ -6,6 +16,14 @@ global.Array::remove = (from, to) ->
 	rest = @slice (to or from) + 1 or @length
 	@length = if from < 0 then @length + from else from
 	return @push.apply @, rest
+
+global.Array::has = (entries...) ->
+	hasEntries = true
+	process = () ->
+		if @.indexOf(entries.shift()) isnt -1 then hasEntries = false
+		null
+	process() until hasEntries is false or entries.length is 0
+	return hasEntries
 
 # the following are based on the autolink-js tool by bryanwoods on github: https://github.com/bryanwoods/autolink-js
 
@@ -140,7 +158,7 @@ $().ready ->
 
 # sample data, for now
 
-global.sampleJSON = sampleJSON = [
+global.sampleJSON = sampleJSON = { "response" : [
 	{
 		"id": 12188547,
 		"text": "@uppfinnarn shows just fine in my stack traces on an exception.",
@@ -150,29 +168,34 @@ global.sampleJSON = sampleJSON = [
 		"checkin": false,
 		"created_at": "2013-06-24T12:17:31Z",
 		"user": {
-			"id": 1688760,
-			"username": "katana",
-			"name": "Damian Bushong",
-			"bio": "Burning a hole through the past and lighting the path into the future.",
-			"website": "",
-			"location": "",
-			"timezone": "Central Time (US & Canada)",
-			"created_at": null,
-			"avatar": "//d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?1aa31f75916f1e69c17373b3087399b3",
-			"background": "//d2dh8keolssd5w.cloudfront.net/default.png",
-			"cover": "//d38xdbig8ajh16.cloudfront.net/default.png",
-			"metadata": {
-				"ping_count": 233,
-				"checkin_count": 0,
-				"listener_count": 26,
-				"listening_count": 6
-			}
+				"id": 1688760,
+				"username": "katana",
+				"name": "Damian Bushong",
+				"bio": "Burning a hole through the past and lighting the path into the future.",
+				"website": "",
+				"location": "",
+				"timezone": "Central Time (US & Canada)",
+				"created_at": null,
+				"avatar": "//d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed",
+				"background": "//d2dh8keolssd5w.cloudfront.net/default.png",
+				"cover": "//d38xdbig8ajh16.cloudfront.net/default.png",
+				"metadata": {
+						"ping_count": 259,
+						"checkin_count": 0,
+						"listener_count": 29,
+						"listening_count": 7
+				}
 		},
 		"media": {},
 		"metadata": {
-			"echo_count": 0,
-			"reply_count": 0
-		}
+				"echo_count": 0,
+				"reply_count": 0,
+				"can_reply": true,
+				"can_delete": true,
+				"can_echo": false,
+				"is_private": false
+		},
+		"replies": []
 	},
 
 	{
@@ -279,19 +302,18 @@ global.sampleJSON = sampleJSON = [
 			}
 		}
 	},
-]
+]}
 
 #
-# bootstrapping some rendering...
+# bootstrapping some rendering for mocking...
 #
 
-jade = require 'jade'
-fn = jade.compile crimson.ui.timelineTemplate, { filename: './assets/templates/timeline.jade' }
-$('.columns').prepend(fn({
-	dateFormat: dateFormat
-	column:
-		name: 'test'
-		type: 'home'
-	entries: sampleJSON
-}))
-$('.column[data-column="superhome"]').hide()
+$().ready ->
+	crimson.connectAll ->
+		displayResponse = (responses) ->
+			$('.column[data-column="superhome"]').prepend(crimson.ui.entryTemplate({
+				entries: responses
+			}))
+		crimson.users[0].data.on 'ping.new', displayResponse
+		crimson.users[0].data.on 'echo.new.ofmine', displayResponse
+		crimson.users[0].data.forwardArray null,sampleJSON, null
