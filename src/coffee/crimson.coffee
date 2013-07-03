@@ -23,11 +23,13 @@ class crimson extends EventEmitter
 
 	updateTokenStore: ->
 		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
-	connectAll: ->
+	connectAll: (fn) ->
 		if Object.keys(@tokenStore).length is 0
 			@connect() # initial authorization needed
 		else
 			@connect token for token in @tokenStore
+		fn?()
+		null
 	connect: (refreshToken) ->
 		# init an object for the user
 		api = crimson.getApi()
