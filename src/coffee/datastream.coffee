@@ -1,7 +1,7 @@
 {EventEmitter} = require 'events'
 
 class dataStream extends EventEmitter
-	constructor: (@client, @_user, @api) ->
+	constructor: (@client, @user, @api) ->
 		minute = 60 * 1000
 		@staleAge =
 			ping: 30 * minute
@@ -31,9 +31,9 @@ class dataStream extends EventEmitter
 	translator: (event) ->
 		# we're grabbing the name of the true query to prevent bind-collisions
 		return switch
-			when event is 'ping.new' or event is 'ping.new.private' or event is 'echo.new'
+			when event is 'ping.new' or event is 'ping.new.private' or event is 'echo.new' or event is 'echo.new.mine'
 				'users.timeline'
-			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.mine'
+			when event is 'mention.new' or event is 'listener.new' or event is 'echo.new.ofmine'
 				'users.notifications'
 			when event.match(/^user\.(?:ping|echo)\.([0-9]+)$/)
 				'users.pings.' + event.split('.').pop()
@@ -75,18 +75,24 @@ class dataStream extends EventEmitter
 		# otherwise, it is almost guaranteed to be another endpoint that we're streaming in
 		if response.data?
 			if response.type is 'mention' then types.push 'mention.new'
-			if response.type is 'echo' and @client.users[response.data.echo.user_id]? then types.push 'echo.new.mine'
+			if response.type is 'echo' and response.data.ping.echo.user_id is @user.id then types.push 'echo.new.ofmine'
+			if response.type is 'echo' and response.data.ping.user_id is @user.id then types.push 'echo.new.mine'
 			#if response.type is 'echo' then types.push 'echo.new'
 			# ---- the above has been commented out for a reason; it'll probably make timelines wayyyyy too spammy about
 			# ---- our own pings being echoed
 			if response.type is 'listen' then types.push 'listener.new'
+			if response.data.ping?.metadata?.is_private? is true then types.push 'ping.new.private'
+
+			if response.data.ping? then response.data.ping.types = types else response.data.types = types
 		else
-			if response.echo? and @client.users[response.echo.user_id]? then types.push 'echo.new.mine'
-			if response.echo? then types.push 'echo.new'
-			# if it's not from users.notifications and not an echo, it *should* be a ping
-			if !response.echo? then types.push 'ping.new'
+			if response.echo? and response.echo.user_id is @user.id then types.push 'echo.new.mine'
+				# if it's not from users.notifications and not an echo, it *should* be a ping
+			if response.echo? then types.push 'echo.new' else types.push 'ping.new'
+			if !response.echo? and response.user_id is @user.id then 'ping.new.mine'
 			# private	pings cannot be echoed, of course
-			if response.is_private? is true then types.push 'ping.new.private'
+			if response.metadata.is_private? is true then types.push 'ping.new.private'
+
+			response.types = types
 		return types
 	forwardArray: (err, json, res) ->
 		if err then return @client.ui.logError err
@@ -120,6 +126,6 @@ class dataStream extends EventEmitter
 	__destroy: ->
 		@emit '__destroy'
 		@client.removeListener 'heartbeat', bindType, listener for listener in @binds
-		@client = @_user = @api = null
+		@client = @user = @api = null
 
 module.exports = dataStream
