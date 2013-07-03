@@ -67,12 +67,14 @@ class ui
 		else
 			clearInterval @throbInterval
 			$('.throbber span').removeClass 'pulse'
-	bigError: (msg) ->
-		$('#errormsg').val msg
+	bigError: (err) ->
+		$('#errormsg').val err
 		display 'fatal'
-	logError: (msg) ->
+	logError: (err) ->
 		# todo - file logging of errors? NeDB inserts? etc? *shrug*
-		console.error msg
+		console.error err
+		fs.writeFileSync './error.log', err.stack
+		#process.exit(1)
 	insertTimeline: (template, entries) ->
 
 module.exports = new ui()

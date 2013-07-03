@@ -3,6 +3,8 @@ heelloApi = require 'heello'
 http = require 'http'
 url = require 'url'
 pkg = require './../../package.json'
+dataStream = require './datastream'
+
 tokenPort = 33233 #todo see how common this port is in use...
 
 class crimson extends EventEmitter
@@ -12,23 +14,21 @@ class crimson extends EventEmitter
 		@interceptors = 0
 		@interceptor = null
 		@tokenPort = tokenPort
-		@tokenStore = JSON.parse localStorage.getItem 'refreshTokenStore'
+		@tokenStore = JSON.parse(localStorage.getItem 'refreshTokenStore') or []
 		@heartbeat = null # this will hold a setInterval reference.
 		@pkg = pkg
 		# the below is for special unauthenticated stuff only
 		@heello = crimson.getApi()
 		@authURI = @heello.getAuthURI '0000'
-		if !@tokenStore? then @tokenStore = []
 		super()
 
 	updateTokenStore: ->
 		localStorage.setItem 'refreshTokenStore', JSON.stringify @tokenStore
-	connectAll: (fn) ->
+	connectAll: ->
 		if Object.keys(@tokenStore).length is 0
 			@connect() # initial authorization needed
 		else
-			@connect token for token in @tokenStore
-		fn?()
+			@connect token for token in @tokenStore when token isnt null
 		null
 	connect: (refreshToken) ->
 		# init an object for the user
@@ -41,15 +41,19 @@ class crimson extends EventEmitter
 			profile: null
 		user.data = new dataStream @, user, api
 		procTokens = (err) =>
-			if err? then bigError err
+			if err? then return @ui.logError err
+			if api.refreshToken is null then throw new Error 'api.refreshToken null!'
+			oldTokenIndex = @tokenStore.indexOf refreshToken
+			if oldTokenIndex isnt -1 then @tokenStore.remove oldTokenIndex
 			@tokenStore.push api.refreshToken
 			@updateTokenStore()
 			api.on 'newTokens', (oldRefreshToken, newRefreshToken) =>
-				if @tokenStore.indexOf(oldRefreshToken) isnt -1
-					@tokenStore.remove @tokenStore.indexOf oldRefreshToken
+				oldTokenIndex = @tokenStore.indexOf oldRefreshToken
+				if oldTokenIndex isnt -1 then @tokenStore.remove oldTokenIndex
 				@tokenStore.push newRefreshToken
 				@updateTokenStore()
 			api.users.me (err, json) =>
+				if err? then return @ui.logError err
 				user.profile = json.response
 				user.id = user.profile.id
 				first = Object.keys(@users).length is 0
@@ -64,7 +68,7 @@ class crimson extends EventEmitter
 				api.getTokens code, procTokens
 			@emit 'auth.pending', user
 		else
-			api.refreshTokens refreshToken, procToken
+			api.refreshTokens refreshToken, procTokens
 	tokenInterceptor: (fn) ->
 		# interceptor queue, so that we don't waste an HTTP server when we need one
 		if @interceptors is 0
@@ -106,7 +110,7 @@ class crimson extends EventEmitter
 			# ignore the obfuscation, it's necessary due to automated code scanners
 			appId: new Buffer('ZThhYTg4NGJmM2NlYzk1NmQ2NGJjODc3NDc1N2U4Nzk5ZTFlZGEwZGY3MmNlNjQyOWYxYTRlZWNiN2ViZDQxYw==', 'base64').toString()
 			appSecret: new Buffer('MDljMTE2MjRmN2EyZTZiNTRjODFmZDcxMjQzYTY5Y2Q5OTZmZDZhOTliM2ZjMzk0MmNjMzhiODNjMGYyM2FhNg==', 'base64').toString()
-			callbackURI: "http://127.0.0.1:#{@tokenPort}"
+			callbackURI: "http://127.0.0.1:#{tokenPort}"
 			userAgent: "crimson-client_#{pkg.version}"
 		}
 

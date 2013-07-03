@@ -44,18 +44,19 @@ class dataStream extends EventEmitter
 		type = @translator event
 		if type is false then return
 		# newListener is the actual listener that will be forwarding dispatches
-		newListener = switch
-			when event is 'users.timeline'
-				=>
-					@api.users.timeline @forwardArray
-			when event is 'users.notifications'
-				=>
-					@api.users.notifications @forwardArray
-			when event.match(/^users\.pings\./)
-				uid = event.split('.').pop()
-				=>
-					# todo - paging?
-					@api.users.pings { ':id': uid }, @forwardArray
+		newListener = null
+		if event is 'users.timeline'
+			newListener = =>
+				@api.users.timeline @forwardArray
+		if event is 'users.notifications'
+			newListener = =>
+				@api.users.notifications @forwardArray
+		if event.match(/^users\.pings\./)
+			uid = event.split('.').pop()
+			newListener = =>
+				# todo paging?
+				@api.users.pings { ':id': uid }, @forwardArray
+		if !newListener? then return
 		if !@binds[type]?
 			@binds[type] = newListener
 			@client.on 'heartbeat', newListener
@@ -75,30 +76,32 @@ class dataStream extends EventEmitter
 		# otherwise, it is almost guaranteed to be another endpoint that we're streaming in
 		if response.data?
 			if response.type is 'mention' then types.push 'mention.new'
+			if response.type is 'echo' then types.push 'echo.new'
+			if response.type is 'listen' then types.push 'listener.new'
+
 			if response.type is 'echo' and response.data.ping.echo.user_id is @user.id then types.push 'echo.new.ofmine'
 			if response.type is 'echo' and response.data.ping.user_id is @user.id then types.push 'echo.new.mine'
-			#if response.type is 'echo' then types.push 'echo.new'
-			# ---- the above has been commented out for a reason; it'll probably make timelines wayyyyy too spammy about
-			# ---- our own pings being echoed
-			if response.type is 'listen' then types.push 'listener.new'
-			if response.data.ping?.metadata?.is_private? is true then types.push 'ping.new.private'
+			if response.type is 'mention' and response.data.ping.metadata.is_private is true then types.push 'ping.new.private'
 
 			if response.data.ping? then response.data.ping.types = types else response.data.types = types
 		else
-			if response.echo? and response.echo.user_id is @user.id then types.push 'echo.new.mine'
-				# if it's not from users.notifications and not an echo, it *should* be a ping
-			if response.echo? then types.push 'echo.new' else types.push 'ping.new'
-			if !response.echo? and response.user_id is @user.id then 'ping.new.mine'
-			# private	pings cannot be echoed, of course
-			if response.metadata.is_private? is true then types.push 'ping.new.private'
+			# if it's not from users.notifications and not an echo, it *should* be a ping
+			if response.echo?
+				types.push 'echo.new'
+				if response.echo.user_id is @user.id then types.push 'echo.new.mine'
+			else
+				types.push 'ping.new'
+				if response.user_id is @user.id then types.push 'ping.new.mine'
+				if response.metadata.is_private is true then types.push 'ping.new.private'
 
 			response.types = types
 		return types
 	forwardArray: (err, json, res) ->
-		if err then return @client.ui.logError err
+		#if err then return @client.ui.logError err
+		if err then throw err
 		results = {}
 		processTypes = (type, response) ->
-			if results[type]? then results[type] = []
+			if !results[type]? then results[type] = []
 			# for some reason, heello.users.notifications is a clusterfsck
 			# and breaks the standard format they *almost* had going.
 			# ....so to semi-standardize this for display, we have to do this ugly thing.
@@ -106,7 +109,7 @@ class dataStream extends EventEmitter
 			if response.data?
 				response = if response.data.ping? then response.data.ping else response.data
 			results[type].push(response)
-		processTypes type, response for type in @_processResponse(response) for response in json.responses
+		processTypes type, response for type in @_processResponse(response) for response in json.response
 		@emit type, responses for type, responses of results
 	forwardSingle: (err, json, res) ->
 		response = json.response
