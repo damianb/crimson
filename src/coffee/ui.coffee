@@ -11,7 +11,7 @@ class ui
 		@entryTemplate = jade.compile (fs.readFileSync './assets/templates/entries.jade'), { filename: './assets/templates/entries.jade' }
 		@counters = {}
 		@throbInterval = null
-		@viewport = new viewport()
+		@viewport = new viewport @
 	display: (state) ->
 		throbbing = !($('.display.dis-load').hasClass 'hide')
 		$('.display').addClass 'hide'

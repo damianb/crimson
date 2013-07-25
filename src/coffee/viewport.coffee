@@ -1,5 +1,5 @@
 class viewport
-	constructor: () ->
+	constructor: (@ui) ->
 		@timelines = {}
 		@visible = 1
 		@first = 0
@@ -15,8 +15,14 @@ class viewport
 		else
 			false
 	removeTimeline: (timeline) ->
-		timelineName = if timeline.user then "#{timeline.type}.#{timeline.user.id}" else timeline.type
-		if !@timelines[timelineName]?
+		if typeof timeline is Object
+			timelineName = if timeline.user then "#{timeline.type}.#{timeline.user.id}" else timeline.type
+		else
+			timelineName = timeline
+			timeline = @timelines[timelineName]? then @timelines[timelineName] else false
+
+		if @timelines[timelineName]?
+			@unrenderTimeline(timeline)
 			delete @timelines[timelineName]
 			timeline.__destroy()
 			@redraw()
@@ -62,7 +68,8 @@ class viewport
 		$('.columns').css('width', (viewportWidth - overflowWidth) + 'px')
 		$('.column-overflow').css('width', overflowWidth + 'px')
 		true
-
+	renderTimeline: (timeline) ->
+	unrenderTimeline: (timeline) ->
 	render: (entries) ->
 		# todo
 
