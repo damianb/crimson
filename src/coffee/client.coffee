@@ -25,8 +25,9 @@ global.Array::has = (entries...) ->
 	process() until hasEntries is false or entries.length is 0
 	return hasEntries
 
-# the following are based on the autolink-js tool by bryanwoods on github: https://github.com/bryanwoods/autolink-js
+# todo - deprecate the following two globals
 
+# the following are based on the autolink-js tool by bryanwoods on github: https://github.com/bryanwoods/autolink-js
 global.String::autolink = ->
 	pattern = ///
 		(^|\s)
@@ -66,11 +67,12 @@ dateFormat = require 'dateformat'
 global.Date::format = (mask, utc) ->
 	dateFormat @, mask, utc
 
-# global muckery...eugh
+# global muckery...yuck. ;_;
 
 global.localStorage = localStorage
 global.$ = $
 global.gui = gui = require 'nw.gui'
+mainWindow = gui.Window.get()
 
 # special requires
 
@@ -84,6 +86,14 @@ fs = require 'fs'
 # initially, we are NOT in debug mode. we have to key-sequence our way into debug mode, and answer
 # a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.
 DEBUG = false
+
+# working around a node-webkit bug on windows
+# ref: https://github.com/rogerwang/node-webkit/issues/253
+mainWindow.on 'minimize', ->
+	width = mainWindow.width
+	mainWindow.once 'restore', ->
+		if mainWindow.width isnt width
+			mainWindow.width = width
 
 process.on 'uncaughtException', (err) ->
 	fs.writeFileSync './error.log', err.stack
