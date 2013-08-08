@@ -1,28 +1,30 @@
 {
-	"private": true,
-	"name": "crimson",
-	"author": "Damian Bushong <katana@codebite.net>",
-	"description": "desktop heello client",
-	"homepage": "https://github.com/damianb/crimson",
-	"repository": {
-		"type": "git",
-		"url": "http://github.com/damianb/crimson.git"
-	},
-	"version": "0.1.0",
-	"main": "index.html",
-	"single-instance": true,
-	"window": {
-		"width": 380,
-		"height": 550,
-		"min_width": 320,
-		"min_height": 500,
-		"toolbar": false
-	},
-	"dependencies": {
-		"jade": "~0.31.2",
-		"dateformat": "~1.0.6-1.2.3",
-		"escape-html": "~1.0.0",
-		"twitter": "~1.1.8",
-		"debug": "~0.7.2"
-	}
+  "private": true,
+  "name": "crimson",
+  "author": "Damian Bushong <katana@codebite.net>",
+  "description": "desktop heello client",
+  "homepage": "https://github.com/damianb/crimson",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/damianb/crimson.git"
+  },
+  "version": "0.1.0",
+  "main": "index.html",
+  "single-instance": true,
+  "window": {
+    "width": 380,
+    "height": 550,
+    "min_width": 320,
+    "min_height": 500,
+    "toolbar": false
+  },
+  "dependencies": {
+    "jade": "~0.31.2",
+    "dateformat": "~1.0.6-1.2.3",
+    "escape-html": "~1.0.0",
+    "twit": "~1.1.8",
+    "debug": "~0.7.2",
+    "request": "~2.26.0",
+    "oauth": "~0.9.10"
+  }
 }
