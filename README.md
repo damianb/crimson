@@ -1,6 +1,6 @@
 # crimson
 
-desktop heello client, built using node-webkit, node-heello, and several other libraries.
+desktop social network client, built using node-webkit, twit, and several other libraries.
 
 targets:
 
@@ -8,7 +8,7 @@ targets:
 * mac
 * linux
 
-*note*: linux support currently broken due to an upstream issue regarding availability of older versions of `libudev.so` on modern distributions (see [issue](https://github.com/rogerwang/node-webkit/issues/770))
+*note*: linux support problematic due to an upstream issue regarding availability of older versions of `libudev.so` on modern distributions (see [issue](https://github.com/rogerwang/node-webkit/issues/770))
 
 ## license
 
@@ -18,7 +18,7 @@ twitter bootstrap used under [Apache license 2.0](https://github.com/twitter/boo
 
 ### compiling
 
-requires node-webkit 0.5.1 (at least)
+requires node-webkit 0.6.0+
 
 to build latest changes, cd to project directory and use `cake build` or `cake watch` to build coffeescript, less, jade files used by crimson.
 
@@ -26,8 +26,9 @@ to run the application, cd to project directory and launch the build directory w
 
 ### todo
 
+* refactor for proper twitter support
+* leverage twitter userstreams for max efficiency
 * finish multi-column, multi-user support
-* add NeDB support for storage
 * settings menus
 * navigation icons
 * logo
