@@ -2,13 +2,13 @@
   "private": true,
   "name": "crimson",
   "author": "Damian Bushong <katana@codebite.net>",
-  "description": "desktop heello client",
+  "description": "desktop social network client",
   "homepage": "https://github.com/damianb/crimson",
   "repository": {
     "type": "git",
     "url": "http://github.com/damianb/crimson.git"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "index.html",
   "single-instance": true,
   "window": {
@@ -19,12 +19,13 @@
     "toolbar": false
   },
   "dependencies": {
-    "jade": "~0.31.2",
+    "async": "~0.2.9",
     "dateformat": "~1.0.6-1.2.3",
+	"debug": "~0.7.2",
     "escape-html": "~1.0.0",
-    "twit": "~1.1.8",
-    "debug": "~0.7.2",
-    "request": "~2.26.0",
-    "nedb": "~0.8.5"
+	"jade": "~0.31.2",
+	"nedb": "~0.8.5",
+	"request": "~2.26.0",
+    "twit": "~1.1.8"
   }
 }
