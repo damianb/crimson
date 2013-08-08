@@ -15,15 +15,15 @@ twitter: https://twitter.com/burningcrimson
 global.Array::remove = (from, to) ->
 	rest = @slice (to or from) + 1 or @length
 	@length = if from < 0 then @length + from else from
-	return @push.apply @, rest
+	@push.apply @, rest
 
 global.Array::has = (entries...) ->
 	hasEntries = true
-	process = () =>
-		if @indexOf(entries.shift()) is -1 then hasEntries = false
-		null
+	process = =>
+		if (@indexOf entries.shift()) is -1 then
+			hasEntries = false
 	process() until hasEntries is false or entries.length is 0
-	return hasEntries
+	hasEntries
 
 # todo - deprecate the following two globals
 
@@ -63,7 +63,7 @@ global.String::autousername = ->
 
 escapeHTML = require 'escape-html'
 global.String::escapeHTML = ->
-	return escapeHTML @
+	escapeHTML @
 
 dateFormat = require 'dateformat'
 global.Date::format = (mask, utc) ->
@@ -84,6 +84,10 @@ dataStream = require './assets/js/datastream'
 timeline = require './assets/js/timeline'
 domain = require 'domain'
 fs = require 'fs'
+debug = (require 'debug')('client')
+
+# we need to make this a global for now
+global.crimson = crimson
 
 # initially, we are NOT in debug mode. we have to key-sequence our way into debug mode, and answer
 # a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.
@@ -94,14 +98,16 @@ DEBUG = false
 mainWindow.on 'minimize', ->
 	width = mainWindow.width
 	mainWindow.once 'restore', ->
-		if mainWindow.width isnt width
-			mainWindow.width = width
+		if mainWindow.width isnt width then mainWindow.width = width
 
 process.on 'uncaughtException', (err) ->
+	debug 'uncaught exception: ' + err
 	fs.writeFileSync './error.log', err.stack
+	# process.exit 1
 
 d = domain.create()
 d.on 'error', (err) ->
+	debug 'caught error: ' + err
 	fs.writeFileSync './error.log', err.stack
 
 d.run ->
@@ -130,10 +136,13 @@ d.run ->
 	crimson.on 'user.ready', ->
 		console.log 'connected!'
 
-	crimson.on 'auth.pending', ->
-		# display the auth chrome if we don't have any tokens
-		if Object.keys(crimson.users).length is 0 and crimson.tokenStore.length is 0
-			crimson.ui.display 'auth'
+	crimson.on 'user.noaccount', ->
+		# todo finish
+		gui.window.open 'authorize.html', {
+			position: 'center'
+			height: 500
+			width: 500
+		}
 
 	#
 	# - key binds
@@ -146,23 +155,15 @@ d.run ->
 	$(document).on 'keydown', null, 'ctrl+j', ->
 		if DEBUG
 			gui.Window.get().showDevTools()
-		return null
 	$(document).on 'keydown', null, 'ctrl+r', ->
 		if DEBUG
 			gui.Window.get().reloadIgnoringCache()
-		return null
-
-	#
-	# - button binds
-	#
-
-	$('button#authorize').on 'click', null, () ->
-		gui.Shell.openExternal crimson.authURI
 
 	#
 	# - ui binds
 	#
 
+	# todo refactor
 	crimson.ui.counter('#pingText', '#charcount', 200)
 	$('button#private').on 'click', null, ->
 		if !$('button#private').hasClass 'active'
@@ -179,11 +180,12 @@ d.run ->
 		$('#version').text("nw #{process.versions['node-webkit']}; node #{process.version}; crimson #{crimson.pkg.version}")
 		$('footer').hide()
 		crimson.ui.display 'load'
-		crimson.ui.display 'client'
-		crimson.ui.column 'home'
+
+		#crimson.ui.display 'client'
+		#crimson.ui.column 'home'
 
 		$('.reldate').relatizeDateTime()
 		setInterval ->
 			$('.reldate').relatizeDateTime()
 		, 60
-		#crimson.connectAll()
+		crimson.connectAll()
