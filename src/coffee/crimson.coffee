@@ -7,7 +7,6 @@ twit = require 'twit'
 nedb  = require 'nedb'
 request = require 'request'
 pkg = require './../../package.json'
-dataStream = require './datastream'
 
 class crimson extends EventEmitter
 	constructor: ->
@@ -60,9 +59,10 @@ class crimson extends EventEmitter
 		user =
 			api: @getApi(account.token, account.secret)
 			crimson: @
-			data: null
 			id: account.userId
 			profile: null
+
+		#user.api.get
 
 		# todo finish
 
