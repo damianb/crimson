@@ -1,20 +1,43 @@
 {$} = global
 
 class timeline
-	constructor: (@user, type) ->
+	constructor: (@type, @user) ->
 		{ @stream, @crimson } = @user
-		if !@uid? and (type isnt 'superhome')
-			throw new Error 'All timelines except super types must be provided a user'
+		if !@stream? and (@type isnt 'superhome' or @type isnt 'supernotify')
+			throw new Error 'All timelines except super types must be provided a datastream'
+		else if @type is 'superhome' or @type is 'supernotify'
+			@stream = @crimson
 
-		if !timeline.timelineEvents[type]?
-			throw new Error 'unrecognized timeline type'
+		if !timeline.timelineEvents[@type]?
+			throw new Error 'Unrecognized timeline type provided'
 
-		@stream.on event, @addEntry for event in timeline.timelineEvents[type]
+		@stream.on event, @addEntry for event in timeline.timelineEvents[@type]
 		@stream.on 'tweet.delete', @removeEntry
-	addEntry: (entry) ->
-		# todo DOM manipulation
+	addEntry: (entries...) ->
+		$('#timeline').prepend @crimson.ui.entryTemplate {
+			entries: entries
+		}
 	removeEntry: (entry) ->
-		# todo DOM removal, remove from NeDB database?
+		# todo DOM removal
+	minimize: (fn) ->
+		# hmmm....not sure what we can or should do here. maybe emit or something later.
+		$('#timeline').html('')
+		fn null
+	restore: (fn) ->
+		# build our query based on timeline event types, etc.
+		query = {}
+
+		# only use an ownerId if we're not using a ^super timeline
+		if @type isnt 'superhome' and @type isnt 'supernotify'
+			query.ownerId = @user.id
+		query.eventType = { $in: tiemline.timelineEvents }
+		@crimson.db.event.find query, (err, docs) =>
+			docs.sort (a,b) ->
+				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
+			$('#timeline').prepend @crimson.ui.entryTemplate {
+				entries: docs
+			}
+			fn null
 	__destroy: ->
 		@stream.removeListener event, @addEntry for event in timeline.timelineEvents[type]
 		@stream.removeListener 'tweet.delete', @removeEntry
