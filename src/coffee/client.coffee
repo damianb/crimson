@@ -85,7 +85,6 @@ d.run ->
 		# if the first user to connect, we need to display the client chrome and the home column
 		if first
 			crimson.ui.display 'client'
-			crimson.ui.column 'home'
 
 			displayResponse = (responses) ->
 				$('.column[data-column="superhome"]').prepend(crimson.ui.entryTemplate({
@@ -129,25 +128,12 @@ d.run ->
 	#
 
 	# todo refactor
-	crimson.ui.counter('#pingText', '#charcount', 200)
-	$('button#private').on 'click', null, ->
-		if !$('button#private').hasClass 'active'
-			crimson.ui.counters['#pingText'].max = 400
-		else
-			crimson.ui.counters['#pingText'].max = 200
-		crimson.ui.counters['#pingText'].charCount(false)
-
-	$(window).resize ->
-		# queue a redraw
-		crimson.ui.viewport.resize()
+	crimson.ui.counter('#tweetText', '#charcount', 140)
 
 	$().ready ->
 		$('#version').text("nw #{process.versions['node-webkit']}; node #{process.version}; crimson #{crimson.pkg.version}")
 		$('footer').hide()
 		crimson.ui.display 'load'
-
-		#crimson.ui.display 'client'
-		#crimson.ui.column 'home'
 
 		$('.reldate').relatizeDateTime()
 		setInterval ->
