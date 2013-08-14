@@ -19,8 +19,8 @@ class timeline
 		}
 	removeEntry: (entry) ->
 		# todo DOM removal
+		# htf am I going to find the right entry. AAAAAAAAAAAAAAAAAAUGH FUCKING HELL *tableflip*
 	minimize: (fn) ->
-		# hmmm....not sure what we can or should do here. maybe emit or something later.
 		$('#timeline').html('')
 		fn null
 	restore: (fn) ->
