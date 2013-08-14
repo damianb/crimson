@@ -3,9 +3,9 @@ debug = (require 'debug')('stream')
 
 class stream extends EventEmitter
 	constructor: (@user) ->
-		{@crimson, @api}
+		{@crimson, @api} = @user
 		@twitStream = @api.stream('user')
-		@twitStream.on 'tweet', @tweetEmitter
+		couple false
 		super()
 
 	tweetEmitter: (event) ->
@@ -17,9 +17,8 @@ class stream extends EventEmitter
 		# retweet.new.mine
 		# retweet.new.ofmine
 		# mention.new
-		# follower.new - not tweet
-		# favorite.new.ofmine - not tweet
 		#
+
 		query =
 			ownerId: @user.id
 			eventType: []
@@ -166,6 +165,32 @@ class stream extends EventEmitter
 
 	# no way in hell am I doing lists here. not in the first versions. fuck that shit.
 
+	couple: (decouple = false) ->
+		method = if decouple then 'removeListener' else 'on'
+
+		# the standard bs
+		@twitStream[method] 'tweet', @tweetEmitter
+		@twitStream[method] 'delete', @deleteEmitter
+		# disabled for now
+		#@twitStream[method] 'scrub_geo', @scrubgeoEmitter
+		@twitStream[method] 'connect', @connectEmitter
+		@twitStream[method] 'disconnect', @disconnectEmitter
+		@twitStream[method] 'reconnect', @reconnectEmitter
+		@twitStream[method] 'status_withheld', @withheldTweetEmitter
+		@twitStream[method] 'user_withheld', @withheldUserEmitter
+		@twitStream[method] 'friends', @friendsEmitter
+
+		# special user stream events
+		@twitStream[method] 'user_update', @userUpdateEmitter
+		@twitStream[method] 'follow', @friendsEmitter
+		@twitStream[method] 'unfollow', @friendsEmitter
+		@twitStream[method] 'favorite', @friendsEmitter
+		@twitStream[method] 'unfavorite', @friendsEmitter
+		@twitStream[method] 'blocked', @friendsEmitter
+		@twitStream[method] 'unblocked', @friendsEmitter
+
+
+
 	emit: (args...) ->
 		# please work on the first try, oh please oh please
 		@crimson.emit.apply @crimson, args
@@ -173,5 +198,4 @@ class stream extends EventEmitter
 
 	__destroy: ->
 		# todo remove all listeners from twitstream and close it and kill it with fire
-		@twitStream.removeListener 'tweet', @tweetEmitter
-		@twitStream.removeListener 'delete', @deleteEmitter
+		@couple true
