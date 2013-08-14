@@ -1,12 +1,11 @@
 {EventEmitter} = require 'events'
 debug = (require 'debug')('core')
-http = require 'http'
 url = require 'url'
 qs = require 'querystring'
 twit = require 'twit'
 nedb  = require 'nedb'
 request = require 'request'
-pkg = require './../../package.json'
+{ gui } = global
 
 class crimson extends EventEmitter
 	constructor: ->
@@ -14,8 +13,8 @@ class crimson extends EventEmitter
 			# todo update with actual tokens
 			consumer_key: new Buffer '', 'base64'
 			consumer_secret: new Buffer '', 'base64'
-		@pkg = pkg #todo remove in favor of nw's app.Manifest
-		@ui = null
+		@pkg = gui.App.manifest
+		@ui = require './ui'
 
 		#
 		# the following three databases are divvied up as follows:
@@ -30,9 +29,14 @@ class crimson extends EventEmitter
 			preferences: new nedb { nodeWebkitAppName: 'crimson', filename: 'prefs.db' }
 			users: new nedb { nodeWebkitAppName: 'crimson', filename: 'users.db' }
 			events: new nedb()
+		# todo: index constraints
 
+		@timelines =
+			super:
+				superhome: null
+				supernotify: null
+			user: {}
 		@users = {}
-		@heartbeat = true
 
 		super()
 
@@ -128,11 +132,7 @@ class crimson extends EventEmitter
 
 	# shutdown procedures - should handle cleanup
 	__destroy: ->
-		# stop heartbeat
-		#@halt()
-		# ensure token store is completely up to date
-		@updateTokenStore()
 		@emit '__destroy'
-		user.data.__destroy() for user of @users
+		user.stream.__destroy() for user of @users
 
 module.exports = new crimson()
