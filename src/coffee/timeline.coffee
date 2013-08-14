@@ -18,8 +18,7 @@ class timeline
 			entries: entries
 		}
 	removeEntry: (entry) ->
-		# todo DOM removal
-		# htf am I going to find the right entry. AAAAAAAAAAAAAAAAAAUGH FUCKING HELL *tableflip*
+		$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
 	minimize: (fn) ->
 		$('#timeline').html('')
 		fn null
