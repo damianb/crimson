@@ -11,10 +11,10 @@ pkg = require './../../package.json'
 class crimson extends EventEmitter
 	constructor: ->
 		@appTokens =
-			consumer_key: new Buffer('', 'base64')
-			consumer_secret: new Buffer('', 'base64')
-		@pkg = pkg
-
+			# todo update with actual tokens
+			consumer_key: new Buffer '', 'base64'
+			consumer_secret: new Buffer '', 'base64'
+		@pkg = pkg #todo remove in favor of nw's app.Manifest
 		@ui = null
 
 		#
@@ -24,12 +24,12 @@ class crimson extends EventEmitter
 		#  userId: user's string id
 		#  token: oauth token
 		#  secret: oauth secret token
-		# tweet: in-memory database of recent tweets. will be purged of old content on an interval to reduce memory nommage
+		# event: in-memory database of recent stream events. will be purged of old content on an interval to reduce memory nommage
 		#
 		@db =
 			preferences: new nedb { nodeWebkitAppName: 'crimson', filename: 'prefs.db' }
-			user: new nedb { nodeWebkitAppName: 'crimson', filename: 'users.db' }
-			tweet: new nedb()
+			users: new nedb { nodeWebkitAppName: 'crimson', filename: 'users.db' }
+			events: new nedb()
 
 		@users = {}
 		@heartbeat = true
@@ -37,7 +37,7 @@ class crimson extends EventEmitter
 		super()
 
 	connectAll: (fn) ->
-		@db.user.find { enabled: true }, (err, tokens) =>
+		@db.users.find { enabled: true }, (err, tokens) =>
 			if err
 				debug 'crimson.connectAll nedb err: ' + err
 				return fn err
@@ -59,6 +59,7 @@ class crimson extends EventEmitter
 		user =
 			api: @getApi(account.token, account.secret)
 			crimson: @
+			stream: null # will hold a datastream, which wraps twit streams
 			id: account.userId
 			profile: null
 
