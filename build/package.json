@@ -21,11 +21,12 @@
   "dependencies": {
     "async": "~0.2.9",
     "dateformat": "~1.0.6-1.2.3",
-	"debug": "~0.7.2",
+    "debug": "~0.7.2",
     "escape-html": "~1.0.0",
-	"jade": "~0.31.2",
-	"nedb": "~0.8.5",
-	"request": "~2.26.0",
-    "twit": "~1.1.8"
+    "jade": "~0.31.2",
+    "nedb": "~0.8.5",
+    "request": "~2.26.0",
+    "twit": "~1.1.8",
+    "twitter-text": "~1.6.1"
   }
 }
