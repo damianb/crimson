@@ -13,10 +13,9 @@ class timeline
 
 		@stream.on event, @addEntry for event in timeline.timelineEvents[@type]
 		@stream.on 'tweet.delete', @removeEntry
+		@stream.on '__destroy', @__destroy
 	addEntry: (entries...) ->
-		$('#timeline').prepend @crimson.ui.entryTemplate {
-			entries: entries
-		}
+		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
 	removeEntry: (entry) ->
 		$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
 	minimize: (fn) ->
@@ -33,9 +32,7 @@ class timeline
 		@crimson.db.event.find query, (err, docs) =>
 			docs.sort (a,b) ->
 				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
-			$('#timeline').prepend @crimson.ui.entryTemplate {
-				entries: docs
-			}
+			$('#timeline').prepend @crimson.ui.entryTemplate { entries: docs }
 			fn null
 	__destroy: ->
 		@stream.removeListener event, @addEntry for event in timeline.timelineEvents[type]
