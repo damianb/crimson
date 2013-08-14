@@ -1,5 +1,5 @@
 ###
-crimson - desktop heello client
+crimson - desktop social network client
 ---
 author: Damian Bushong <katana@codebite.net>
 license: MIT license
@@ -25,41 +25,6 @@ global.Array::has = (entries...) ->
 	process() until hasEntries is false or entries.length is 0
 	hasEntries
 
-# todo - deprecate the following two globals
-
-###
-# the following are based on the autolink-js tool by bryanwoods on github: https://github.com/bryanwoods/autolink-js
-global.String::autolink = ->
-	pattern = ///
-		(^|\s)
-		(
-			(?:https?|ftp):// # Look for a valid URL protocol (non-captured)
-			[\w\-+\u0026@#/%?=~|!:,.;]*# Valid URL characters (any number of times)
-			[\w\-+\u0026@#/%=~|] # String must end in a valid URL character
-		)
-	///gi
-
-	if arguments.length is 0
-		return @replace(pattern, "$1<a href='$2'>$2</a>")
-
-	options = Array::slice.call(options)
-	linkAttributes = (" #{k}='#{v}'" for k, v of options when k isnt 'callback').join ''
-	return @replace pattern, (match, space, url) ->
-		link = options.callback?(url) or "<a href='#{url}'#{linkAttributes}>#{url}</a>"
-		"#{space}#{link}"
-
-global.String::autousername = ->
-	pattern = /(^|\s)@([\w]{1,18})/g
-	uriBase = 'https://heello.com/'
-	if arguments.length is 0
-		return @replace(pattern, "$1<a href='#{uriBase}'>@$2</a>")
-
-	options = Array::slice.call(options)
-	linkAttributes = (" #{k}='#{v}'" for k, v of options when k isnt 'callback').join ''
-	return @replace pattern, (match, space, username) ->
-		link = options.callback?(url) or "<a href='#{uriBase}#{url}'#{linkAttributes}>@#{username}</a>"
-		"#{space}#{link}"
-###
 
 escapeHTML = require 'escape-html'
 global.String::escapeHTML = ->
@@ -80,8 +45,8 @@ mainWindow = gui.Window.get()
 
 crimson = require './assets/js/crimson'
 crimson.ui = require './assets/js/ui'
-dataStream = require './assets/js/datastream'
-timeline = require './assets/js/timeline'
+#dataStream = require './assets/js/datastream'
+#timeline = require './assets/js/timeline'
 domain = require 'domain'
 fs = require 'fs'
 debug = (require 'debug')('client')
