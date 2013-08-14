@@ -66,6 +66,8 @@ class crimson extends EventEmitter
 			stream: null # will hold a datastream, which wraps twit streams
 			id: account.userId
 			profile: null
+			friends: []
+			blocked: []
 
 		#user.api.get
 
