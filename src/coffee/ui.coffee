@@ -1,8 +1,7 @@
 fs = require 'fs'
-# because node-webkit is being stupid about requiring in nw.gui...
+# nw-gui include (has to be globaled in)
 gui = global.gui
 jade = require 'jade'
-viewport = require './viewport'
 
 class ui
 	constructor: ->
@@ -11,7 +10,6 @@ class ui
 		@entryTemplate = jade.compile (fs.readFileSync './assets/templates/entries.jade'), { filename: './assets/templates/entries.jade' }
 		@counters = {}
 		@throbInterval = null
-		@viewport = new viewport @
 	display: (state) ->
 		throbbing = !($('.display.dis-load').hasClass 'hide')
 		$('.display').addClass 'hide'
@@ -74,7 +72,7 @@ class ui
 		# todo - file logging of errors? NeDB inserts? etc? *shrug*
 		console.error err
 		fs.writeFileSync './error.log', err.stack
-		#process.exit(1)
+		process.exit 1
 	insertTimeline: (template, entries) ->
 
 module.exports = new ui()
