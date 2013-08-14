@@ -14,13 +14,19 @@ class timeline
 		@stream.on event, @addEntry for event in timeline.timelineEvents[@type]
 		@stream.on 'tweet.delete', @removeEntry
 		@stream.on '__destroy', @__destroy
+
 	addEntry: (entries...) ->
+		# todo apply filters on entries, remove any that we don't want
 		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
+
 	removeEntry: (entry) ->
+		# todo verify if entry is actually a tweet
 		$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
+
 	minimize: (fn) ->
 		$('#timeline').html('')
 		fn null
+
 	restore: (fn) ->
 		# build our query based on timeline event types, etc.
 		query = {}
@@ -32,11 +38,13 @@ class timeline
 		@crimson.db.event.find query, (err, docs) =>
 			docs.sort (a,b) ->
 				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
-			$('#timeline').prepend @crimson.ui.entryTemplate { entries: docs }
+			@addEntry.apply @, docs
 			fn null
+
 	__destroy: ->
 		@stream.removeListener event, @addEntry for event in timeline.timelineEvents[type]
 		@stream.removeListener 'tweet.delete', @removeEntry
+
 	@timelineEvents =
 		superhome: 'tweet.new', 'tweet.new.mine', 'retweet.new', 'retweet.new.mine', 'mention.new'
 		supernotify: 'mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine'
