@@ -34,7 +34,7 @@ class timeline
 		# only use an ownerId if we're not using a ^super timeline
 		if @type isnt 'superhome' and @type isnt 'supernotify'
 			query.ownerId = @user.id
-		query.eventType = { $in: tiemline.timelineEvents }
+		query.eventType = { $in: timeline.timelineEvents }
 		@crimson.db.event.find query, (err, docs) =>
 			docs.sort (a,b) ->
 				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
