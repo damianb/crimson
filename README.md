@@ -18,7 +18,7 @@ twitter bootstrap used under [Apache license 2.0](https://github.com/twitter/boo
 
 ### compiling
 
-requires node-webkit 0.6.0+
+requires node-webkit 0.7.0+
 
 to build latest changes, cd to project directory and use `cake build` or `cake watch` to build coffeescript, less, jade files used by crimson.
 
