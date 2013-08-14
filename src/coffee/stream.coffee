@@ -103,12 +103,18 @@ class stream extends EventEmitter
 	# to hell with you damn brits, it's FAVORITE. OR. NOT OUR. THIS CODE IS NOT BRITISH.
 	favoriteEmitter: (event) ->
 		if @user.id is event.source.id_str
-			# us on them
-			#
-			# todo mark tweet as favorited on ui if visible
-			# also update the nedb entry if it's there
-
-			# @emit 'twitter.', event.target
+			# us, to theirs
+			query =
+				ownerId: @user.id
+				eventType: 'tweet.new'
+				event:
+					id_str: event.target_object.id_str
+					favorited: { $set: true }
+			@crimson.db.events.update query, (err) =>
+				if err
+					debug 'stream.favoriteEmitter nedb err: ' + err
+					throw Err
+				@emit 'twitter.favorited', event.target_object
 		else
 			# them, to ours
 			query =
@@ -124,19 +130,25 @@ class stream extends EventEmitter
 
 	unfavoriteEmitter: (event) ->
 		if @user.id is event.source.id_str
-			# us on them
-			#
-			# todo unmark tweet as favorited on ui if visible
-			# also update the nedb entry if it's there
-
-			# @emit 'twitter.', event.target
+			# us, to theirs
+			query =
+				ownerId: @user.id
+				eventType: 'tweet.new'
+				event:
+					id_str: event.target_object.id_str
+					favorited: { $set: false }
+			@crimson.db.events.update query, (err) =>
+				if err
+					debug 'stream.unfavoriteEmitter nedb err: ' + err
+					throw Err
+				@emit 'twitter.unfavorited', event.target_object
 		else
 			# them, to ours
 
 			# discard any and all notifications here
 			query =
 				ownerId: @user.id
-				eventType: ['favorite.new.ofmine']
+				eventType: 'favorite.new.ofmine'
 				'event.target_object.id_str': event.target_object.id_str
 			@crimson.db.events.remove query, (err) =>
 				if err
