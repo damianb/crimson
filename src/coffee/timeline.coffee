@@ -1,72 +1,26 @@
-class timeline
-	constructor: (@client, type, @uid = null, options = {}) ->
-		# note: @binds structure:
-		#
-		# binds: {
-		# 'userid': [
-		#	   'bindname',
-		#    'bindname',
-		#  ]
-		# }
-		@binds = {}
-		@name = null
+{$} = global
 
-		if !@uid? and (type isnt 'superhome' or type isnt 'supernotify')
+class timeline
+	constructor: (@user, type) ->
+		{ @stream, @crimson } = @user
+		if !@uid? and (type isnt 'superhome')
 			throw new Error 'All timelines except super types must be provided a user'
 
-		# if we had a user object instead, we'd still need to pull out the uid, so meh. :p
-		if @uid?
-			@user = @client.users[@uid]
-			@user.data.on '__destroy', @__destroy
-		else
-			@user = null
+		if !timeline.timelineEvents[type]?
+			throw new Error 'unrecognized timeline type'
 
-		if type is 'superhome'
-			@bind 'ping.new', 'ping.new.mine', 'ping.new.private', 'echo.new', 'echo.new.mine', 'mention.new'
-		# probably not as useful of a type...
-		else if type is 'supernotify'
-			@bind 'mention.new', 'listener.new', 'echo.new.ofmine'
-		else if type is 'home'
-			@bind 'ping.new', 'ping.new.private', 'echo.new'
-		else if type is 'notify'
-			@bind 'mention.new', 'listener.new', 'echo.new.ofmine'
-		# shows notifications and usual home content...user-level though.
-		else if type is 'hybrid'
-			@bind 'ping.new', 'ping.new.private', 'echo.new', 'mention.new', 'listener.new', 'echo.new.mine', 'echo.new.ofmine'
-		else if type is 'mentions'
-			@bind 'mention.new'
-		else if type is 'private'
-			@bind 'ping.new.private'
-		else if type is 'user'
-			if !options.uid?
-				throw new Error 'cannot use a user timeline without specifying a user id'
-			@bind 'user.ping.' + options.uid, 'user.profile'
-			if options.showEchoes then @bind 'user.echo.' + options.uid
+		@stream.on event, @addEntry for event in timeline.timelineEvents[type]
+		@stream.on 'tweet.delete', @removeEntry
 	addEntry: (entry) ->
 		# todo DOM manipulation
 	removeEntry: (entry) ->
-	getEntry: (entry) ->
-	getEntries: () ->
-	page: (offset, length) ->
-		# todo
-	bind: (events...) ->
-		setEvent = (uid, user, event) =>
-			if !@binds[uid]? then @binds[uid] = []
-			if !@binds[uid].indexOf event
-				@binds[uid].push event
-				user.data.on event, @addEntry
-			true
-		proc = (event) =>
-			if !@user?
-				setEvent uid, user, event for uid, user of @client.users
-			else
-				setEvent @uid, @user, event
-		proc event for event in events
-		true
+		# todo DOM removal, remove from NeDB database?
 	__destroy: ->
-		# remove listeners before we seppuku...
-		proc = (uid, bind) =>
-			@client.users[uid].data.removeListener bind, @addEntry
-		proc uid, bind for bind in binds for uid, binds of @binds
-		@binds = {}
-		@client = @user = @uid = null
+		@stream.removeListener event, @addEntry for event in timeline.timelineEvents[type]
+		@stream.removeListener 'tweet.delete', @removeEntry
+	@timelineEvents =
+		superhome: 'tweet.new', 'tweet.new.mine', 'retweet.new', 'retweet.new.mine', 'mention.new'
+		supernotify: 'mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine'
+		home: 'tweet.new', 'tweet.new.mine', 'retweet.new'
+		mentions: 'mention.new', 'mention.new.mine'
+		events: 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine'
