@@ -20,7 +20,7 @@ global.Array::remove = (from, to) ->
 global.Array::has = (entries...) ->
 	hasEntries = true
 	process = =>
-		if (@indexOf entries.shift()) is -1 then
+		if (@indexOf entries.shift()) is -1
 			hasEntries = false
 	process() until hasEntries is false or entries.length is 0
 	hasEntries

@@ -46,8 +46,8 @@ class timeline
 		@stream.removeListener 'tweet.delete', @removeEntry
 
 	@timelineEvents =
-		superhome: 'tweet.new', 'tweet.new.mine', 'retweet.new', 'retweet.new.mine', 'mention.new'
-		supernotify: 'mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine'
-		home: 'tweet.new', 'tweet.new.mine', 'retweet.new'
-		mentions: 'mention.new', 'mention.new.mine'
-		events: 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine'
+		superhome: ['tweet.new', 'tweet.new.mine', 'retweet.new', 'retweet.new.mine', 'mention.new']
+		supernotify: ['mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
+		home: ['tweet.new', 'tweet.new.mine', 'retweet.new']
+		mentions: ['mention.new', 'mention.new.mine']
+		events: ['follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
