@@ -1,11 +1,18 @@
 {EventEmitter} = require 'events'
-debug = (require 'debug')('core')
-url = require 'url'
 qs = require 'querystring'
-twit = require 'twit'
+url = require 'url'
+
+async = require 'async'
+debug = (require 'debug')('core')
 nedb  = require 'nedb'
 request = require 'request'
+twit = require 'twit'
+
 { gui } = global
+
+stream = require './stream'
+timeline = require './timeline'
+ui = require './ui'
 
 class crimson extends EventEmitter
 	constructor: ->
@@ -14,7 +21,7 @@ class crimson extends EventEmitter
 			consumer_key: new Buffer '', 'base64'
 			consumer_secret: new Buffer '', 'base64'
 		@pkg = gui.App.manifest
-		@ui = require './ui'
+		@ui = ui
 
 		#
 		# the following three databases are divvied up as follows:
@@ -52,12 +59,9 @@ class crimson extends EventEmitter
 			else
 				@connect token for token in tokens when token isnt null
 
-	connect: (account) ->
-		# todo check if user already connected
-
+	connect: (account, fn) ->
 		if users[account.userId]?
 			return users[account.userId]
-
 
 		# init an object for the user
 		user =
@@ -69,9 +73,28 @@ class crimson extends EventEmitter
 			friends: []
 			blocked: []
 
-		#user.api.get
+		# todo:
+		# get user profile
+		async.waterfall [
+			(cb) =>
+				user.api.get 'blocks/ids', { stringify_ids: true }, (err, reply) =>
+					if err then return cb err
 
-		# todo finish
+						return cb err
+					user.blocked = reply.ids
+
+			(cb) =>
+				user.api.get 'users/show', { user_id: user.id, include_entities: true }, (err, reply) =>
+					if err
+						debug 'crimson.connect (fetch profile) err: ' + err
+						return cb err
+					user.profile = reply
+			(cb) =>
+				user.stream = new stream user
+		], (err) =>
+			if err
+				debug 'crimson.connect err: ' + err
+				throw err
 
 	getAuthUri: (fn) ->
 		oauth =
