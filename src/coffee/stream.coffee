@@ -92,8 +92,8 @@ class stream extends EventEmitter
 			@crimson.db.events.insert query, (err, doc) =>
 				if err
 					debug 'stream.followEmitter nedb err: ' + err
-					throw Err
-				@emit 'follower.new' doc
+					throw err
+				@emit 'follower.new', doc
 
 	unfollowEmitter: (event) ->
 		@user.friends.remove event.target.id_str
@@ -112,7 +112,7 @@ class stream extends EventEmitter
 			@crimson.db.events.update query, (err) =>
 				if err
 					debug 'stream.favoriteEmitter nedb err: ' + err
-					throw Err
+					throw err
 				@emit 'twitter.favorited', event.target_object
 		else
 			# them, to ours
@@ -124,8 +124,8 @@ class stream extends EventEmitter
 			@crimson.db.events.insert query, (err, doc) =>
 				if err
 					debug 'stream.favoriteEmitter nedb err: ' + err
-					throw Err
-				@emit 'favorite.new.ofmine' doc
+					throw err
+				@emit 'favorite.new.ofmine', doc
 
 	unfavoriteEmitter: (event) ->
 		if @user.id is event.source.id_str
@@ -139,7 +139,7 @@ class stream extends EventEmitter
 			@crimson.db.events.update query, (err) =>
 				if err
 					debug 'stream.unfavoriteEmitter nedb err: ' + err
-					throw Err
+					throw err
 				@emit 'twitter.unfavorited', event.target_object
 		else
 			# them, to ours
@@ -152,16 +152,17 @@ class stream extends EventEmitter
 			@crimson.db.events.remove query, (err) =>
 				if err
 					debug 'stream.unfavoriteEmitter nedb err: ' + err
-					throw Err
-				@emit 'unfavorite.new.ofmine' doc
-
-# todo - block tracking, so we know who we're ignoring the fuck out of.
+					throw err
+				@emit 'unfavorite.new.ofmine', doc
 
 	blockEmitter: (event) ->
-		# todo
+
+		@user.blocked.push event.target.id_str
+		@emit 'twitter.blocked', event.target
 
 	unblockEmitter: (event) ->
-		# todo
+		@user.blocked.remove event.target.id_str
+		@emit 'twitter.unblocked', event.target
 
 	# no way in hell am I doing lists here. not in the first versions. fuck that shit.
 
@@ -182,12 +183,12 @@ class stream extends EventEmitter
 
 		# special user stream events
 		@twitStream[method] 'user_update', @userUpdateEmitter
-		@twitStream[method] 'follow', @friendsEmitter
-		@twitStream[method] 'unfollow', @friendsEmitter
-		@twitStream[method] 'favorite', @friendsEmitter
-		@twitStream[method] 'unfavorite', @friendsEmitter
-		@twitStream[method] 'blocked', @friendsEmitter
-		@twitStream[method] 'unblocked', @friendsEmitter
+		@twitStream[method] 'follow', @followEmitter
+		@twitStream[method] 'unfollow', @unfollowEmitter
+		@twitStream[method] 'favorite', @favoriteEmitter
+		@twitStream[method] 'unfavorite', @unfavoriteEmitter
+		@twitStream[method] 'blocked', @blockedEmitter
+		@twitStream[method] 'unblocked', @unblockedEmitter
 
 
 
