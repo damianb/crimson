@@ -73,24 +73,23 @@ class crimson extends EventEmitter
 			friends: []
 			blocked: []
 
-		# todo:
-		# get user profile
 		async.waterfall [
 			(cb) =>
 				user.api.get 'blocks/ids', { stringify_ids: true }, (err, reply) =>
 					if err then return cb err
-
-						return cb err
 					user.blocked = reply.ids
-
+					cb null
 			(cb) =>
 				user.api.get 'users/show', { user_id: user.id, include_entities: true }, (err, reply) =>
-					if err
-						debug 'crimson.connect (fetch profile) err: ' + err
-						return cb err
+					if err then return cb err
 					user.profile = reply
+					cb null
 			(cb) =>
 				user.stream = new stream user
+				cb null
+			(cb) =>
+				# todo init timelines (ALL OF THE TIMELINES! :DDDDD)
+				cb null
 		], (err) =>
 			if err
 				debug 'crimson.connect err: ' + err
