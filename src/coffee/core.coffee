@@ -37,6 +37,9 @@ class crimson extends EventEmitter
 			users: new nedb { nodeWebkitAppName: 'crimson', filename: 'users.db' }
 			events: new nedb()
 		# todo: index constraints
+		#  preferences: array of unique keys
+		#  users: same as above. keys are by user.id
+		#  events...special situation. unique index by event.id_str ? event.eventType?
 
 		@timelines =
 			super:
@@ -47,6 +50,8 @@ class crimson extends EventEmitter
 
 		super()
 
+		@timelines.super.superhome = new timeline 'superhome', { crimson: @ }
+		@timelines.super.supernotify = new timeline 'supernotify', { crimson: @ }
 	connectAll: (fn) ->
 		@db.users.find { enabled: true }, (err, tokens) =>
 			if err
