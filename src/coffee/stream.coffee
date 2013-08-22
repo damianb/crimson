@@ -232,4 +232,5 @@ class stream extends EventEmitter
 		# todo remove all listeners from twitstream and close it and kill it with fire
 		@twitStream.stop()
 		@couple true
+		@emit '__destroy'
 
