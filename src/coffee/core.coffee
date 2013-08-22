@@ -167,12 +167,12 @@ class crimson extends EventEmitter
 
 	# get a new twitter api instance (will provide streaming, etc.)
 	getApi: (token, secret) ->
-		return new twit {
+		return new twit({
 			consumer_key: @appTokens.consumer_key.toString()
 			consumer_secret: @appTokens.consumer_secret.toSting()
 			access_token: token
 			access_token_secret: secret
-		}
+		})
 
 	# shutdown procedures - should handle cleanup
 	__destroy: ->
