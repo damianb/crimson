@@ -1,4 +1,5 @@
 {EventEmitter} = require 'events'
+{$} = global
 debug = (require 'debug')('stream')
 
 class stream extends EventEmitter
@@ -38,6 +39,13 @@ class stream extends EventEmitter
 				do (mention) =>
 					if mention.id_str is @user.id and types.indexOf('mention.new') isnt -1
 						types.push 'mention.new'
+
+		# fuck you twitter and your html tweet.source bullshit. seriously, fuck you.
+		source = $(event.source)
+		event.source =
+			link: source.attr('href')
+			name: source.text()
+
 
 		# todo run filters by the tweet here, indicate in doc.filteredBy and doc.hide if the tweet was ignored,
 		# and if so by what filters (we will count blocking as a filter) so that in the future if a filter is removed,
