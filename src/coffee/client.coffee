@@ -81,18 +81,6 @@ d.run ->
 	crimson.on 'user.ready', (user, first) ->
 		###
 		# if the first user to connect, we need to display the client chrome and the home column
-		if first
-			crimson.ui.display 'client'
-
-			displayResponse = (responses) ->
-				$('.column[data-column="superhome"]').prepend(crimson.ui.entryTemplate({
-					entries: responses
-				}))
-			user.data.on 'ping.new', displayResponse
-			user.data.on 'echo.new.ofmine', displayResponse
-			user.data.forwardArray null,sampleJSON, null
-		# kickstart my heart!
-		crimson.kickstart()
 		###
 
 	crimson.on 'user.ready', ->
