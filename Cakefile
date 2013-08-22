@@ -18,6 +18,7 @@ lessOpts = '--no-ie-compat -x'
 files =
 	jade: [
 		'index'
+		'authorize'
 	]
 	less: [
 		'crimson'
