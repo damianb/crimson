@@ -24,15 +24,11 @@ html
 			header
 				.whoami(style='background-image: url(https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed)')
 				.inputbox
-					textarea.scroll#pingText(placeholder="What's going on?",rows="2")
+					textarea.scroll#tweetText(placeholder="What's happening?",rows="2")
 					// todo: turn into proper form
 					.toolbar
 						span#charcount.length
-						.btn-group
-							button.btn.btn-small.btn-info#private(data-toggle='button')
-								i.icon-lock.icon-white
-							button.btn.btn-small.btn-info#ping ping
-				//span upload
+						button.btn.btn-small.btn-info#tweet tweet
 			.l
 				nav
 					ul.top
@@ -52,88 +48,85 @@ html
 			.r
 				.corner
 					.inside
-				.main#viewport
-					.columns
-						.column.scroll.col-home(data-column='superhome')
-							.col-head
-								// to be used for displaying user profiles? alerts?
-							.entries
-								.entry.ping
-									.profile
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-									.post
-										.meta
-											a.who(href='#') @heello
-											span.time &nbsp;21 mins
-										p Example ping text
-									.controls
-										a(href='#')
-											i.icon-share-alt
-										a(href='#')
-											i.icon-random
-								.entry.ping.mention
-									.profile
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-									.post
-										.meta
-											a.who(href='#') @heello
-											span.time &nbsp;14 mins
-										p This ping mentions you! - &nbsp;
-											a.who(href='#') @katana
-									.controls
-										a(href='#')
-											i.icon-share-alt
-										a(href='#')
-											i.icon-random
-								.entry.ping.echo
-									.profile
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-									.m-profile.own
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
-									.post
-										.meta
-											a.who(href='#') @heello
-											span.time &nbsp;13 mins
-										p This is something you echoed!
-									.controls
-										a(href='#')
-											i.icon-share-alt
-										a(href='#')
-											i.icon-remove
-								.entry.ping.echo.own
-									.profile
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
-									.m-profile
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
-									.post
-										.meta
-											a.who(href='#') @katana
-											span.time &nbsp;13 mins
-										p Someone echoed you!
-								.entry.ping.own
-									.profile.self
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
-									.post
-										.meta
-											a.who(href='#') @katana
-											span.time &nbsp;12 mins
-										p This ping is by you!
-									.controls
-										a(href='#')
-											i.icon-remove
-								.entry.ping.own.private
-									.profile.self
-										img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
-									.post
-										.meta
-											a.who(href='#') @katana
-											span.time &nbsp;12 mins
-										p This is a private ping by you!
-									.controls
-										a(href='#')
-											i.icon-remove
-								.stretch &nbsp;
-					.column-overflow
+				.timeline.scroll
+					.col-head
+						// to be used for displaying user profiles? alerts?
+					.entries
+						.entry.ping
+							.profile
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+							.post
+								.meta
+									a.who(href='#') @heello
+									span.time &nbsp;21 mins
+								p Example ping text
+							.controls
+								a(href='#')
+									i.icon-share-alt
+								a(href='#')
+									i.icon-random
+						.entry.ping.mention
+							.profile
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+							.post
+								.meta
+									a.who(href='#') @heello
+									span.time &nbsp;14 mins
+								p This ping mentions you! - &nbsp;
+									a.who(href='#') @katana
+							.controls
+								a(href='#')
+									i.icon-share-alt
+								a(href='#')
+									i.icon-random
+						.entry.ping.echo
+							.profile
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+							.m-profile.own
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+							.post
+								.meta
+									a.who(href='#') @heello
+									span.time &nbsp;13 mins
+								p This is something you echoed!
+							.controls
+								a(href='#')
+									i.icon-share-alt
+								a(href='#')
+									i.icon-remove
+						.entry.ping.echo.own
+							.profile
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+							.m-profile
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+							.post
+								.meta
+									a.who(href='#') @katana
+									span.time &nbsp;13 mins
+								p Someone echoed you!
+						.entry.ping.own
+							.profile.self
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+							.post
+								.meta
+									a.who(href='#') @katana
+									span.time &nbsp;12 mins
+								p This ping is by you!
+							.controls
+								a(href='#')
+									i.icon-remove
+						.entry.ping.own.private
+							.profile.self
+								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+							.post
+								.meta
+									a.who(href='#') @katana
+									span.time &nbsp;12 mins
+								p This is a private ping by you!
+							.controls
+								a(href='#')
+									i.icon-remove
+						.stretch &nbsp;
 				footer
 					span#version
 					script(src='assets/js/jquery.min.js')
