@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg3078"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="New document 3">
+  <defs
+     id="defs3080">
+    <linearGradient
+       id="linearGradient3879">
+      <stop
+         id="stop3881"
+         offset="0"
+         style="stop-color:#dc143c;stop-opacity:1;" />
+      <stop
+         id="stop3883"
+         offset="1"
+         style="stop-color:#e25822;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3879"
+       id="linearGradient3877"
+       x1="307.06256"
+       y1="162.24434"
+       x2="386.01822"
+       y2="105.27224"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.51"
+     inkscape:cx="341.65269"
+     inkscape:cy="935.94228"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="707"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3083">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       d="m 120.60112,17.784337 c 3.57503,-2.06621 7.98392,-2.06621 11.55895,0 l 95.76638,55.26322 c 3.58117,2.06621 5.78559,5.8816 5.78559,10.01788 l 0,110.612823 c 0,4.13008 -2.20442,7.94817 -5.77945,10.01775 l -95.76638,55.30795 c -3.58117,2.0635 -7.99006,2.0635 -11.57123,0 L 24.853225,203.69595 c -3.57889,-2.06651 -5.78331,-5.88761 -5.78331,-10.01769 l 0,-110.615893 c 0,-4.13321 2.20442,-7.9486 5.78559,-10.01481 l 95.745615,-55.26322"
+       inkscape:connector-curvature="0"
+       id="path28"
+       style="fill:#dc143c;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3861"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient3877);fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans;font-stretch:normal;font-variant:normal"><flowRegion
+         id="flowRegion3863"
+         style="fill-opacity:1.0;fill:url(#linearGradient3877)"><rect
+           id="rect3865"
+           width="363.1579"
+           height="63.909775"
+           x="304.51129"
+           y="108.75316"
+           style="fill-opacity:1;fill:url(#linearGradient3877);-inkscape-font-specification:Open Sans;font-family:Open Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" /></flowRegion><flowPara
+         id="flowPara3867"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Open Sans;-inkscape-font-specification:Open Sans;fill-opacity:1;fill:url(#linearGradient3877)">crims<flowSpan
+   style="fill:url(#linearGradient3877);fill-opacity:1;-inkscape-font-specification:Open Sans;font-family:Open Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+   id="flowSpan3869">o</flowSpan>n</flowPara></flowRoot>  </g>
+</svg>

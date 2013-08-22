@@ -31,8 +31,14 @@ files =
 		'ui'
 	]
 	copy: [
-		'templates/timeline.jade'
 		'templates/entries.jade'
+		'css/bootstrap.min.css'
+		'js/bootstrap.min.js'
+		'js/jquery.min.js'
+		'js/jquery.hotkeys.js'
+		'js/jquery.relatize_date.js'
+		'img/glyphicons-halflings-white.png'
+		'img/glyphicons-halflings.png'
 	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
