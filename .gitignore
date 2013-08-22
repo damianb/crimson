@@ -1,7 +1,4 @@
 node_modules/
 *.komodoproject
 nw/
-build/assets/js/crimson.*js
-build/assets/templates/*.jade
-build/assets/css/crimson.css
-build/*.html
+build/*
