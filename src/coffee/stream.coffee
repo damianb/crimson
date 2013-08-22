@@ -20,14 +20,23 @@ class stream extends EventEmitter
 		#
 		types = ['tweet.new']
 
+		# our tweet?
 		if event.user.id_str is @user.id then types.push 'tweet.new.mine'
+
+		# is it a retweet?
+		if event.retweeted is true
+			types.push 'retweet.new'
+			# retweet of our tweet?
+			if event.retweeted_status.user.id_str is @user.id then types.push 'retweet.new.ofmine'
+			# we retweeted?
+			if event.user.id_str is @user.id then types.push 'retweet.new.mine'
 
 		# Indentception.
 		# Oh, and check for a mention.
 		if event.entities.user_mentions.length > 0
 			for mention in event.entities.user_mentions
 				do (mention) =>
-					if mention.id_str is @user.id and types.indexOf('tweet.new') isnt -1
+					if mention.id_str is @user.id and types.indexOf('mention.new') isnt -1
 						types.push 'mention.new'
 
 		# because we're not guaranteed that this tweet hasn't already been received on another account,
@@ -45,6 +54,8 @@ class stream extends EventEmitter
 				debug 'stream.tweetEmitter nedb err: ' + err
 				throw err
 
+			# until we know exactly what the f the _id was that was modified with the update query,
+			# we have to use this. ref: https://github.com/louischatriot/nedb/issues/72
 			@crimson.db.events.findOne { 'event.id_str': event.id_str }, (err, doc) =>
 				@emit type, doc for type in types
 
