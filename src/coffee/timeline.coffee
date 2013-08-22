@@ -3,9 +3,11 @@
 class timeline
 	constructor: (@type, @user) ->
 		{ @stream, @crimson } = @user
-		if !@stream? and (@type isnt 'superhome' or @type isnt 'supernotify')
+		@isSuper = if @type is 'superhome' or @type is 'supernotify' then true else false
+
+		if !@stream? and !@isSuper
 			throw new Error 'All timelines except super types must be provided a datastream'
-		else if @type is 'superhome' or @type is 'supernotify'
+		else if @isSuper
 			@stream = @crimson
 
 		if !timeline.timelineEvents[@type]?
@@ -17,6 +19,7 @@ class timeline
 
 	addEntry: (entries...) ->
 		# todo apply filters on entries, remove any that we don't want
+		# should this move farther up the stack? filter once instead of per-timeline?
 		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
 
 	removeEntry: (entry) ->
@@ -32,8 +35,7 @@ class timeline
 		query = {}
 
 		# only use an ownerId if we're not using a ^super timeline
-		if @type isnt 'superhome' and @type isnt 'supernotify'
-			query.ownerId = @user.id
+		if @isSuper then query.ownerId = @user.id
 		query.eventType = { $in: timeline.timelineEvents }
 		@crimson.db.event.find query, (err, docs) =>
 			docs.sort (a,b) ->
