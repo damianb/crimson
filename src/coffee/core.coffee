@@ -50,8 +50,10 @@ class crimson extends EventEmitter
 
 		super()
 
+		# hooking these up after calling super() so that eventemitter is ready.
 		@timelines.super.superhome = new timeline 'superhome', { crimson: @ }
 		@timelines.super.supernotify = new timeline 'supernotify', { crimson: @ }
+
 	connectAll: (fn) ->
 		@db.users.find { enabled: true }, (err, tokens) =>
 			if err
@@ -77,6 +79,8 @@ class crimson extends EventEmitter
 			profile: null
 			friends: []
 			blocked: []
+		@timelines.user[user.id] = {}
+		@users[user.id] = user
 
 		async.waterfall [
 			(cb) =>
@@ -90,19 +94,26 @@ class crimson extends EventEmitter
 					user.profile = reply
 					cb null
 			(cb) =>
+				# we don't want to init the stream until now, due to...stuff.
 				user.stream = new stream user
+				user.stream.on '__destroy', =>
+					# clean up the timelines reference here quickly when we have a __destroy emitted
+					@timelines.user[user.id] = undefined
+					@users[user.id] = undefined
 				cb null
 			(cb) =>
 				# todo init timelines (ALL OF THE TIMELINES! :DDDDD)
-				cb null
-			(cb) =>
-				# store it in memory, and now, let's FLY!
-				@users[user.id] = user
+				@timelines.user[user.id] =
+					home: new timeline 'home', user
+					mentions: new timeline 'mentions', user
+					events: new timeline 'events', user
 				cb null
 		], (err) =>
 			if err
 				debug 'crimson.connect err: ' + err
 				throw err
+
+			fn user
 
 	getAuthUri: (fn) ->
 		oauth =
