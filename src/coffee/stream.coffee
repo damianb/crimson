@@ -19,17 +19,21 @@ class stream extends EventEmitter
 		# mention.new
 		#
 
+		types = ['tweet.new']
 		query =
-			ownerId: @user.id
-			eventType: []
-			eventTime: Date.now()
 			event: event
-
-		@crimson.db.events.insert query, (err, doc) =>
+		updateQuery =
+			$set:
+				eventTime: Date.now()
+			$addToSet:
+				ownerId: @user.id
+				eventType: types
+		@crimson.db.events.update query, updateQuery, { upsert: true }, (err, numReplaced, upsert) =>
 			if err
 				debug 'stream.tweetEmitter nedb err: ' + err
-				throw Err
-			@emit type, doc for type in query.eventType
+				throw err
+			# @emit type, doc for type in query.eventType
+			# todo get affected entry
 
 	deleteEmitter: (event) ->
 		query =
@@ -39,7 +43,7 @@ class stream extends EventEmitter
 		@crimson.db.events.remove query, false, (err) ->
 			if err
 				debug 'stream.deleteEmitter nedb err: ' + err
-				throw Err
+				throw err
 			@emit 'tweet.delete', event
 
 	scrubgeoEmitter: (event) ->
@@ -190,8 +194,6 @@ class stream extends EventEmitter
 		@twitStream[method] 'blocked', @blockedEmitter
 		@twitStream[method] 'unblocked', @unblockedEmitter
 
-
-
 	emit: (args...) ->
 		# please work on the first try, oh please oh please
 		@crimson.emit.apply @crimson, args
@@ -199,4 +201,6 @@ class stream extends EventEmitter
 
 	__destroy: ->
 		# todo remove all listeners from twitstream and close it and kill it with fire
+		@twitStream.close
 		@couple true
+
