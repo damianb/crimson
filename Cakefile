@@ -3,6 +3,7 @@ fs = require 'fs'
 path = require 'path'
 util = require 'util'
 mkdirp = require 'mkdirp'
+async = require 'async'
 
 # ANSI Terminal Colors
 bold = '\x1b[0;1m'
@@ -53,14 +54,19 @@ files =
 	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
-	invoke 'build:builddir'
-	invoke 'build:rootcopy'
-	invoke 'build:less'
-	invoke 'build:jade'
-	#invoke 'build:uglycoffee'
-	invoke 'build:coffee'
-	invoke 'build:copy'
-
+	async.eachSeries [
+		'builddir'
+		'rootcopy'
+		'less'
+		'jade'
+		#'uglycoffee'
+		'coffee'
+		'copy'
+	], build, (err) ->
+		if err
+			log 'build error!', err, true
+		else
+			log 'build complete!'
 
 task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:less'
@@ -87,13 +93,21 @@ task 'watch:uglify', 'watch js files for changes and compress', -> watch 'uglify
 task 'watch:uglycoffee', 'watch less files for changes and rebuild', -> watch 'uglycoffee'
 task 'watch:copy', 'watch for misc changes and copy to build dir', -> watch 'copy'
 
-build = (type) ->
+build = (type, fn) ->
 	fileset = switch
 		when type is 'uglify' then 'coffee'
 		when type is 'uglycoffee' then 'coffee'
 		else type
-	for file in files[fileset]
-		compile type,file
+
+	async.each files[fileset], (file, cb) ->
+		compile type, file, cb
+	, (err) ->
+		fn err
+
+	#for file in files[fileset]
+	#	compile type, file, (err) ->
+	#		if err then fn err
+	#fn null
 
 watch = (type) ->
 	invoke 'build:'+type
@@ -115,13 +129,14 @@ watch = (type) ->
 			if +curr.mtime isnt +prev.mtime
 				compile type,_file
 
-compile = (type, file) ->
+compile = (type, file, fn) ->
 	if type is 'builddir'
 		mkdirp path.normalize('build/' + file), (err) ->
 			if err
 				log "#{type}: failed to create directory #{file}", err, true
 			else
 				log "#{type}: created directory #{file} successfully"
+			fn? err
 	else
 		cmdLine = switch
 			when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less build/assets/css/#{file}.css"
@@ -139,6 +154,7 @@ compile = (type, file) ->
 				log "#{type}: failed to compile #{file}; #{err}", stderr, true
 			else
 				log "#{type}: compiled #{file} successfully"
+			fn? err
 
 log = (message, explanation, isError = false) ->
 	if isError
