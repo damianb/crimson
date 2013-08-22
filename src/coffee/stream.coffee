@@ -39,6 +39,10 @@ class stream extends EventEmitter
 					if mention.id_str is @user.id and types.indexOf('mention.new') isnt -1
 						types.push 'mention.new'
 
+		# todo run filters by the tweet here, indicate in doc.filteredBy and doc.hide if the tweet was ignored,
+		# and if so by what filters (we will count blocking as a filter) so that in the future if a filter is removed,
+		# we can just pull anything it affected and see if there were any other filters acting on it at the same time.
+
 		# because we're not guaranteed that this tweet hasn't already been received on another account,
 		# we have to assume it might have been, and then use an upsert if it hasn't been
 		query =
@@ -173,7 +177,7 @@ class stream extends EventEmitter
 		else
 			# them, to ours
 
-			# discard any and all notifications here
+			# discard previous favoriting notifications here
 			query =
 				ownerId: @user.id
 				eventType: 'favorite.new.ofmine'
@@ -184,6 +188,7 @@ class stream extends EventEmitter
 					throw err
 				@emit 'unfavorite.new.ofmine', doc
 
+	# todo trigger a filter update...?
 	blockEmitter: (event) ->
 		@user.blocked.push event.target.id_str
 		@emit 'twitter.blocked', event.target
