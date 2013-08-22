@@ -1,6 +1,8 @@
-fs = require 'fs'
 {spawn, exec} = require 'child_process'
+fs = require 'fs'
+path = require 'path'
 util = require 'util'
+mkdirp = require 'mkdirp'
 
 # ANSI Terminal Colors
 bold = '\x1b[0;1m'
@@ -16,6 +18,12 @@ lessOpts = '--no-ie-compat -x'
 
 # files to build/watch, etc.
 files =
+	builddir: [
+		'assets/css'
+		'assets/img'
+		'assets/js'
+		'assets/templates'
+	]
 	jade: [
 		'index'
 		'authorize'
@@ -40,8 +48,13 @@ files =
 		'img/glyphicons-halflings-white.png'
 		'img/glyphicons-halflings.png'
 	]
+	rootcopy: [
+		'package.json'
+	]
 
 task 'build', 'build all - less, jade, coffeescript', ->
+	invoke 'build:builddir'
+	invoke 'build:rootcopy'
 	invoke 'build:less'
 	invoke 'build:jade'
 	#invoke 'build:uglycoffee'
@@ -57,12 +70,14 @@ task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:copy'
 
 # individual build tasks
+task 'build:builddir', 'prepares build directory by creating needed structure', -> build 'builddir'
 task 'build:jade', 'build jade files into html', -> build 'jade'
 task 'build:less', 'build less files into css', -> build 'less'
 task 'build:coffee', 'build coffeescript files into js', -> build 'coffee'
 task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
 task 'build:uglycoffee', 'build coffescript files & minify', -> build 'uglycoffee'
 task 'build:copy', 'copy necessary files to build dir', -> build 'copy'
+task 'build:rootcopy', 'copy necessary files to build root dir', -> build 'rootcopy'
 
 # individual watch tasks
 task 'watch:jade', 'watch jade files for changes and rebuild', -> watch 'jade'
@@ -95,25 +110,35 @@ watch = (type) ->
 			when type is 'uglify' then "build/assets/js/#{_file}.js"
 			when type is 'uglycoffee' then "src/coffee/#{_file}.coffee"
 			when type is 'copy' then "src/#{_file}"
+			when type is 'rootcopy' then "src/buildroot/#{_file}"
 		fs.watchFile path, (curr, prev) ->
 			if +curr.mtime isnt +prev.mtime
 				compile type,_file
 
 compile = (type, file) ->
-	cmdLine = switch
-		when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less build/assets/css/#{file}.css"
-		when type is 'jade' then "jade #{jadeOpts} < src/jade/#{file}.jade > build/#{file}.html"
-		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/crimson.#{file}.js"
-		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
-		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
-		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src\\#{file.replace '/','\\'} build\\assets\\#{file.replace '/','\\'}" # todo windows copy command
-		when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/assets/#{file}"
-		else throw new Error 'unknown compile type'
-	exec cmdLine, (err, stdout, stderr) ->
-		if err
-			log "#{type}: failed to compile #{file}; #{err}", stderr, true
-		else
-			log "#{type}: compiled #{file} successfully"
+	if type is 'builddir'
+		mkdirp path.normalize('build/' + file), (err) ->
+			if err
+				log "#{type}: failed to create directory #{file}", err, true
+			else
+				log "#{type}: created directory #{file} successfully"
+	else
+		cmdLine = switch
+			when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less build/assets/css/#{file}.css"
+			when type is 'jade' then "jade #{jadeOpts} < src/jade/#{file}.jade > build/#{file}.html"
+			when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/crimson.#{file}.js"
+			when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
+			when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
+			when type is 'copy' and process.platform.match(/^win/) then "copy /Y #{path.normalize('src/' + file)} #{path.normalize('build/assets/' + file)}"
+			when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/assets/#{file}"
+			when type is 'rootcopy' and process.platform.match(/^win/) then "copy /Y #{path.normalize('src/buildroot/' + file)} #{path.normalize('build/' + file)}"
+			when type is 'rootcopy' and !process.platform.match(/^win/) then "cp -u src/buildroot/#{file} build/#{file}"
+			else throw new Error 'unknown compile type'
+		exec cmdLine, (err, stdout, stderr) ->
+			if err
+				log "#{type}: failed to compile #{file}; #{err}", stderr, true
+			else
+				log "#{type}: compiled #{file} successfully"
 
 log = (message, explanation, isError = false) ->
 	if isError

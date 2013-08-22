@@ -2,13 +2,17 @@
   "private": true,
   "name": "crimson-dev",
   "author": "Damian Bushong <katana@codebite.net>",
-  "description":"desktop heello client - development codebase",
+  "description": "desktop heello client - development codebase",
   "homepage": "https://github.com/damianb/crimson",
-  "repository": { "type": "git", "url": "http://github.com/damianb/crimson.git" },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/damianb/crimson.git"
+  },
   "devDependencies": {
     "uglify-js": "~2.3.6",
     "jade": "~0.31.1",
     "less": "~1.4.0",
-    "coffee-script": "~1.6.3"
+    "coffee-script": "~1.6.3",
+    "mkdirp": "~0.3.5"
   }
 }
