@@ -24,7 +24,7 @@ files =
 	]
 	coffee: [
 		'client'
-		'crimson'
+		'core'
 		'stream'
 		'timeline'
 		'ui'
@@ -96,7 +96,7 @@ compile = (type, file) ->
 	cmdLine = switch
 		when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less build/assets/css/#{file}.css"
 		when type is 'jade' then "jade #{jadeOpts} < src/jade/#{file}.jade > build/#{file}.html"
-		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/#{file}.js"
+		when type is 'coffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee > build/assets/js/crimson.#{file}.js"
 		when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
 		when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
 		when type is 'copy' and process.platform.match(/^win/) then "copy /Y src\\#{file.replace '/','\\'} build\\assets\\#{file.replace '/','\\'}" # todo windows copy command
