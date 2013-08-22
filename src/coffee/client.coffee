@@ -43,10 +43,8 @@ mainWindow = gui.Window.get()
 
 # special requires
 
-crimson = require './assets/js/core'
-crimson.ui = require './assets/js/ui'
-#dataStream = require './assets/js/datastream'
-#timeline = require './assets/js/timeline'
+crimson = require './assets/js/crimson.core'
+crimson.ui = require './assets/js/crimson.ui'
 domain = require 'domain'
 fs = require 'fs'
 debug = (require 'debug')('client')
