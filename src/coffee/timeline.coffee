@@ -18,13 +18,13 @@ class timeline
 		@stream.on '__destroy', @__destroy
 
 	addEntry: (entries...) ->
-		# todo apply filters on entries, remove any that we don't want
-		# should this move farther up the stack? filter once instead of per-timeline?
+		# note, entries should be handled properly on insertion. they may not all be tweets!
 		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
 
 	removeEntry: (entry) ->
-		# todo verify if entry is actually a tweet
-		$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
+		# if it's a tweet...
+		if entry.eventType.indexOf('tweet.new') isnt -1
+			$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
 
 	minimize: (fn) ->
 		$('#timeline').html('')
@@ -35,8 +35,9 @@ class timeline
 		query = {}
 
 		# only use an ownerId if we're not using a ^super timeline
-		if @isSuper then query.ownerId = @user.id
-		query.eventType = { $in: timeline.timelineEvents }
+		if !@isSuper then query.ownerId = @user.id
+		query.eventType =
+			$in: timeline.timelineEvents
 		@crimson.db.event.find query, (err, docs) =>
 			docs.sort (a,b) ->
 				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
