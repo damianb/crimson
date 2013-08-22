@@ -60,8 +60,8 @@ class crimson extends EventEmitter
 				@connect token for token in tokens when token isnt null
 
 	connect: (account, fn) ->
-		if users[account.userId]?
-			return users[account.userId]
+		if @users[account.userId]?
+			return @users[account.userId]
 
 		# init an object for the user
 		user =
@@ -89,6 +89,10 @@ class crimson extends EventEmitter
 				cb null
 			(cb) =>
 				# todo init timelines (ALL OF THE TIMELINES! :DDDDD)
+				cb null
+			(cb) =>
+				# store it in memory, and now, let's FLY!
+				@users[user.id] = user
 				cb null
 		], (err) =>
 			if err
