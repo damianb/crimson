@@ -18,8 +18,20 @@ class stream extends EventEmitter
 		# retweet.new.ofmine
 		# mention.new
 		#
-
 		types = ['tweet.new']
+
+		if event.user.id_str is @user.id then types.push 'tweet.new.mine'
+
+		# Indentception.
+		# Oh, and check for a mention.
+		if event.entities.user_mentions.length > 0
+			for mention in event.entities.user_mentions
+				do (mention) =>
+					if mention.id_str is @user.id and types.indexOf('tweet.new') isnt -1
+						types.push 'mention.new'
+
+		# because we're not guaranteed that this tweet hasn't already been received on another account,
+		# we have to assume it might have been, and then use an upsert if it hasn't been
 		query =
 			event: event
 		updateQuery =
@@ -32,8 +44,9 @@ class stream extends EventEmitter
 			if err
 				debug 'stream.tweetEmitter nedb err: ' + err
 				throw err
-			# @emit type, doc for type in query.eventType
-			# todo get affected entry
+
+			@crimson.db.events.findOne { 'event.id_str': event.id_str }, (err, doc) =>
+				@emit type, doc for type in types
 
 	deleteEmitter: (event) ->
 		query =
@@ -46,8 +59,9 @@ class stream extends EventEmitter
 				throw err
 			@emit 'tweet.delete', event
 
+	# scumbag twitter, acts as if we can iterate over a range when they moved on to snowflake ids
 	scrubgeoEmitter: (event) ->
-		# todo
+		# todo...maybe never. idk
 
 	connectEmitter: ->
 		@emit 'twitter.connecting'
@@ -160,7 +174,6 @@ class stream extends EventEmitter
 				@emit 'unfavorite.new.ofmine', doc
 
 	blockEmitter: (event) ->
-
 		@user.blocked.push event.target.id_str
 		@emit 'twitter.blocked', event.target
 
@@ -201,6 +214,6 @@ class stream extends EventEmitter
 
 	__destroy: ->
 		# todo remove all listeners from twitstream and close it and kill it with fire
-		@twitStream.close
+		@twitStream.stop()
 		@couple true
 
