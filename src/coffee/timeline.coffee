@@ -54,3 +54,5 @@ class timeline
 		home: ['tweet.new', 'tweet.new.mine', 'retweet.new']
 		mentions: ['mention.new', 'mention.new.mine']
 		events: ['follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
+
+module.exports = timeline

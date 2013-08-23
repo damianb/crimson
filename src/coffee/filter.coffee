@@ -7,6 +7,7 @@ class filter
 	runFilters: (doc) ->
 		# is it a tweet?
 		if doc.eventType.indexOf('tweet.new') isnt -1
+			null
 			# things to filter:
 
 			# author: is it a filtered or blocked user
@@ -25,3 +26,5 @@ class filter
 
 	__destroy: ->
 		# todo
+
+module.exports = filter

@@ -242,3 +242,4 @@ class stream extends EventEmitter
 		@couple true
 		@emit '__destroy'
 
+module.exports = stream

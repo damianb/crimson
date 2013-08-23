@@ -43,14 +43,12 @@ mainWindow = gui.Window.get()
 
 # special requires
 
-crimson = require './assets/js/crimson.core'
-crimson.ui = require './assets/js/crimson.ui'
+# we need to make this a global to prevent gc
+global.crimson = crimson = require './assets/js/crimson/core'
+
 domain = require 'domain'
 fs = require 'fs'
 debug = (require 'debug')('client')
-
-# we need to make this a global for now
-global.crimson = crimson
 
 # initially, we are NOT in debug mode. we have to key-sequence our way into debug mode, and answer
 # a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.

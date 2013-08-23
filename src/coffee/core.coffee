@@ -10,9 +10,9 @@ twit = require 'twit'
 
 { gui } = global
 
-stream = require './crimson.stream'
-timeline = require './crimson.timeline'
-ui = require './crimson.ui'
+stream = require './stream'
+timeline = require './timeline'
+ui = require './ui'
 
 class crimson extends EventEmitter
 	constructor: ->
