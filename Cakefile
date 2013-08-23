@@ -35,6 +35,7 @@ files =
 	coffee: [
 		'client'
 		'core'
+		'filter'
 		'stream'
 		'timeline'
 		'ui'
