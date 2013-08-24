@@ -33,9 +33,9 @@ class crimson extends EventEmitter
 		# event: in-memory database of recent stream events. will be purged of old content on an interval to reduce memory nommage
 		#
 		@db =
-			preferences: new nedb { nodeWebkitAppName: 'crimson', filename: 'prefs.db' }
-			users: new nedb { nodeWebkitAppName: 'crimson', filename: 'users.db' }
-			events: new nedb()
+			preferences: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'prefs.db' }
+			users: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'users.db' }
+			events: new nedb { autoload: true }
 		# todo: index constraints
 		#  preferences: array of unique keys
 		#  users: same as above. keys are by user.id
@@ -63,8 +63,13 @@ class crimson extends EventEmitter
 			if tokens.length is 0
 				@emit 'user.noaccount'
 				# the above should indicate that the user needs to add an account.
+				fn null, tokens.length
 			else
-				@connect token for token in tokens when token isnt null
+				async.each tokens, @connect.bind(@), (err) ->
+					if err
+						debug 'crimson.connectAll err: ' + err
+						return fn err
+					fn null, tokens.length
 
 	connect: (account, fn) ->
 		if @users[account.userId]?
