@@ -63,13 +63,15 @@ mainWindow.on 'minimize', ->
 
 process.on 'uncaughtException', (err) ->
 	debug 'uncaught exception: ' + err
-	fs.writeFileSync './error.log', err.stack
+	console.error err
+	fs.appendFileSync './error.log', "#{new Date()}\n #{err.stack}"
 	# process.exit 1
 
 d = domain.create()
 d.on 'error', (err) ->
 	debug 'caught error: ' + err
-	fs.writeFileSync './error.log', err.stack
+	console.error err
+	fs.appendFileSync './error.log', "#{new Date()}\n #{err.stack}"
 
 d.run ->
 	#
@@ -85,8 +87,9 @@ d.run ->
 		console.log 'connected!'
 
 	crimson.on 'user.noaccount', ->
-		# todo finish
-		gui.window.open 'authorize.html', {
+		console.log "no account, opening authorize account window"
+		# todo, prepare authorize template
+		gui.Window.open 'authorize.html', {
 			position: 'center'
 			height: 500
 			width: 500
@@ -122,5 +125,8 @@ d.run ->
 		$('.reldate').relatizeDateTime()
 		setInterval ->
 			$('.reldate').relatizeDateTime()
-		, 60
-		crimson.connectAll()
+		, 45 # todo, maybe make 15 second intervals?
+
+		crimson.connectAll (err, accountCount) ->
+			if err then return console.log err
+			console.log "#{accountCount} accounts connected"
