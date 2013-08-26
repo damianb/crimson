@@ -66,11 +66,12 @@ class filter
 				}
 
 			# filtered text (will need to allow for regexps at some point)
-		else if doc.eventType.has 'tweet.censored', 'user.censored'
+		else if doc.eventType.has 'tweet.censored'
 			# non-super timelines only
 			if !timeline.isSuper
 				# blocked user?
-				
+				if doc.event.user_id_str
+					doc.filtered.push
 
 
 			# things to filter:
