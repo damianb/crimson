@@ -5,7 +5,7 @@ debug = (require 'debug')('stream')
 class stream extends EventEmitter
 	constructor: (@user) ->
 		{@crimson, @api} = @user
-		@twitStream = @api.stream('user')
+		@twitStream = @api.stream 'user'
 		couple false
 		super()
 
@@ -37,7 +37,7 @@ class stream extends EventEmitter
 		if event.entities.user_mentions.length > 0
 			for mention in event.entities.user_mentions
 				do (mention) =>
-					if mention.id_str is @user.id and types.indexOf('mention.new') isnt -1
+					if mention.id_str is @user.id and types.has 'mention.new'
 						types.push 'mention.new'
 
 		# fuck you twitter and your html tweet.source bullshit. seriously, fuck you.
@@ -45,7 +45,6 @@ class stream extends EventEmitter
 		event.source =
 			link: source.attr('href')
 			name: source.text()
-
 
 		# todo run filters by the tweet here, indicate in doc.filteredBy and doc.hide if the tweet was ignored,
 		# and if so by what filters (we will count blocking as a filter) so that in the future if a filter is removed,
@@ -97,6 +96,7 @@ class stream extends EventEmitter
 
 	withheldTweetEmitter: (event) ->
 		withheld =
+			eventType: ['tweet.censored']
 			type: 'tweet'
 			id_str: event.id
 			user_id_str: event.user_id
@@ -105,6 +105,7 @@ class stream extends EventEmitter
 
 	withheldUserEmitter: (event) ->
 		withheld =
+			eventType: ['tweet.censored']
 			type: 'user'
 			user_id_str: event.id
 			withheld_in_countries: event.withheld_in_countries
