@@ -30,7 +30,7 @@ red = '\x1b[0;31m'
 #
 
 jadeOpts = '-P'
-coffeeOpts = '-b'
+coffeeOpts = '-bmc'
 uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
 buildDir = 'build/crimson.app'
@@ -85,6 +85,8 @@ buildCommands =
 			mkdirp path.normalize(buildDir + '/' + dir), (err) ->
 				_log 'builddirs', dir, err
 				fn? err
+		coffee: (file, fn) ->
+			compile 'coffeecopy', file, fn
 		# todo: file-exists checks on less, jade, coffee, uglify, copy, rootcopy
 
 	# command to exec...should be sync.  (file)
@@ -94,7 +96,7 @@ buildCommands =
 		jade: (file) ->
 			"jade #{jadeOpts} < src/jade/#{file}.jade > #{buildDir}/#{file}.html"
 		coffee: (file) ->
-			"coffee #{coffeeOpts} -mo #{buildDir}/assets/js/crimson/ src/coffee/#{file}.coffee"
+			"coffee #{coffeeOpts} #{buildDir}/assets/js/crimson/#{file}.coffee"
 		uglify: (file) ->
 			"uglifyjs #{uglifyOpts} < #{buildDir}/assets/js/#{file}.js > #{buildDir}/assets/js/#{file}.min.js"
 		copy: (file) ->
@@ -115,9 +117,7 @@ buildCommands =
 		builddirs: false # deliberately ignoring the exec for builddir
 
 	# post-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
-	post:
-		coffee: (file, fn) ->
-			compile 'coffeecopy', file, fn
+	post: {} #none
 
 	messages:
 		error:
