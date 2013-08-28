@@ -16,7 +16,7 @@ jadeOpts = '-P'
 coffeeOpts = '-b'
 uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
-buildDir = 'build/crimson.app/'
+buildDir = 'build/crimson.app'
 isWindows = !!process.platform.match(/^win/)
 
 # files to build/watch, etc.
@@ -60,14 +60,14 @@ buildCommands =
 	# pre-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
 	pre:
 		builddirs: (dir, fn) ->
-			mkdirp path.normalize('build/' + dir), (err) ->
-			if err
-				msg = buildCommands.messages.error['builddirs'] || buildCommands.messages.error.def
-				log (msg type, file, err), err, true
-			else
-				msg = buildCommands.messages.success['builddirs'] || buildCommands.messages.success.def
-				log (msg type, file)
-			fn? err
+			mkdirp path.normalize(buildDir + '/' + dir), (err) ->
+				if err
+					msg = buildCommands.messages.error['builddirs'] || buildCommands.messages.error.def
+					log (msg 'builddirs', dir, err), err, true
+				else
+					msg = buildCommands.messages.success['builddirs'] || buildCommands.messages.success.def
+					log (msg 'builddirs', dir)
+				fn? err
 		# todo: file-exists checks on less, jade, coffee, uglify, copy, rootcopy
 
 	# command to exec...should be sync.  (file)
@@ -87,12 +87,12 @@ buildCommands =
 				"cp -u src/#{file} #{buildDir}/assets/#{file}"
 		rootcopy: (file) ->
 			if isWindows
-				"copy /Y #{path.normalize('src/' + file)} #{path.normalize(buildDir + '/' + file)}"
+				"copy /Y #{path.normalize('src/buildroot/'+file)} #{path.normalize(buildDir+'/'+file)}"
 			else
-				"cp -u src/#{file} #{buildDir}/#{file}"
+				"cp -u src/buildroot/#{file} #{buildDir}/#{file}"
 		coffeecopy: (file) ->
 			if isWindows
-				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'assets/js/crimson/'+file+'.coffee')}"
+				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'/assets/js/crimson/'+file+'.coffee')}"
 			else
 				cmd = "cp -u src/coffee/#{file}.coffee #{buildDir}/assets/js/crimson/#{file}.coffee"
 		builddirs: false # deliberately ignoring the exec for builddir
@@ -123,7 +123,7 @@ buildCommands =
 			coffeecopy: (type, file) ->
 				"#{type}: copied #{file} successfully"
 			builddirs: (type, file) ->
-				"#{type}: created directory #{dir} successfully"
+				"#{type}: created directory #{file} successfully"
 
 
 task 'build', 'build all - less, jade, coffeescript', ->
