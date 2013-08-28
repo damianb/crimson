@@ -61,12 +61,7 @@ buildCommands =
 	pre:
 		builddirs: (dir, fn) ->
 			mkdirp path.normalize(buildDir + '/' + dir), (err) ->
-				if err
-					msg = buildCommands.messages.error['builddirs'] || buildCommands.messages.error.def
-					log (msg 'builddirs', dir, err), err, true
-				else
-					msg = buildCommands.messages.success['builddirs'] || buildCommands.messages.success.def
-					log (msg 'builddirs', dir)
+				_log 'builddirs', dir, err
 				fn? err
 		# todo: file-exists checks on less, jade, coffee, uglify, copy, rootcopy
 
@@ -216,12 +211,7 @@ watch = (type) ->
 
 compile = (type, file, fn) ->
 		exec (buildCommands.run[type] file), (err, stdout, stderr) ->
-			if err
-				msg = buildCommands.messages.error[type] || buildCommands.messages.error.def
-				log (msg type, file, err), stderr, true
-			else
-				msg = buildCommands.messages.success[type] || buildCommands.messages.success.def
-				log (msg type, file)
+			_log type, file, err, stderr
 			fn? err
 
 log = (message, explanation, isError = false) ->
@@ -230,3 +220,11 @@ log = (message, explanation, isError = false) ->
 	else
 		message = green + message.trim() + reset
 	util.log message + ' ' + (explanation or '')
+
+_log = (type, file, err, moreErr) ->
+	if err
+		msg = buildCommands.messages.error[type] or buildCommands.messages.error.def
+		log (msg type, file, err), moreErr, true
+	else
+		msg = buildCommands.messages.success[type] or buildCommands.messages.success.def
+		log (msg type, file)
