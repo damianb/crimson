@@ -16,6 +16,7 @@ jadeOpts = '-P'
 coffeeOpts = '-b'
 uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
+buildDir = 'build/nw.app/'
 
 # files to build/watch, etc.
 files =
@@ -141,15 +142,15 @@ compile = (type, file, fn) ->
 			fn? err
 	else
 		cmdLine = switch
-			when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less build/assets/css/#{file}.css"
-			when type is 'jade' then "jade #{jadeOpts} < src/jade/#{file}.jade > build/#{file}.html"
-			when type is 'coffee' then "coffee #{coffeeOpts} -mo build/assets/js/crimson/ src/coffee/#{file}.coffee"
+			when type is 'less' then "lessc #{lessOpts} src/less/#{file}.less #{buildDir}/assets/css/#{file}.css"
+			when type is 'jade' then "jade #{jadeOpts} < src/jade/#{file}.jade > #{buildDir}/#{file}.html"
+			when type is 'coffee' then "coffee #{coffeeOpts} -mo #{buildDir}/assets/js/crimson/ src/coffee/#{file}.coffee"
 			#when type is 'uglify' then "uglifyjs #{uglifyOpts} < build/assets/js/#{file}.js > build/assets/js/#{file}.min.js"
 			#when type is 'uglycoffee' then "coffee #{coffeeOpts} -cs < src/coffee/#{file}.coffee | uglifyjs #{uglifyOpts} > build/assets/js/#{file}.min.js"
-			when type is 'copy' and process.platform.match(/^win/) then "copy /Y #{path.normalize('src/' + file)} #{path.normalize('build/assets/' + file)}"
-			when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} build/assets/#{file}"
-			when type is 'rootcopy' and process.platform.match(/^win/) then "copy /Y #{path.normalize('src/buildroot/' + file)} #{path.normalize('build/' + file)}"
-			when type is 'rootcopy' and !process.platform.match(/^win/) then "cp -u src/buildroot/#{file} build/#{file}"
+			when type is 'copy' and process.platform.match(/^win/) then "copy /Y #{path.normalize('src/' + file)} #{path.normalize(buildDir + '/assets/' + file)}"
+			when type is 'copy' and !process.platform.match(/^win/) then "cp -u src/#{file} #{buildDir}/assets/#{file}"
+			when type is 'rootcopy' and process.platform.match(/^win/) then "copy /Y #{path.normalize('src/buildroot/' + file)} #{path.normalize(buildDir + '/' + file)}"
+			when type is 'rootcopy' and !process.platform.match(/^win/) then "cp -u src/buildroot/#{file} #{buildDir}/#{file}"
 			else throw new Error 'unknown compile type'
 		exec cmdLine, (err, stdout, stderr) ->
 			if err
