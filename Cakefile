@@ -1,9 +1,13 @@
+#
+# requires, vars, and autoconfiguration
+#
 {spawn, exec} = require 'child_process'
 fs = require 'fs'
 path = require 'path'
 util = require 'util'
 mkdirp = require 'mkdirp'
 async = require 'async'
+isWindows = !!process.platform.match(/^win/)
 
 # ANSI Terminal Colors
 bold = '\x1b[0;1m'
@@ -11,15 +15,20 @@ green = '\x1b[0;32m'
 reset = '\x1b[0m'
 red = '\x1b[0;31m'
 
-# options for our various tools
+
+#
+# build configuration (for tools and such)
+#
+
 jadeOpts = '-P'
 coffeeOpts = '-b'
 uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
 buildDir = 'build/crimson.app'
-isWindows = !!process.platform.match(/^win/)
 
+#
 # files to build/watch, etc.
+#
 files =
 	builddirs: [
 		'assets/css'
@@ -55,6 +64,10 @@ files =
 	rootcopy: [
 		'package.json'
 	]
+
+#
+# build command configuration!
+#
 
 buildCommands =
 	# pre-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
@@ -96,6 +109,7 @@ buildCommands =
 	post:
 		coffee: (file, fn) ->
 			compile 'coffeecopy', file, fn
+
 	messages:
 		error:
 			def: (type, file, err) ->
@@ -120,6 +134,9 @@ buildCommands =
 			builddirs: (type, file) ->
 				"#{type}: created directory #{file} successfully"
 
+#
+# mega tasks
+#
 
 task 'build', 'build all - less, jade, coffeescript', ->
 	async.eachSeries [
@@ -142,20 +159,30 @@ task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:coffee'
 	invoke 'watch:copy'
 
+#
 # individual build tasks
+#
+
 task 'build:builddirs', 'prepares build dir\'s structure', -> build 'builddir'
 task 'build:jade', 'build jade files into html', -> build 'jade'
 task 'build:less', 'build less files into css', -> build 'less'
 task 'build:coffee', 'build coffeescript files into js', -> build 'coffee'
-task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
+#task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
 task 'build:copy', 'copy necessary files to build dir', -> build 'copy'
 task 'build:rootcopy', 'copy necessary files to build root dir', -> build 'rootcopy'
 
+#
 # individual watch tasks
+#
+
 task 'watch:jade', 'watch jade files for changes and rebuild', -> watch 'jade'
 task 'watch:less', 'watch less files for changes and rebuild', -> watch 'less'
 task 'watch:coffee', 'watch coffee files for changes and rebuild', -> watch 'coffee'
 task 'watch:copy', 'watch for misc changes and copy to build dir', -> watch 'copy'
+
+#
+# helper functions
+#
 
 build = (type, final) ->
 	# fileset is deliberately separate from type here.
