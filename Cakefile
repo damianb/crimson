@@ -168,6 +168,22 @@ task 'watch', 'watch and rebuild files when changed', ->
 	invoke 'watch:coffee'
 	invoke 'watch:copy'
 
+# todo - finish. Need to automate this for windows and stuff.
+#task 'package', 'package a release', ->
+#	async.eachSeries [
+#		'builddirs'
+#		'rootcopy'
+#		'less'
+#		'jade'
+#		'coffee'
+#		#'uglify'
+#		'copy'
+#	], build, (err) ->
+#		if err
+#			log 'build error!', err, true
+#		else
+#			log 'build complete!'
+
 #
 # individual build tasks
 #
