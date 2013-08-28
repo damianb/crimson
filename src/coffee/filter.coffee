@@ -34,7 +34,7 @@ class filter
 					}
 
 				# blocked retweeted user?
-				if doc.event.retweeted_status? and timeline.user.blocked.has doc.event.retweeted_status.user.id_str
+				if doc.eventtype.has 'retweet.new' and timeline.user.blocked.has doc.event.retweeted_status.user.id_str
 					doc.filtered[timeline.user.id].push {
 						why: 'blocked_rt_user'
 						what: doc.event.retweeted_status.user.id_str
@@ -48,7 +48,7 @@ class filter
 				}
 
 			# filtered retweeted user?
-			if doc.event.retweeted_status? and @filteredUsers.has doc.event.retweeted_status.user.id_str
+			if doc.eventtype.has 'retweet.new' and @filteredUsers.has doc.event.retweeted_status.user.id_str
 				doc.filtered.super.push {
 					why: 'filtered_rt_user'
 					what: doc.event.retweeted_status.user.id_str
@@ -72,19 +72,32 @@ class filter
 				}
 
 			if @filteredUsers.has doc.event.user_id_str
-				doc.filtered[timeline.user.id].push {
+				doc.filtered.super.push {
 					why: 'filtered_user'
 					what: doc.event.user_id_str
 				}
+		else if doc.eventType.has 'follower.new', 'favorite.new.ofmine'
+			# non-super timelines only
+			if !timeline.isSuper and timeline.user.blocked.has doc.event.source.user_id_str
+				doc.filtered[timeline.user.id].push {
+					why: 'blocked_user'
+					what: doc.event.source.user_id_str
+				}
+
+			if @filteredUsers.has doc.event.source.user_id_str
+				doc.filtered.super.push {
+					why: 'filtered_user'
+					what: doc.event.source.user_id_str
+				}
 
 		return doc
-
 
 	addFilter: () ->
 		# todo
 
 	remFilter: () ->
 		# todo
+		# IT SHOULD ALWAYS BE IN THE DOM, JUST NOT VISIBLE! (display:none) so we don't lose where it is in the DOM!
 
 	__destroy: ->
 		# todo
