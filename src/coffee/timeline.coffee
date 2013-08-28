@@ -19,6 +19,7 @@ class timeline
 
 	addEntry: (entries...) ->
 		# note, entries should be handled properly on insertion. they may not all be tweets!
+		# ( S-SENPAI, THAT'T NOT A TWEET! ///// )
 		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
 
 	removeEntry: (entry) ->
