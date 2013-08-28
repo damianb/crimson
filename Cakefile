@@ -105,7 +105,7 @@ buildCommands =
 			rootcopy: (type, file, err) ->
 				"#{type}: failed to copy #{file}; #{err}"
 			coffeecopy: (type, file, err) ->
-				"#{type}: failed to copy #{file}; #{err}"
+				"#{type}: failed to copy #{file}.coffee; #{err}"
 			builddirs: (type, file, err) ->
 				"#{type}: failed to create directory #{file}"
 		success:
@@ -116,7 +116,7 @@ buildCommands =
 			rootcopy: (type, file) ->
 				"#{type}: copied #{file} successfully"
 			coffeecopy: (type, file) ->
-				"#{type}: copied #{file} successfully"
+				"#{type}: copied #{file}.coffee successfully"
 			builddirs: (type, file) ->
 				"#{type}: created directory #{file} successfully"
 
