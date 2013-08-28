@@ -18,71 +18,67 @@ class filter
 			@filtered.text = doc.filters.text
 
 	runFilters: (timeline, doc) ->
-		if !doc.filtered? then doc.filtered = []
+		if !doc.filtered? then doc.filtered = {}
+		if !doc.filtered.super? then doc.filtered.super = []
+		if !doc.filtered[timeline.user.id]? then doc.filtered[timeline.user.id] = []
 
 		# is it a tweet?
 		if doc.eventType.has 'tweet.new'
-
 			# these two checks should only occur in non-super timelines
 			if !timeline.isSuper
 				# blocked user?
-				if timeline.user.blocked.has @doc.event.user.id_str
-					doc.filtered.push {
-						super: false
-						user: timeline.user
+				if timeline.user.blocked.has doc.event.user.id_str
+					doc.filtered[timeline.user.id].push {
 						why: 'blocked_user'
+						what: doc.event.user.id_str
 					}
 
 				# blocked retweeted user?
 				if doc.event.retweeted_status? and timeline.user.blocked.has doc.event.retweeted_status.user.id_str
-					doc.filtered.push {
-						super: false
-						user: timeline.user
+					doc.filtered[timeline.user.id].push {
 						why: 'blocked_rt_user'
+						what: doc.event.retweeted_status.user.id_str
 					}
 
 			# filtered user?
 			if @filteredUsers.has doc.event.user.id_str
-				doc.filtered.push {
-					super: timeline.isSuper
-					user: timeline.user
+				doc.filtered.super.push {
 					why: 'filtered_user'
+					what: doc.event.user.id_str
 				}
 
 			# filtered retweeted user?
 			if doc.event.retweeted_status? and @filteredUsers.has doc.event.retweeted_status.user.id_str
-				doc.filtered.push {
-					super: timeline.isSuper
-					user: timeline.user
+				doc.filtered.super.push {
 					why: 'filtered_rt_user'
+					what: doc.event.retweeted_status.user.id_str
 				}
 
 			# filtered application?
 			if @filteredSources.has doc.event.source.name
-				doc.filtered.push {
-					super: timeline.isSuper
-					user: timeline.user
+				doc.filtered.super.push {
 					why: 'filtered_app'
+					what: doc.event.source.name
 				}
 
 			# filtered text (will need to allow for regexps at some point)
+			# todo
 		else if doc.eventType.has 'tweet.censored'
 			# non-super timelines only
-			if !timeline.isSuper
-				# blocked user?
-				if doc.event.user_id_str
-					doc.filtered.push
+			if !timeline.isSuper and timeline.user.blocked.has doc.event.user_id_str
+				doc.filtered[timeline.user.id].push {
+					why: 'blocked_user'
+					what: doc.event.user_id_str
+				}
 
+			if @filteredUsers.has doc.event.user_id_str
+				doc.filtered[timeline.user.id].push {
+					why: 'filtered_user'
+					what: doc.event.user_id_str
+				}
 
-			# things to filter:
+		return doc
 
-			# author: is it a filtered or blocked user
-			# retweeted: is it a retweet of a filtered user
-			# text: does it contain a filtered word or phrase
-			# text: does it match a regex filter
-			# source: does it match a filtered application
-
-			# todo
 
 	addFilter: () ->
 		# todo
