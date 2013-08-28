@@ -59,12 +59,14 @@ files =
 buildCommands =
 	# pre-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
 	pre:
-		builddirs: (path, fn) ->
-			mkdirp path.normalize('build/' + file), (err) ->
+		builddirs: (dir, fn) ->
+			mkdirp path.normalize('build/' + dir), (err) ->
 			if err
-				log "#{type}: failed to create directory #{file}", err, true
+				msg = buildCommands.messages.error['builddirs'] || buildCommands.messages.error.def
+				log (msg type, file, err), err, true
 			else
-				log "#{type}: created directory #{file} successfully"
+				msg = buildCommands.messages.success['builddirs'] || buildCommands.messages.success.def
+				log (msg type, file)
 			fn? err
 		# todo: file-exists checks on less, jade, coffee, uglify, copy, rootcopy
 
@@ -109,6 +111,8 @@ buildCommands =
 				"#{type}: failed to copy #{file}; #{err}"
 			coffeecopy: (type, file, err) ->
 				"#{type}: failed to copy #{file}; #{err}"
+			builddirs: (type, file, err) ->
+				"#{type}: failed to create directory #{file}"
 		success:
 			def: (type, file) ->
 				"#{type}: compiled #{file} successfully"
@@ -118,6 +122,8 @@ buildCommands =
 				"#{type}: copied #{file} successfully"
 			coffeecopy: (type, file) ->
 				"#{type}: copied #{file} successfully"
+			builddirs: (type, file) ->
+				"#{type}: created directory #{dir} successfully"
 
 
 task 'build', 'build all - less, jade, coffeescript', ->
