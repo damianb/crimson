@@ -4,7 +4,6 @@ crimson - desktop social network client
 author: Damian Bushong <katana@codebite.net>
 license: MIT license
 url: https://github.com/damianb/crimson
-heello: https://heello.com/katana
 twitter: https://twitter.com/burningcrimson
 ###
 
@@ -36,7 +35,6 @@ global.Date::format = (mask, utc) ->
 
 # global muckery...yuck. ;_;
 
-global.localStorage = localStorage
 global.$ = $
 global.gui = gui = require 'nw.gui'
 mainWindow = gui.Window.get()

@@ -1,6 +1,16 @@
+###
+crimson - desktop social network client
+---
+author: Damian Bushong <katana@codebite.net>
+license: MIT license
+url: https://github.com/damianb/crimson
+twitter: https://twitter.com/burningcrimson
+###
+
 #
 # requires, vars, and autoconfiguration
 #
+
 {spawn, exec} = require 'child_process'
 fs = require 'fs'
 path = require 'path'
@@ -14,7 +24,6 @@ bold = '\x1b[0;1m'
 green = '\x1b[0;32m'
 reset = '\x1b[0m'
 red = '\x1b[0;31m'
-
 
 #
 # build configuration (for tools and such)
