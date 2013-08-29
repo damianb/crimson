@@ -34,35 +34,42 @@ class filter
 					}
 
 				# blocked retweeted user?
-				if doc.eventtype.has 'retweet.new' and timeline.user.blocked.has doc.event.retweeted_status.user.id_str
+				if doc.eventType.has 'retweet.new' and timeline.user.blocked.has doc.event.retweeted_status.user.id_str
 					doc.filtered[timeline.user.id].push {
 						why: 'blocked_rt_user'
 						what: doc.event.retweeted_status.user.id_str
 					}
 
 			# filtered user?
-			if @filteredUsers.has doc.event.user.id_str
+			if @filtered.users.has doc.event.user.id_str
 				doc.filtered.super.push {
 					why: 'filtered_user'
 					what: doc.event.user.id_str
 				}
 
 			# filtered retweeted user?
-			if doc.eventtype.has 'retweet.new' and @filteredUsers.has doc.event.retweeted_status.user.id_str
+			if doc.eventType.has 'retweet.new' and @filtered.users.has doc.event.retweeted_status.user.id_str
 				doc.filtered.super.push {
 					why: 'filtered_rt_user'
 					what: doc.event.retweeted_status.user.id_str
 				}
 
 			# filtered application?
-			if @filteredSources.has doc.event.source.name
+			if @filtered.sources.has doc.event.source.name
 				doc.filtered.super.push {
 					why: 'filtered_app'
 					what: doc.event.source.name
 				}
 
 			# filtered text (will need to allow for regexps at some point)
-			# todo
+			for match in @filtered.text do
+				(match) ->
+					text = if doc.eventType.has 'retweet.new' then doc.event.retweeted_status.text else doc.event.text
+					if text.search(match) isnt -1
+						doc.filtered.super.push {
+							why: 'filtered_text'
+							what: match
+						}
 		else if doc.eventType.has 'tweet.censored'
 			# non-super timelines only
 			if !timeline.isSuper and timeline.user.blocked.has doc.event.user_id_str
@@ -84,7 +91,7 @@ class filter
 					what: doc.event.source.user_id_str
 				}
 
-			if @filteredUsers.has doc.event.source.user_id_str
+			if @filtered.users.has doc.event.source.user_id_str
 				doc.filtered.super.push {
 					why: 'filtered_user'
 					what: doc.event.source.user_id_str
