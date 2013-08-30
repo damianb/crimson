@@ -34,7 +34,7 @@ class crimson extends EventEmitter
 		#
 		@db =
 			preferences: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'prefs.db' }
-			users: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'users.db' }
+			accounts: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'users.db' }
 			events: new nedb { autoload: true }
 		# todo: index constraints
 		#  preferences: array of unique keys
@@ -48,6 +48,22 @@ class crimson extends EventEmitter
 			user: {}
 		@users = {}
 
+		# establish filters in the core, to prevent unnecessary duplication in memory
+		@filtered =
+			users: []
+			sources: []
+			text: []
+
+		@crimson.db.preferences.findOne { key: 'filter' }, (err, doc) =>
+			if err
+				debug 'core.constructor nedb err: ' + err
+				return err
+
+			if doc
+				@filtered.users = doc.filters.users
+				@filtered.sources = doc.filters.sources
+				@filtered.text = doc.filters.text
+
 		super()
 
 		# hooking these up after calling super() so that eventemitter is ready.
@@ -55,7 +71,7 @@ class crimson extends EventEmitter
 		@timelines.super.supernotify = new timeline 'supernotify', { crimson: @ }
 
 	connectAll: (fn) ->
-		@db.users.find { enabled: true }, (err, tokens) =>
+		@db.accounts.find { enabled: true }, (err, tokens) =>
 			if err
 				debug 'crimson.connectAll nedb err: ' + err
 				return fn err
@@ -79,7 +95,8 @@ class crimson extends EventEmitter
 		user =
 			api: @getApi(account.token, account.secret)
 			crimson: @
-			stream: null # will hold a datastream, which wraps twit streams
+			stream: null # will hold a stream object, which wraps twit streams
+			filter: null # will hold a filter object
 			id: account.userId
 			profile: null
 			friends: []
@@ -98,6 +115,10 @@ class crimson extends EventEmitter
 					if err then return cb err
 					user.profile = reply
 					cb null
+			(cb) =>
+				# prepare the filter object...
+				user.filter = new filter @, user
+				cb null
 			(cb) =>
 				# we don't want to init the stream until now, due to...stuff.
 				user.stream = new stream user
@@ -160,7 +181,7 @@ class crimson extends EventEmitter
 
 			tokens = qs.parse body
 			# insert into users db
-			@db.users.insert {
+			@db.accounts.insert {
 				token: tokens.oauth_token
 				secret: tokens.oauth_token_secret
 				userId: tokens.user_id

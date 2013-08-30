@@ -26,6 +26,8 @@ class timeline
 		# if it's a tweet...
 		if entry.eventType.indexOf('tweet.new') isnt -1
 			$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
+	hideEntry: (entry) ->
+		# todo
 
 	minimize: (fn) ->
 		$('#timeline').html('')
@@ -33,12 +35,13 @@ class timeline
 
 	restore: (fn) ->
 		# build our query based on timeline event types, etc.
-		query = {}
+		query =
+			eventType:
+				$in: timeline.timelineEvents
 
 		# only use an ownerId if we're not using a ^super timeline
 		if !@isSuper then query.ownerId = @user.id
-		query.eventType =
-			$in: timeline.timelineEvents
+
 		@crimson.db.event.find query, (err, docs) =>
 			docs.sort (a,b) ->
 				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
