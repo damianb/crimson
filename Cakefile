@@ -104,17 +104,17 @@ buildCommands =
 			if isWindows
 				"copy /Y #{path.normalize('src/' + file)} #{path.normalize(buildDir + '/assets/' + file)}"
 			else
-				"cp -u src/#{file} #{buildDir}/assets/#{file}"
+				"cp src/#{file} #{buildDir}/assets/#{file}"
 		rootcopy: (file) ->
 			if isWindows
 				"copy /Y #{path.normalize('src/buildroot/'+file)} #{path.normalize(buildDir+'/'+file)}"
 			else
-				"cp -u src/buildroot/#{file} #{buildDir}/#{file}"
+				"cp src/buildroot/#{file} #{buildDir}/#{file}"
 		coffeecopy: (file) ->
 			if isWindows
 				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'/assets/js/crimson/'+file+'.coffee')}"
 			else
-				cmd = "cp -u src/coffee/#{file}.coffee #{buildDir}/assets/js/crimson/#{file}.coffee"
+				cmd = "cp src/coffee/#{file}.coffee #{buildDir}/assets/js/crimson/#{file}.coffee"
 		builddirs: false # deliberately ignoring the exec for builddir
 
 	# post-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
