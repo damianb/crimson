@@ -29,6 +29,8 @@ $ cd
 $ npm install -g coffee-script uglify-js less jade
 ```
 
+(the above may require sudo, if you choose not to add `~/node_modules/.bin/` to your `$PATH`)
+
 Next, install required dependencies.
 
 ```shell
