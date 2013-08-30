@@ -57,7 +57,7 @@ class crimson extends EventEmitter
 			sources: []
 			text: []
 
-		@crimson.db.preferences.findOne { key: 'filter' }, (err, doc) =>
+		@db.preferences.findOne { key: 'filter' }, (err, doc) =>
 			if err
 				debug 'core.constructor nedb err: ' + err
 				return err
