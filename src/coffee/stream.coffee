@@ -52,8 +52,8 @@ class stream extends EventEmitter
 				}
 
 			# filtered text (will need to allow for regexps at some point)
-			for match in @crimson.filtered.text do
-				(match) ->
+			for match in @crimson.filtered.text
+				do (match) ->
 					text = if doc.eventType.has 'retweet.new' then doc.event.retweeted_status.text else doc.event.text
 					if text.search(match) isnt -1
 						doc.filtered.super.push {
@@ -84,7 +84,6 @@ class stream extends EventEmitter
 					why: 'filtered_user'
 					what: doc.event.source.user_id_str
 				}
-
 		return doc
 
 	tweetEmitter: (event) ->
