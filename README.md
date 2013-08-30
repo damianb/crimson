@@ -18,9 +18,26 @@ twitter bootstrap used under [Apache license 2.0](https://github.com/twitter/boo
 
 ### compiling
 
-requires node-webkit 0.7.0+
+note: requires [node-webkit] 0.7.0+ to run compiled code
 
-to build latest changes, cd to project directory and use `cake build` or `cake watch` to build coffeescript, less, jade files used by crimson.
+Due to coffee-script providing no programmatic wrapper for compiling coffee itself, we have to do stuff through shell processes.
+
+Install nodejs (0.10) as per normal for your distro/OS, then, after ensuring that `~/node_modules/.bin/` is in your `$PATH`
+
+```
+$ cd
+$ npm install -g coffee-script uglify-js less jade
+```
+
+Next, install required dependencies.
+
+```shell
+$ git clone https://github.com/damianb/crimson.git
+$ cd crimson; npm install
+$ cake build:builddirs build:rootcopy
+$ cd build; npm install
+$ cd ..; cake build
+```
 
 to run the application, cd to project directory and launch the build directory with the `nw` executable provided by node-webkit
 
