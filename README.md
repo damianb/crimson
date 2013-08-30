@@ -18,7 +18,7 @@ twitter bootstrap used under [Apache license 2.0](https://github.com/twitter/boo
 
 ### compiling
 
-note: requires [node-webkit] 0.7.0+ to run compiled code
+note: requires [node-webkit](https://github.com/rogerwang/node-webkit/) 0.7.0+ to run compiled code
 
 Due to coffee-script providing no programmatic wrapper for compiling coffee itself, we have to do stuff through shell processes.
 
@@ -36,9 +36,8 @@ Next, install required dependencies.
 ```shell
 $ git clone https://github.com/damianb/crimson.git
 $ cd crimson; npm install
-$ cake build:builddirs build:rootcopy
+$ cake build
 $ cd build; npm install
-$ cd ..; cake build
 ```
 
 to run the application, cd to project directory and launch the build directory with the `nw` executable provided by node-webkit
