@@ -6,7 +6,7 @@ class timeline
 		@isSuper = if @type is 'superhome' or @type is 'supernotify' then true else false
 
 		if !@stream? and !@isSuper
-			throw new Error 'All timelines except super types must be provided a datastream'
+			throw new Error 'All timelines except super types must be provided a stream'
 		else if @isSuper
 			@stream = @crimson
 
@@ -22,10 +22,14 @@ class timeline
 		# ( S-SENPAI, THAT'T NOT A TWEET! ///// )
 		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
 
+	updateEntry: (identifier, entry) ->
+		# todo
+
 	removeEntry: (entry) ->
 		# if it's a tweet...
-		if entry.eventType.indexOf('tweet.new') isnt -1
+		if entry.eventType.has 'tweet.new'
 			$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
+
 	hideEntry: (entry) ->
 		# todo
 

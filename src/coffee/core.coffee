@@ -35,6 +35,9 @@ class crimson extends EventEmitter
 		@db =
 			preferences: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'prefs.db' }
 			accounts: new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'users.db' }
+			#users: new nedb { autoload: true }
+			# may be used for quick lookup of user accounts - we'll upsert as needed to update.
+			# would provide us with a good method of autocomplete
 			events: new nedb { autoload: true }
 		# todo: index constraints
 		#  preferences: array of unique keys
@@ -63,6 +66,8 @@ class crimson extends EventEmitter
 				@filtered.users = doc.filters.users
 				@filtered.sources = doc.filters.sources
 				@filtered.text = doc.filters.text
+
+		# todo filter management
 
 		super()
 
@@ -96,7 +101,6 @@ class crimson extends EventEmitter
 			api: @getApi(account.token, account.secret)
 			crimson: @
 			stream: null # will hold a stream object, which wraps twit streams
-			filter: null # will hold a filter object
 			id: account.userId
 			profile: null
 			friends: []
@@ -116,10 +120,6 @@ class crimson extends EventEmitter
 					user.profile = reply
 					cb null
 			(cb) =>
-				# prepare the filter object...
-				user.filter = new filter @, user
-				cb null
-			(cb) =>
 				# we don't want to init the stream until now, due to...stuff.
 				user.stream = new stream user
 				user.stream.on '__destroy', =>
@@ -134,6 +134,8 @@ class crimson extends EventEmitter
 					mentions: new timeline 'mentions', user
 					events: new timeline 'events', user
 				cb null
+			(cb) =>
+				#
 		], (err) =>
 			if err
 				debug 'crimson.connect err: ' + err
@@ -199,6 +201,16 @@ class crimson extends EventEmitter
 			access_token: token
 			access_token_secret: secret
 		})
+
+	addFilter: () ->
+		# emit something so that all events db items are refiltered.
+		# this will take an nedb query, at least
+		# todo
+
+	remFilter: () ->
+		# todo
+		# IT SHOULD ALWAYS BE IN THE DOM, JUST NOT VISIBLE! (display:none) so we don't lose where it is in the DOM!
+		# todo: emit something to trigger dom modifications, nedb updates
 
 	# shutdown procedures - should handle cleanup
 	__destroy: ->

@@ -54,8 +54,9 @@ files =
 	]
 	coffee: [
 		'client'
+		'client_authorize'
 		'core'
-		'filter'
+		'global'
 		'stream'
 		'timeline'
 		'ui'
