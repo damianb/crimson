@@ -7,69 +7,16 @@ url: https://github.com/damianb/crimson
 twitter: https://twitter.com/burningcrimson
 ###
 
-#
-# - global object prototype modifications...
-#
-
-global.Array::remove = (from, to) ->
-	rest = @slice (to or from) + 1 or @length
-	@length = if from < 0 then @length + from else from
-	@push.apply @, rest
-
-global.Array::has = (entries...) ->
-	hasEntries = true
-	process = =>
-		if (@indexOf entries.shift()) is -1
-			hasEntries = false
-	process() until hasEntries is false or entries.length is 0
-	hasEntries
-
-
-escapeHTML = require 'escape-html'
-global.String::escapeHTML = ->
-	escapeHTML @
-
-dateFormat = require 'dateformat'
-global.Date::format = (mask, utc) ->
-	dateFormat @, mask, utc
-
-# global muckery...yuck. ;_;
-
-global.$ = $
-global.gui = gui = require 'nw.gui'
-mainWindow = gui.Window.get()
-
-# special requires
-
 # we need to make this a global to prevent gc
 global.crimson = crimson = require './assets/js/crimson/core'
-
 domain = require 'domain'
-fs = require 'fs'
-debug = (require 'debug')('client')
 
 # initially, we are NOT in debug mode. we have to key-sequence our way into debug mode, and answer
 # a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.
 DEBUG = false
 
-# working around a node-webkit bug on windows
-# ref: https://github.com/rogerwang/node-webkit/issues/253
-mainWindow.on 'minimize', ->
-	width = mainWindow.width
-	mainWindow.once 'restore', ->
-		if mainWindow.width isnt width then mainWindow.width = width
-
-process.on 'uncaughtException', (err) ->
-	debug 'uncaught exception: ' + err
-	console.error err
-	fs.appendFileSync './error.log', "#{new Date()}\n #{err.stack}"
-	# process.exit 1
-
 d = domain.create()
-d.on 'error', (err) ->
-	debug 'caught error: ' + err
-	console.error err
-	fs.appendFileSync './error.log', "#{new Date()}\n #{err.stack}"
+d.on 'error', global.handleCrit
 
 d.run ->
 	#
@@ -94,7 +41,8 @@ d.run ->
 		}
 
 	#
-	# - key binds
+	# - special key binds
+	# - there will be no compromise. these will not be allowed to be used
 	#
 
 	$(document).on 'keydown', null, 'ctrl+F12', ->
