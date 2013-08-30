@@ -34,3 +34,5 @@ d.run ->
 
 	$().ready ->
 		# todo
+		# bind to authorize button, open a new browser window to get the user to authenticate, and then wait for the pin...
+		# afterwards, try with the pin, see if we get something legit, then go!
