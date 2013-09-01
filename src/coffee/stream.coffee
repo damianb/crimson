@@ -286,28 +286,28 @@ class stream extends EventEmitter
 	# no way in hell am I doing lists here. not in the first versions. fuck that shit.
 
 	couple: (decouple = false) ->
-		method = if decouple then 'removeListener' else 'on'
+		method = if decouple then @twitStream.removeListener else @twitStream.addListener
 
 		# the standard bs
-		@twitStream[method] 'tweet', @tweetEmitter
-		@twitStream[method] 'delete', @deleteEmitter
+		method 'tweet', @tweetEmitter
+		method 'delete', @deleteEmitter
 		# disabled for now
-		#@twitStream[method] 'scrub_geo', @scrubgeoEmitter
-		@twitStream[method] 'connect', @connectEmitter
-		@twitStream[method] 'disconnect', @disconnectEmitter
-		@twitStream[method] 'reconnect', @reconnectEmitter
-		@twitStream[method] 'status_withheld', @withheldTweetEmitter
-		@twitStream[method] 'user_withheld', @withheldUserEmitter
-		@twitStream[method] 'friends', @friendsEmitter
+		#method 'scrub_geo', @scrubgeoEmitter
+		method 'connect', @connectEmitter
+		method 'disconnect', @disconnectEmitter
+		method 'reconnect', @reconnectEmitter
+		method 'status_withheld', @withheldTweetEmitter
+		method 'user_withheld', @withheldUserEmitter
+		method 'friends', @friendsEmitter
 
 		# special user stream events
-		@twitStream[method] 'user_update', @userUpdateEmitter
-		@twitStream[method] 'follow', @followEmitter
-		@twitStream[method] 'unfollow', @unfollowEmitter
-		@twitStream[method] 'favorite', @favoriteEmitter
-		@twitStream[method] 'unfavorite', @unfavoriteEmitter
-		@twitStream[method] 'blocked', @blockedEmitter
-		@twitStream[method] 'unblocked', @unblockedEmitter
+		method 'user_update', @userUpdateEmitter
+		method 'follow', @followEmitter
+		method 'unfollow', @unfollowEmitter
+		method 'favorite', @favoriteEmitter
+		method 'unfavorite', @unfavoriteEmitter
+		method 'blocked', @blockEmitter
+		method 'unblocked', @unblockEmitter
 
 	emit: (args...) ->
 		# please work on the first try, oh please oh please
