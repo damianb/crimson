@@ -15,6 +15,15 @@ domain = require 'domain'
 # a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.
 DEBUG = false
 
+curwindow = gui.Window.get()
+
+# working around a node-webkit bug on windows
+# ref: https://github.com/rogerwang/node-webkit/issues/253
+curwindow.on 'minimize', ->
+	width = curwindow.width
+	curwindow.once 'restore', ->
+		if curwindow.width isnt width then curwindow.width = width
+
 d = domain.create()
 d.on 'error', global.handleCrit
 

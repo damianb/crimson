@@ -16,6 +16,15 @@ domain = require 'domain'
 if !crimson
 	throw new Error 'crimson global not found - brb seppuku'
 
+curwindow = gui.Window.get()
+
+# working around a node-webkit bug on windows
+# ref: https://github.com/rogerwang/node-webkit/issues/253
+curwindow.on 'minimize', ->
+	width = curwindow.width
+	curwindow.once 'restore', ->
+		if curwindow.width isnt width then curwindow.width = width
+
 # initially, we are NOT in debug mode. we have to key-sequence our way into debug mode, and answer
 # a series of three questions to the Keeper of the Bridge, else we be cast into the depths beyond.
 DEBUG = false
@@ -40,10 +49,16 @@ d.run ->
 		$('#apin').hide()
 		$('#authorize').click ->
 			# grab authorize URI, then open the browser window
-			crimson.getAuthUri (oauth_token, uri) ->
+			crimson.getAuthUri (err, oauth_token, uri) ->
+				if err
+					# todo, figure out how best to handle this
+					return
+
 				oauthToken = oauth_token
 				$('#apin').show()
 				$('#abutton').hide()
+
+				console.log uri
 
 				gui.Shell.openExternal(uri)
 		$('#sendpin').click ->
