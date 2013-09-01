@@ -11,5 +11,17 @@ html
 		script(src='assets/js/bootstrap.min.js')
 		script(src='assets/js/crimson/global.js')
 		script(src='assets/js/crimson/client_authorize.js')
-		title crimson - authorize your account
+		title crimson
 	body.authorize
+		.notice
+			.p#abutton
+				strong Authorization required!
+				button.btn.btn-primary.btn-small#authorize Authorize with Twitter
+			.p#apin
+				strong Please enter the authorization PIN below.
+				.error
+				.input-append
+					input.span2#pin(type='text')
+					button.btn.btn-primary#sendpin(type='button') Go
+		footer
+			span#version
