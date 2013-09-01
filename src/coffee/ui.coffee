@@ -26,9 +26,9 @@ module.exports =
 		field.bind 'focus paste', =>
 			setTimeout charCount, 10
 			return null
-		field.bind 'blur', =>
+		field.bind 'blur', ->
 			if field.val().length is 0
-				@display.stop().fadeTo('fast', 0)
+				display.stop().fadeTo('fast', 0)
 			return false
 		display.html max
 		display.stop().fadeTo(0, 0)
