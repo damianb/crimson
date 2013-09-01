@@ -7,7 +7,10 @@ url: https://github.com/damianb/crimson
 twitter: https://twitter.com/burningcrimson
 ###
 
+# Just doing this for clarity's sake.
 crimson = global.crimson
+gui = global.gui
+
 domain = require 'domain'
 
 if !crimson
@@ -20,6 +23,7 @@ DEBUG = false
 d = domain.create()
 d.on 'error', global.handleCrit
 
+oauthToken = null
 d.run ->
 	$(document).on 'keydown', null, 'ctrl+F12', ->
 		DEBUG = !DEBUG
@@ -33,6 +37,26 @@ d.run ->
 			gui.Window.get().reloadIgnoringCache()
 
 	$().ready ->
+		$('#apin').hide()
+		$('#authorize').click ->
+			# grab authorize URI, then open the browser window
+			crimson.getAuthUri (oauth_token, uri) ->
+				oauthToken = oauth_token
+				$('#apin').show()
+				$('#abutton').hide()
+
+				gui.Shell.openExternal(uri)
+		$('#sendpin').click ->
+			crimson.tradePinForTokens oauthToken, $('#pin').val(), (err, doc) ->
+				if err
+					# todo, figure out how best to handle this
+					return
+				crimson.connect doc, (err, user) ->
+					if err
+						# todo, figure out how to best handle this
+						return
+					curwindow.close()
+
 		# todo
 		# bind to authorize button, open a new browser window to get the user to authenticate, and then wait for the pin...
 		# afterwards, try with the pin, see if we get something legit, then go!

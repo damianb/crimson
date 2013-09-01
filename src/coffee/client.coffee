@@ -23,21 +23,21 @@ d.run ->
 	# - client event binds
 	#
 
-	crimson.on 'user.ready', (user, first) ->
+	crimson.on 'user.ready', (user) ->
 		###
 		# if the first user to connect, we need to display the client chrome and the home column
 		###
 
-	crimson.on 'user.ready', ->
-		console.log 'connected!'
+	crimson.on 'user.ready', (user) ->
+		console.log 'connected! uid: ' + user.userId
 
 	crimson.on 'user.noaccount', ->
 		console.log "no account, opening authorize account window"
 		# todo, prepare authorize template
 		gui.Window.open 'authorize.html', {
 			position: 'center'
-			height: 500
-			width: 500
+			height: 280
+			width: 440
 		}
 
 	#
