@@ -71,13 +71,14 @@ d.run ->
 	# - ui binds
 	#
 
-	# todo refactor
-	crimson.ui.counter('#tweetText', '#charcount', 140)
+
 
 	$().ready ->
 		$('#version').text("nw #{process.versions['node-webkit']}; node #{process.version}; crimson #{crimson.pkg.version}")
 		$('footer').hide()
 		crimson.ui.display 'load'
+
+		crimson.ui.counter '#tweetText', '#charcount', 140
 
 		$('.reldate').relatizeDateTime()
 		setInterval ->
