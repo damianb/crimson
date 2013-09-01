@@ -113,7 +113,7 @@ body.client {
 
 			background-color: @bgColor;
 			background-image: data-uri("./../img/noise.png"),-webkit-linear-gradient(left, @bgColor 30%, lighten(@bgColor, 15%) 100%);
-			footer, .main, .l, .r { overflow: hidden; position: absolute }
+			footer, .timeline, .l, .r { overflow: hidden; position: absolute }
 			.l, .r { top: @headerHeight; bottom: 0 }
 			header {
 				overflow: hidden;
@@ -149,7 +149,7 @@ body.client {
 					box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
 					border-radius: 4px;
 
-					textarea#pingText {
+					textarea#tweetText {
 						position: absolute;
 						top: 4px;
 						bottom: 29px;
@@ -183,18 +183,12 @@ body.client {
 						bottom: 4px;
 						left: 40px;
 						right: 4px;
-						.btn-group {
+						button {
 							float: right;
-							button {
-								line-height: 15px;
-								&#private {
-									padding-left: 3px;
-									padding-right: 3px;
-								}
-								&#ping {
-									padding-left: 11px;
-									padding-right: 11px;
-								}
+							line-height: 15px;
+							&#tweet {
+								padding-left: 11px;
+								padding-right: 11px;
 							}
 						}
 						span#charcount {
@@ -259,133 +253,129 @@ body.client {
 					}
 				}
 
-				.main {
+				.timeline {
 					top: 0;
 					left: 0;
 					right: 0;
 					bottom: 0;
 					z-index: 15;
+					height: 100%;
 					border-top: 1px solid @subBorder;
 					border-left: 1px solid @subBorder;
-					.columns { height: 100% }
-					.column {
-						top: 0;
-						bottom: 0;
-						height: 100%;
-						overflow-y: scroll !important;
-						background-color: @subColor;
-						background-image: data-uri("./../img/noise.png");
-						.entries { height: 100% }
-						.entry {
-							position: relative;
-							color: #fff;
-							width: 100%;
-							margin-top: 20px;
-							margin-bottom: 20px;
+					overflow-y: scroll !important;
+					background-color: @subColor;
+					background-image: data-uri("./../img/noise.png");
+					.entries { height: 100% }
+					.entry {
+						position: relative;
+						color: #fff;
+						width: 100%;
+						margin-top: 20px;
+						margin-bottom: 20px;
 
-							.who { font-weight: bold; }
-							.post {
-								position:relative;
-								top: 0;
-								bottom: 0;
-								left: 0;
-								right: 0;
-								padding: 3px;
-								margin: 26px 6px 15px 30px;
-								color:#333;
-								background-color: #fafafa;
+						.who { font-weight: bold; }
+						.post {
+							position:relative;
+							top: 0;
+							bottom: 0;
+							left: 0;
+							right: 0;
+							padding: 3px;
+							margin: 26px 6px 15px 30px;
+							color:#333;
+							background-color: #fafafa;
+							border: 1px solid #aaa;
+							border-radius: 6px;
+							box-shadow: inset 0 -1px 2px rgba(0,0,0,0.14), inset -1px 0 2px rgba(0,0,0,0.14);
+							z-index: 20;
+
+							.meta { margin-left: 22px }
+							p { margin: 2px 0 0 16px }
+						}
+
+						.controls {
+							position: absolute;
+							top: 0;
+							right: 10px;
+							z-index: 25;
+
+							a {
+								margin: 2px;
+								display: block;
+								opacity: 0.5;
+								&:hover { opacity: 1.0 }
+							}
+						}
+
+						.profile, .m-profile {
+							position: absolute;
+							top: -22px;
+							bottom: 0;
+							left: 5px;
+
+							@size: 44px;
+							border-radius: (@size - 2) / 2;
+							margin: 3px;
+							width: @size;
+							height: @size;
+							background-color: rgba(170,170,170, 0.5);
+							z-index: 30;
+
+							img.avatar {
+								//background-color: #fff;
+								@isize: @size - 4px;
+								border-radius: @isize / 2;
 								border: 1px solid #aaa;
-								border-radius: 6px;
-								box-shadow: inset 0 -1px 2px rgba(0,0,0,0.14), inset -1px 0 2px rgba(0,0,0,0.14);
-								z-index: 20;
-
-								.meta { margin-left: 22px }
-								p { margin: 2px 0 0 16px }
+								width: @isize;
+								height: @isize;
+								margin: 1px;
+								z-index: 40;
 							}
+						}
 
-							.controls {
-								position: absolute;
-								top: 0;
-								right: 10px;
-								z-index: 25;
+						&.own .profile, &.retweet .m-profile.own {
+							background-color: rgba(122, 201, 122, 0.5);
+							img.avatar { border-color: #66C466 }
+						}
 
-								a {
-									margin: 2px;
-									display: block;
-									opacity: 0.5;
-									&:hover { opacity: 1.0 }
-								}
-							}
+						&.mention .profile {
+							background-color: rgba(204, 51, 51, 0.5);
+							img.avatar { border-color: #c33 }
+						}
 
-							.profile, .m-profile {
-								position: absolute;
-								top: -22px;
-								bottom: 0;
-								left: 5px;
+						&.retweet {
+							margin-bottom: 32px;
 
-								@size: 44px;
+							.m-profile {
+								top: 26px;
+								left: 13px;
+
+								@size: 28px;
 								border-radius: (@size - 2) / 2;
-								margin: 3px;
 								width: @size;
 								height: @size;
-								background-color: rgba(170,170,170, 0.5);
-								z-index: 30;
+								z-index: 25;
 
 								img.avatar {
-									//background-color: #fff;
 									@isize: @size - 4px;
 									border-radius: @isize / 2;
-									border: 1px solid #aaa;
 									width: @isize;
 									height: @isize;
-									margin: 1px;
-									z-index: 40;
-								}
-							}
-
-							&.own .profile, &.echo .m-profile.own {
-								background-color: rgba(122, 201, 122, 0.5);
-								img.avatar { border-color: #66C466 }
-							}
-
-							&.mention .profile {
-								background-color: rgba(204, 51, 51, 0.5);
-								img.avatar { border-color: #c33 }
-							}
-
-							&.echo {
-								margin-bottom: 32px;
-
-								.m-profile {
-									top: 26px;
-									left: 13px;
-
-									@size: 28px;
-									border-radius: (@size - 2) / 2;
-									width: @size;
-									height: @size;
-									z-index: 25;
-
-									img.avatar {
-										@isize: @size - 4px;
-										border-radius: @isize / 2;
-										width: @isize;
-										height: @isize;
-										z-index: 28;
-									}
-								}
-							}
-
-							&.private {
-								.post {
-									background: -webkit-linear-gradient(-45deg, #fafafa 55%,#FDF3BD 100%);
-									// lock color: E9B600
+									z-index: 28;
 								}
 							}
 						}
 
-						.stretch { height: 800px }
+						// do something special for twitter DMs?
+						&.private {
+							.post {
+								background: -webkit-linear-gradient(-45deg, #fafafa 55%,#FDF3BD 100%);
+								// lock color: E9B600
+							}
+						}
 					}
+
+					.stretch { height: 800px }
 				}
 
 				footer {
@@ -412,11 +402,11 @@ body.client {
 		color: #6666AD;
 		font-weight: bold;
 		&.lengthWarn {
-
+			color: #BF2020;
 		}
 		&.lengthOver {
 			color: #BF2020 !important;
-			font-weight: bold;
+			font-style: italic;
 		}
 	}
 

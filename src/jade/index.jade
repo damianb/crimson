@@ -28,7 +28,7 @@ html
 				p#errormsg EUNKNOWN
 		.display.dis-client.hide
 			header
-				.whoami(style='background-image: url(https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed)')
+				.whoami(style='background-image: url(https://si0.twimg.com/profile_images/378800000384263050/12c04d4f6e881ceebf5721e3d1290fd7_normal.png)')
 				.inputbox
 					textarea.scroll#tweetText(placeholder="What's happening?",rows="2")
 					// todo: turn into proper form
@@ -58,77 +58,66 @@ html
 					.col-head
 						// to be used for displaying user profiles? alerts?
 					.entries
-						.entry.ping
+						.entry.tweet
 							.profile
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_bigger.png', alt='thumb')
 							.post
 								.meta
-									a.who(href='#') @heello
+									a.who(href='#') @twitter
 									span.time &nbsp;21 mins
-								p Example ping text
+								p Example tweet
 							.controls
 								a(href='#')
 									i.icon-share-alt
 								a(href='#')
 									i.icon-random
-						.entry.ping.mention
+						.entry.tweet.mention
 							.profile
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_bigger.png', alt='thumb')
 							.post
 								.meta
-									a.who(href='#') @heello
+									a.who(href='#') @twitter
 									span.time &nbsp;14 mins
 								p This ping mentions you! - &nbsp;
-									a.who(href='#') @katana
+									a.who(href='#') @burningcrimson
 							.controls
 								a(href='#')
 									i.icon-share-alt
 								a(href='#')
 									i.icon-random
-						.entry.ping.echo
+						.entry.tweet.retweet
 							.profile
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_bigger.png', alt='thumb')
 							.m-profile.own
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/378800000384263050/12c04d4f6e881ceebf5721e3d1290fd7_normal.png', alt='thumb')
 							.post
 								.meta
-									a.who(href='#') @heello
+									a.who(href='#') @twitter
 									span.time &nbsp;13 mins
-								p This is something you echoed!
+								p This is something you retweeted!
 							.controls
 								a(href='#')
 									i.icon-share-alt
 								a(href='#')
 									i.icon-remove
-						.entry.ping.echo.own
+						.entry.tweet.retweet.own
 							.profile
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/378800000384263050/12c04d4f6e881ceebf5721e3d1290fd7_normal.png', alt='thumb')
 							.m-profile
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/heello/thumb.jpg?478a4b79f06e00992983fef0ed95d54c', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/2284174758/v65oai7fxn47qv9nectx_bigger.png', alt='thumb')
 							.post
 								.meta
 									a.who(href='#') @katana
 									span.time &nbsp;13 mins
-								p Someone echoed you!
-						.entry.ping.own
+								p Someone retweeted you!
+						.entry.tweet.own
 							.profile.self
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
+								img.avatar(src='https://si0.twimg.com/profile_images/378800000384263050/12c04d4f6e881ceebf5721e3d1290fd7_normal.png', alt='thumb')
 							.post
 								.meta
 									a.who(href='#') @katana
 									span.time &nbsp;12 mins
-								p This ping is by you!
-							.controls
-								a(href='#')
-									i.icon-remove
-						.entry.ping.own.private
-							.profile.self
-								img.avatar(src='https://d2trw7474qpa0b.cloudfront.net/katana/thumb.jpg?49c663f527fa2998953bbb65f631c5ed', alt='thumb')
-							.post
-								.meta
-									a.who(href='#') @katana
-									span.time &nbsp;12 mins
-								p This is a private ping by you!
+								p This tweet is by you!
 							.controls
 								a(href='#')
 									i.icon-remove
