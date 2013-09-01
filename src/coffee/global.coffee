@@ -48,7 +48,7 @@ global.gui = gui = require 'nw.gui'
 global.handleCrit = (err) ->
 	debug 'critical: ' + err
 	console.error err
-	fs.appendFileSync './error.log', "#{new Date()}\n #{err.stack}"
+	fs.appendFileSync './error.log', "#{new Date()}\n #{err.stack}\n"
 	process.exit 1
 
 process.on 'uncaughtException', global.handleCrit
