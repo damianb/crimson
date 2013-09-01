@@ -36,9 +36,11 @@ d.run ->
 		###
 		# if the first user to connect, we need to display the client chrome and the home column
 		###
+		if $('.display.dis-load').is(':visible')
+			crimson.ui.display 'client'
 
 	crimson.on 'user.ready', (user) ->
-		console.log 'connected! uid: ' + user.userId
+		console.log 'connected! uid: ' + user.id
 
 	crimson.on 'user.noaccount', ->
 		console.log "no account, opening authorize account window"
