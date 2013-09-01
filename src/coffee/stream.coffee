@@ -6,7 +6,7 @@ class stream extends EventEmitter
 	constructor: (@user) ->
 		{@crimson, @api} = @user
 		@twitStream = @api.stream 'user'
-		couple false
+		@couple false
 		super()
 
 	filter: (doc) ->
