@@ -135,7 +135,8 @@ class crimson extends EventEmitter
 					events: new timeline 'events', user
 				cb null
 			(cb) =>
-				#
+				# initial api calls to populate timelines...
+				cb null
 		], (err) =>
 			if err
 				debug 'crimson.connect err: ' + err
