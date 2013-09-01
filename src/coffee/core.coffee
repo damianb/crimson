@@ -165,7 +165,7 @@ class crimson extends EventEmitter
 			fn null, tokens.oauth_token, url.format {
 				protocol: 'https'
 				hostname: 'api.twitter.com'
-				pathname: '/oauth/oauthorize'
+				pathname: '/oauth/authorize'
 				query:
 					oauth_token: tokens.oauth_token
 			}
@@ -204,7 +204,7 @@ class crimson extends EventEmitter
 	getApi: (token, secret) ->
 		return new twit({
 			consumer_key: @appTokens.consumer_key.toString()
-			consumer_secret: @appTokens.consumer_secret.toSting()
+			consumer_secret: @appTokens.consumer_secret.toString()
 			access_token: token
 			access_token_secret: secret
 		})
