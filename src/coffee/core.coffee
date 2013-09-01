@@ -194,6 +194,7 @@ class crimson extends EventEmitter
 				token: tokens.oauth_token
 				secret: tokens.oauth_token_secret
 				userId: tokens.user_id
+				enabled: true
 			}, (err, doc) ->
 				if err
 					debug 'crimson.tradePinForTokens nedb err: ' + err
