@@ -18,8 +18,8 @@ class crimson extends EventEmitter
 	constructor: ->
 		@appTokens =
 			# todo update with actual tokens
-			consumer_key: new Buffer '', 'base64'
-			consumer_secret: new Buffer '', 'base64'
+			consumer_key: new Buffer 'Y1M0bm9NWFNEWjh1a1VHU2djeFVR', 'base64'
+			consumer_secret: new Buffer 'QjByblViRmVFUDkzMFdKaVdlcGZ5b1RYM1hVUVJ2UTFrVEVTWXFXNjg=', 'base64'
 		@pkg = gui.App.manifest
 		@ui = ui
 
@@ -139,9 +139,10 @@ class crimson extends EventEmitter
 		], (err) =>
 			if err
 				debug 'crimson.connect err: ' + err
-				throw err
+				return fn err
 
-			fn user
+			@emit 'user.ready', user
+			fn null, user
 
 	getAuthUri: (fn) ->
 		oauth =
@@ -182,6 +183,12 @@ class crimson extends EventEmitter
 				return fn err
 
 			tokens = qs.parse body
+
+			if !tokens.user_id
+				err = 'No user_id received from twitter API - authentication failed?'
+				debug 'crimson.tradePinForTokens err: ' + err
+				return fn err
+
 			# insert into users db
 			@db.accounts.insert {
 				token: tokens.oauth_token
