@@ -96,13 +96,19 @@ class stream extends EventEmitter
 		# retweet.new.ofmine
 		# mention.new
 		#
+
+		# until DMs are supported in twit...
+		if event.direct_message?
+			@dmEmitter event
+			return
+
 		types = ['tweet.new']
 
 		# our tweet?
 		if event.user.id_str is @user.id then types.push 'tweet.new.mine'
 
 		# is it a retweet?
-		if event.retweeted is true
+		if event.retweeted_status?
 			types.push 'retweet.new'
 			# retweet of our tweet?
 			if event.retweeted_status.user.id_str is @user.id then types.push 'retweet.new.ofmine'
@@ -148,7 +154,32 @@ class stream extends EventEmitter
 				@emit type, doc for type in types
 
 	dmEmitter: (event) ->
-		# todo
+		types = ['dm.new']
+		if event.direct_message.recipient_id is @user.id
+			types.push 'dm.received'
+		else if event.direct_message.sender_id is @user.id
+			types.push 'dm.sent'
+		#else
+			# I...hope this never happens.
+
+		query =
+			event: event
+		updateQuery =
+			$set:
+				eventTime: Date.now()
+			$addToSet:
+				ownerId: @user.id
+				eventType: types
+
+		@crimson.db.events.update query, updateQuery, { upsert: true }, (err, numReplaced, upsert) =>
+			if err
+				debug 'stream.dmEmitter nedb err: ' + err
+				throw err
+
+			# until we know exactly what the f the _id was that was modified with the update query,
+			# we have to use this. ref: https://github.com/louischatriot/nedb/issues/72
+			@crimson.db.events.findOne { 'event.direct_message.id_str': event.direct_message.id_str }, (err, doc) =>
+				@emit type, doc for type in types
 
 	deleteEmitter: (event) ->
 		query =
@@ -289,34 +320,34 @@ class stream extends EventEmitter
 	# no way in hell am I doing lists here. not in the first versions. fuck that shit.
 
 	couple: (decouple = false) ->
-		method = if decouple then @twitStream.removeListener else @twitStream.addListener
+		method = if decouple then 'removeListener' else 'addListener'
 
 		# the standard bs
-		method 'tweet', @tweetEmitter
-		method 'direct_message', @dmEmitter
-		method 'delete', @deleteEmitter
+		@twitStream[method] 'tweet', @tweetEmitter.bind @
+		@twitStream[method] 'direct_message', @dmEmitter.bind @
+		@twitStream[method] 'delete', @deleteEmitter.bind @
 		# disabled for now
 		#method 'scrub_geo', @scrubgeoEmitter
-		method 'connect', @connectEmitter
-		method 'disconnect', @disconnectEmitter
-		method 'reconnect', @reconnectEmitter
-		method 'status_withheld', @withheldTweetEmitter
-		method 'user_withheld', @withheldUserEmitter
-		method 'friends', @friendsEmitter
+		@twitStream[method] 'connect', @connectEmitter.bind @
+		@twitStream[method] 'disconnect', @disconnectEmitter.bind @
+		@twitStream[method] 'reconnect', @reconnectEmitter.bind @
+		@twitStream[method] 'status_withheld', @withheldTweetEmitter.bind @
+		@twitStream[method] 'user_withheld', @withheldUserEmitter.bind @
+		@twitStream[method] 'friends', @friendsEmitter.bind @
 
 		# special user stream events
-		method 'user_update', @userUpdateEmitter
-		method 'follow', @followEmitter
-		method 'unfollow', @unfollowEmitter
-		method 'favorite', @favoriteEmitter
-		method 'unfavorite', @unfavoriteEmitter
-		method 'blocked', @blockEmitter
-		method 'unblocked', @unblockEmitter
+		@twitStream[method] 'user_update', @userUpdateEmitter.bind @
+		@twitStream[method] 'follow', @followEmitter.bind @
+		@twitStream[method] 'unfollow', @unfollowEmitter.bind @
+		@twitStream[method] 'favorite', @favoriteEmitter.bind @
+		@twitStream[method] 'unfavorite', @unfavoriteEmitter.bind @
+		@twitStream[method] 'blocked', @blockEmitter.bind @
+		@twitStream[method] 'unblocked', @unblockEmitter.bind @
 
 	emit: (args...) ->
 		# please work on the first try, oh please oh please
 		@crimson.emit.apply @crimson, args
-		EventEmitter.emit.apply @, args
+		EventEmitter::emit.apply @, args
 
 	__destroy: ->
 		# todo remove all listeners from twitstream and close it and kill it with fire

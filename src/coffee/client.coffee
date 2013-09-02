@@ -45,7 +45,7 @@ d.run ->
 		logEvent = (event) ->
 			console.log event
 		user.stream.on 'tweet.new', logEvent
-		user.stream.on 'dm.received', logEvent
+		user.stream.on 'dm.new', logEvent
 		user.stream.on 'tweet.delete', logEvent
 		user.stream.on 'tweet.censored', logEvent
 		user.stream.on 'twitter.userupdate', logEvent
