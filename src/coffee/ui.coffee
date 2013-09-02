@@ -61,7 +61,7 @@ module.exports =
 
 	setAvatar: (url) ->
 		$('#avatar')
-			.css('background-image', url)
+			.css('background-image', "url(#{url})")
 			.removeClass('nullAvatar')
 
 	bigError: (err) ->
