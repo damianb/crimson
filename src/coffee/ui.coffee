@@ -59,6 +59,11 @@ module.exports =
 			$('.throbber span').removeClass 'pulse'
 			null
 
+	setAvatar: (url) ->
+		$('#avatar')
+			.css('background-image', url)
+			.removeClass('nullAvatar')
+
 	bigError: (err) ->
 		$('#errormsg').val err
 		@display 'fatal'

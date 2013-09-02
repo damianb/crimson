@@ -1,11 +1,11 @@
-###
-crimson - desktop social network client
----
-author: Damian Bushong <katana@codebite.net>
-license: MIT license
-url: https://github.com/damianb/crimson
-twitter: https://twitter.com/burningcrimson
-###
+#
+# crimson - desktop social network client
+# ---
+# author: Damian Bushong <katana@codebite.net>
+# license: MIT license
+# url: https://github.com/damianb/crimson
+# twitter: https://twitter.com/burningcrimson
+#
 
 # we need to make this a global to prevent gc
 global.crimson = crimson = require './assets/js/crimson/core'
@@ -33,11 +33,12 @@ d.run ->
 	#
 
 	crimson.on 'user.ready', (user) ->
-		###
+		#
 		# if the first user to connect, we need to display the client chrome and the home column
-		###
+		#
 		if $('.display.dis-load').is(':visible')
 			crimson.ui.display 'client'
+			crimson.ui.setAvatar user.profile.profile_image_url_https
 
 	crimson.on 'user.ready', (user) ->
 		console.log 'connected! uid: ' + user.id
@@ -87,8 +88,6 @@ d.run ->
 	#
 	# - ui binds
 	#
-
-
 
 	$().ready ->
 		$('#version').text("nw #{process.versions['node-webkit']}; node #{process.version}; crimson #{crimson.pkg.version}")
