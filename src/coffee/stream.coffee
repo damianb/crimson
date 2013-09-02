@@ -147,6 +147,9 @@ class stream extends EventEmitter
 			@crimson.db.events.findOne { 'event.id_str': event.id_str }, (err, doc) =>
 				@emit type, doc for type in types
 
+	dmEmitter: (event) ->
+		# todo
+
 	deleteEmitter: (event) ->
 		query =
 			id_str: event.status.id_str
@@ -290,6 +293,7 @@ class stream extends EventEmitter
 
 		# the standard bs
 		method 'tweet', @tweetEmitter
+		method 'direct_message', @dmEmitter
 		method 'delete', @deleteEmitter
 		# disabled for now
 		#method 'scrub_geo', @scrubgeoEmitter

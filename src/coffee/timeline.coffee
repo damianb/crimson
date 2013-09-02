@@ -61,6 +61,7 @@ class timeline
 		supernotify: ['mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
 		home: ['tweet.new', 'tweet.new.mine', 'retweet.new']
 		mentions: ['mention.new', 'mention.new.mine']
+		messages: ['dmessage.new', 'dmessage.new.mine']
 		events: ['follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
 
 module.exports = timeline
