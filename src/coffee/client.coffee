@@ -41,6 +41,23 @@ d.run ->
 
 	crimson.on 'user.ready', (user) ->
 		console.log 'connected! uid: ' + user.id
+		console.log 'adding debug dumpers to stream events'
+		logEvent = (event) ->
+			console.log event
+		user.stream.on 'tweet.new', logEvent
+		user.stream.on 'dm.received', logEvent
+		user.stream.on 'tweet.delete', logEvent
+		user.stream.on 'tweet.censored', logEvent
+		user.stream.on 'twitter.userupdate', logEvent
+		user.stream.on 'twitter.newfriend', logEvent
+		user.stream.on 'follower.new', logEvent
+		user.stream.on 'twitter.lostfriend', logEvent
+		user.stream.on 'twitter.favorited', logEvent
+		user.stream.on 'favorite.new.ofmine', logEvent
+		user.stream.on 'twitter.unfavorited', logEvent
+		user.stream.on 'unfavorite.new.ofmine', logEvent
+		user.stream.on 'twitter.blocked', logEvent
+		user.stream.on 'twitter.unblocked', logEvent
 
 	crimson.on 'user.noaccount', ->
 		console.log "no account, opening authorize account window"
