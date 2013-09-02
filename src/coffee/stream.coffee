@@ -130,7 +130,7 @@ class stream extends EventEmitter
 			link: source.attr('href')
 			name: source.text()
 
-		event.text = twitter.autoLinkEntities event.text, event.entities
+		event.text = twitter.autoLink event.text, event.entities
 
 		# todo run filters by the tweet here, indicate in doc.filteredBy and doc.hide if the tweet was ignored,
 		# and if so by what filters (we will count blocking as a filter) so that in the future if a filter is removed,
@@ -165,7 +165,7 @@ class stream extends EventEmitter
 		#else
 			# I...hope this never happens.
 
-		event.text = twitter.autoLinkEntities event.text, event.entities
+		event.text = twitter.autoLink event.text, event.entities
 
 		query =
 			event: event
