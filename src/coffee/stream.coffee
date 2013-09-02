@@ -120,7 +120,7 @@ class stream extends EventEmitter
 		if event.entities.user_mentions.length > 0
 			for mention in event.entities.user_mentions
 				do (mention) =>
-					if mention.id_str is @user.id and types.has 'mention.new'
+					if mention.id_str is @user.id and !types.has 'mention.new'
 						types.push 'mention.new'
 
 		# fuck you twitter and your html tweet.source bullshit. seriously, fuck you.
