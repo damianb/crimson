@@ -13,14 +13,15 @@ class timeline
 		if !timeline.timelineEvents[@type]?
 			throw new Error 'Unrecognized timeline type provided'
 
-		@stream.on event, @addEntry for event in timeline.timelineEvents[@type]
-		@stream.on 'tweet.delete', @removeEntry
-		@stream.on '__destroy', @__destroy
+		@stream.on event, @addEntry.bind(@) for event in timeline.timelineEvents[@type]
+		@stream.on 'tweet.delete', @removeEntry.bind @
+		@stream.on '__destroy', @__destroy.bind @
 
 	addEntry: (entries...) ->
 		# note, entries should be handled properly on insertion. they may not all be tweets!
 		# ( S-SENPAI, THAT'T NOT A TWEET! ///// )
-		$('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
+		# this is horribly broken at the moment.
+		# $('#timeline').prepend @crimson.ui.entryTemplate { entries: entries }
 
 	updateEntry: (identifier, entry) ->
 		# todo
@@ -53,7 +54,7 @@ class timeline
 			fn null
 
 	__destroy: ->
-		@stream.removeListener event, @addEntry for event in timeline.timelineEvents[type]
+		@stream.removeListener event, @addEntry.bind(@) for event in timeline.timelineEvents[type]
 		@stream.removeListener 'tweet.delete', @removeEntry
 
 	@timelineEvents =
@@ -61,7 +62,7 @@ class timeline
 		supernotify: ['mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
 		home: ['tweet.new', 'tweet.new.mine', 'retweet.new']
 		mentions: ['mention.new', 'mention.new.mine']
-		messages: ['dmessage.new', 'dmessage.new.mine']
+		messages: ['dm.sent', 'dm.received']
 		events: ['follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
 
 module.exports = timeline
