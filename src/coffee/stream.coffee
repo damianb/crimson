@@ -1,4 +1,5 @@
 {EventEmitter} = require 'events'
+twitter = require 'twitter-text'
 {$} = global
 debug = (require 'debug')('stream')
 
@@ -129,6 +130,8 @@ class stream extends EventEmitter
 			link: source.attr('href')
 			name: source.text()
 
+		event.text = twitter.autoLink event.text, event.entities
+
 		# todo run filters by the tweet here, indicate in doc.filteredBy and doc.hide if the tweet was ignored,
 		# and if so by what filters (we will count blocking as a filter) so that in the future if a filter is removed,
 		# we can just pull anything it affected and see if there were any other filters acting on it at the same time.
@@ -161,6 +164,8 @@ class stream extends EventEmitter
 			types.push 'dm.sent'
 		#else
 			# I...hope this never happens.
+
+		event.text = twitter.autoLink event.text, event.entities
 
 		query =
 			event: event
