@@ -60,9 +60,10 @@ module.exports =
 			null
 
 	setAvatar: (url) ->
-		$('#avatar')
-			.css('background-image', "url(#{url})")
-			.removeClass('nullAvatar')
+		if url
+			$('#avatar')
+				.css('background-image', "url(#{url.replace('_normal', '_bigger')})")
+				.removeClass('nullAvatar')
 
 	bigError: (err) ->
 		$('#errormsg').val err
