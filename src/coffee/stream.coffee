@@ -145,7 +145,7 @@ class stream extends EventEmitter
 				eventTime: Date.now()
 			$addToSet:
 				ownerId: @user.id
-				eventType: types
+				eventType: { $each: types }
 		@crimson.db.events.update query, updateQuery, { upsert: true }, (err, numReplaced, upsert) =>
 			if err
 				debug 'stream.tweetEmitter nedb err: ' + err
@@ -174,7 +174,7 @@ class stream extends EventEmitter
 				eventTime: Date.now()
 			$addToSet:
 				ownerId: @user.id
-				eventType: types
+				eventType: { $each: types }
 
 		@crimson.db.events.update query, updateQuery, { upsert: true }, (err, numReplaced, upsert) =>
 			if err
