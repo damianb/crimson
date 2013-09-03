@@ -17,6 +17,21 @@ class timeline
 		@stream.on 'tweet.delete', @removeEntry.bind @
 		@stream.on '__destroy', @__destroy.bind @
 
+	domifyEntry: (entry) ->
+		if entry.entryTypes.has 'tweet.new'
+			entry.type = 'tweet'
+			# override type to be retweet if it is such
+			if entry.entryTypes.has 'retweet.new'
+				entry.type 'retweet'
+		else if entry.entryTypes.has 'dm.new'
+			entry.type = 'dm'
+		else if entry.entryTypes.has 'favorite.new'
+			entry.type = 'favorite'
+		else if entry.entryTypes.has 'follower.new'
+			entry.type = 'follower'
+
+		return entry
+
 	addEntry: (entries...) ->
 		# note, entries should be handled properly on insertion. they may not all be tweets!
 		# ( S-SENPAI, THAT'T NOT A TWEET! ///// )
@@ -28,11 +43,13 @@ class timeline
 
 	removeEntry: (entry) ->
 		# if it's a tweet...
-		if entry.eventType.has 'tweet.new'
-			$("#timeline .entry.tweet[data-id='#{ entry.id }']").remove()
+		$("#timeline .entry[data-nedb-id='#{entry._id}']").remove()
+
+	showEntry: (entry) ->
+		$("#timeline .entry[data-nedb-id='#{entry._id}']").show()
 
 	hideEntry: (entry) ->
-		# todo
+		$("#timeline .entry[data-nedb-id='#{entry._id}']").hide()
 
 	minimize: (fn) ->
 		$('#timeline').html('')
@@ -61,7 +78,7 @@ class timeline
 		superhome: ['tweet.new', 'tweet.new.mine', 'retweet.new', 'retweet.new.mine', 'mention.new']
 		supernotify: ['mention.new', 'follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
 		home: ['tweet.new', 'tweet.new.mine', 'retweet.new']
-		mentions: ['mention.new', 'mention.new.mine']
+		mentions: ['mention.new']
 		messages: ['dm.sent', 'dm.received']
 		events: ['follower.new', 'retweet.new.ofmine', 'favorite.new.ofmine']
 
