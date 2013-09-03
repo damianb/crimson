@@ -18,16 +18,16 @@ class timeline
 		@stream.on '__destroy', @__destroy.bind @
 
 	domifyEntry: (entry) ->
-		if entry.entryTypes.has 'tweet.new'
+		if entry.eventType.has 'tweet.new'
 			entry.type = 'tweet'
 			# override type to be retweet if it is such
-			if entry.entryTypes.has 'retweet.new'
+			if entry.eventType.has 'retweet.new'
 				entry.type 'retweet'
-		else if entry.entryTypes.has 'dm.new'
+		else if entry.eventType.has 'dm.new'
 			entry.type = 'dm'
-		else if entry.entryTypes.has 'favorite.new'
+		else if entry.eventType.has 'favorite.new'
 			entry.type = 'favorite'
-		else if entry.entryTypes.has 'follower.new'
+		else if entry.eventType.has 'follower.new'
 			entry.type = 'follower'
 
 		return entry
