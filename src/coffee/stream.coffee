@@ -88,16 +88,6 @@ class stream extends EventEmitter
 		return doc
 
 	tweetEmitter: (event) ->
-		# todo parse out all the types necessary
-		#
-		# tweet.new
-		# tweet.new.mine
-		# retweet.new
-		# retweet.new.mine
-		# retweet.new.ofmine
-		# mention.new
-		#
-
 		# until DMs are supported in twit...
 		if event.direct_message?
 			@dmEmitter event
@@ -124,7 +114,8 @@ class stream extends EventEmitter
 					if mention.id_str is @user.id and !types.has 'mention.new'
 						types.push 'mention.new'
 
-		# fuck you twitter and your html tweet.source bullshit. seriously, fuck you.
+		# scumbag twitter:
+		# LET'S JUST SEND HTML OVER THE WIRE. THAT WOULD BE TOTALLY APPROPRIATE WHEN WE'RE ALREADY SENDING JSON! YEAH!
 		source = $(event.source)
 		event.source =
 			link: source.attr('href')
@@ -151,7 +142,7 @@ class stream extends EventEmitter
 				debug 'stream.tweetEmitter nedb err: ' + err
 				throw err
 
-			# until we know exactly what the f the _id was that was modified with the update query,
+			# until we know exactly what the hell the _id was that was modified with the update query,
 			# we have to use this. ref: https://github.com/louischatriot/nedb/issues/72
 			@crimson.db.events.findOne { 'event.id_str': event.id_str }, (err, doc) =>
 				@emit type, doc for type in types
@@ -181,7 +172,7 @@ class stream extends EventEmitter
 				debug 'stream.dmEmitter nedb err: ' + err
 				throw err
 
-			# until we know exactly what the f the _id was that was modified with the update query,
+			# until we know exactly what the hell the _id was that was modified with the update query,
 			# we have to use this. ref: https://github.com/louischatriot/nedb/issues/72
 			@crimson.db.events.findOne { 'event.direct_message.id_str': event.direct_message.id_str }, (err, doc) =>
 				@emit type, doc for type in types
