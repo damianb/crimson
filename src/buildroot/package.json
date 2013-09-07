@@ -16,7 +16,7 @@
     "height": 550,
     "min_width": 320,
     "min_height": 500,
-    "toolbar": true
+    "toolbar": false
   },
   "dependencies": {
     "async": "~0.2.9",
