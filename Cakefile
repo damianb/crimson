@@ -20,11 +20,12 @@ red = '\x1b[0;31m'
 # build configuration (for tools and such)
 #
 
+appName = 'crimson'
 jadeOpts = '-P'
 coffeeOpts = '-bmc'
 uglifyOpts = '-mc'
 lessOpts = '--no-ie-compat -x'
-buildDir = 'build/crimson.app'
+buildDir = "build/{appName}.app"
 
 #
 # files to build/watch, etc.
@@ -87,7 +88,7 @@ buildCommands =
 		jade: (file) ->
 			"jade #{jadeOpts} < src/jade/#{file}.jade > #{buildDir}/#{file}.html"
 		coffee: (file) ->
-			"coffee #{coffeeOpts} #{buildDir}/assets/js/star/#{file}.coffee"
+			"coffee #{coffeeOpts} #{buildDir}/assets/js/{appName}/#{file}.coffee"
 		uglify: (file) ->
 			"uglifyjs #{uglifyOpts} < #{buildDir}/assets/js/#{file}.js > #{buildDir}/assets/js/#{file}.min.js"
 		copy: (file) ->
@@ -96,7 +97,7 @@ buildCommands =
 			else
 				"cp src/#{file} #{buildDir}/assets/#{file}"
 		controllers: ->
-			"coffee #{coffeeOpts} -j #{path.normalize(buildDir+'/assets/js/star/controllers.js')} src/coffee/controllers.coffee src/coffee/controller/"
+			"coffee #{coffeeOpts} -j #{path.normalize(buildDir+'/assets/js/{appName}/controllers.js')} src/coffee/controllers.coffee src/coffee/controller/"
 		rootcopy: (file) ->
 			if isWindows
 				"copy /Y #{path.normalize('src/buildroot/'+file)} #{path.normalize(buildDir+'/'+file)}"
@@ -104,9 +105,9 @@ buildCommands =
 				"cp src/buildroot/#{file} #{buildDir}/#{file}"
 		coffeecopy: (file) ->
 			if isWindows
-				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'/assets/js/star/'+file+'.coffee')}"
+				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'/assets/js/{appName}/'+file+'.coffee')}"
 			else
-				cmd = "cp src/coffee/#{file}.coffee #{buildDir}/assets/js/star/#{file}.coffee"
+				cmd = "cp src/coffee/#{file}.coffee #{buildDir}/assets/js/{appName}/#{file}.coffee"
 		builddirs: false # deliberately ignoring the exec for builddir
 
 	# post-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
