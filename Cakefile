@@ -1,12 +1,3 @@
-###
-crimson - desktop social network client
----
-author: Damian Bushong <katana@codebite.net>
-license: MIT license
-url: https://github.com/damianb/crimson
-twitter: https://twitter.com/burningcrimson
-###
-
 #
 # requires, vars, and autoconfiguration
 #
@@ -45,10 +36,8 @@ files =
 		'assets/js/crimson/'
 		'assets/templates'
 	]
-	jade: [
-		'index'
-		'authorize'
-	]
+	controllers: false
+	jade: []
 	less: [
 		'crimson'
 	]
@@ -73,6 +62,7 @@ files =
 	]
 	rootcopy: [
 		'package.json'
+		'index.html' # won't need this soon
 	]
 
 #
@@ -97,7 +87,7 @@ buildCommands =
 		jade: (file) ->
 			"jade #{jadeOpts} < src/jade/#{file}.jade > #{buildDir}/#{file}.html"
 		coffee: (file) ->
-			"coffee #{coffeeOpts} #{buildDir}/assets/js/crimson/#{file}.coffee"
+			"coffee #{coffeeOpts} #{buildDir}/assets/js/star/#{file}.coffee"
 		uglify: (file) ->
 			"uglifyjs #{uglifyOpts} < #{buildDir}/assets/js/#{file}.js > #{buildDir}/assets/js/#{file}.min.js"
 		copy: (file) ->
@@ -105,6 +95,8 @@ buildCommands =
 				"copy /Y #{path.normalize('src/' + file)} #{path.normalize(buildDir + '/assets/' + file)}"
 			else
 				"cp src/#{file} #{buildDir}/assets/#{file}"
+		controllers: ->
+			"coffee #{coffeeOpts} -j #{path.normalize(buildDir+'/assets/js/star/controllers.js')} src/coffee/controllers.coffee src/coffee/controller/"
 		rootcopy: (file) ->
 			if isWindows
 				"copy /Y #{path.normalize('src/buildroot/'+file)} #{path.normalize(buildDir+'/'+file)}"
@@ -112,9 +104,9 @@ buildCommands =
 				"cp src/buildroot/#{file} #{buildDir}/#{file}"
 		coffeecopy: (file) ->
 			if isWindows
-				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'/assets/js/crimson/'+file+'.coffee')}"
+				cmd = "copy /Y #{path.normalize('src/coffee/'+file+'.coffee')} #{path.normalize(buildDir+'/assets/js/star/'+file+'.coffee')}"
 			else
-				cmd = "cp src/coffee/#{file}.coffee #{buildDir}/assets/js/crimson/#{file}.coffee"
+				cmd = "cp src/coffee/#{file}.coffee #{buildDir}/assets/js/star/#{file}.coffee"
 		builddirs: false # deliberately ignoring the exec for builddir
 
 	# post-build actions to run...should be async.  (file, fn) - or just (fn) to only run once
@@ -124,6 +116,8 @@ buildCommands =
 		error:
 			def: (type, file, err) ->
 				"#{type}: failed to compile #{file}; #{err}"
+			controllers: (type, file, err) ->
+				"#{type}: failed to compile controllers; #{err}"
 			copy: (type, file, err) ->
 				"#{type}: failed to copy #{file}; #{err}"
 			rootcopy: (type, file, err) ->
@@ -135,6 +129,8 @@ buildCommands =
 		success:
 			def: (type, file) ->
 				"#{type}: compiled #{file} successfully"
+			controllers: (type, file) ->
+				"#{type}: compiled controllers successfully"
 			copy: (type, file) ->
 				"#{type}: copied #{file} successfully"
 			rootcopy: (type, file) ->
@@ -148,13 +144,14 @@ buildCommands =
 # mega tasks
 #
 
-task 'build', 'build all - less, jade, coffeescript', ->
+task 'build', 'run all build tasks', ->
 	async.eachSeries [
 		'builddirs'
 		'rootcopy'
 		'less'
-		'jade'
+		#'jade'
 		'coffee'
+		'controllers'
 		#'uglify'
 		'copy'
 	], build, (err) ->
@@ -162,12 +159,6 @@ task 'build', 'build all - less, jade, coffeescript', ->
 			log 'build error!', err, true
 		else
 			log 'build complete!'
-
-task 'watch', 'watch and rebuild files when changed', ->
-	invoke 'watch:less'
-	invoke 'watch:jade'
-	invoke 'watch:coffee'
-	invoke 'watch:copy'
 
 # todo - finish. Need to automate this for windows and stuff.
 #task 'package', 'package a release', ->
@@ -193,18 +184,10 @@ task 'build:builddirs', 'prepares build dir\'s structure', -> build 'builddir'
 task 'build:jade', 'build jade files into html', -> build 'jade'
 task 'build:less', 'build less files into css', -> build 'less'
 task 'build:coffee', 'build coffeescript files into js', -> build 'coffee'
+task 'build:controllers', 'build controllers', -> build 'controllers'
 #task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
 task 'build:copy', 'copy necessary files to build dir', -> build 'copy'
 task 'build:rootcopy', 'copy necessary files to build root dir', -> build 'rootcopy'
-
-#
-# individual watch tasks
-#
-
-task 'watch:jade', 'watch jade files for changes and rebuild', -> watch 'jade'
-task 'watch:less', 'watch less files for changes and rebuild', -> watch 'less'
-task 'watch:coffee', 'watch coffee files for changes and rebuild', -> watch 'coffee'
-task 'watch:copy', 'watch for misc changes and copy to build dir', -> watch 'copy'
 
 #
 # helper functions
@@ -227,9 +210,12 @@ build = (type, final) ->
 		# exec!
 		(fn) ->
 			if !!buildCommands.run[type]
-				async.each files[fileset], (file, cb) ->
-					compile type, file, cb
-				, fn
+				if util.isArray files[fileset]
+					async.each files[fileset], (file, cb) ->
+						compile type, file, cb
+					, fn
+				else
+					compile type, null, fn
 			else if buildCommands.run[type] is false
 				fn null
 			else
@@ -245,22 +231,6 @@ build = (type, final) ->
 				fn null
 	], (err) ->
 		final? err
-
-watch = (type) ->
-	invoke 'build:'+type
-	# fileset is deliberately separate from type here.
-	fileset = if type is 'uglify' then 'coffee' else type
-	for file in files[fileset]
-		do (file) ->
-			path = switch
-				when type is 'less' then "src/less/#{file}.less"
-				when type is 'jade' then "src/jade/#{file}.jade"
-				when type is 'coffee' then "src/coffee/#{file}.coffee"
-				when type is 'copy' then "src/#{file}"
-				when type is 'rootcopy' then "src/buildroot/#{file}"
-			fs.watchFile path, (curr, prev) ->
-				if +curr.mtime isnt +prev.mtime
-					compile type, file
 
 compile = (type, file, fn) ->
 		exec (buildCommands.run[type] file), (err, stdout, stderr) ->
