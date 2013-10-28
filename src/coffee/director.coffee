@@ -9,7 +9,6 @@
 
 {EventEmitter} = require 'events'
 debug = (require 'debug')('director')
-
 async = require 'async'
 
 #
