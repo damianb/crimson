@@ -1,3 +1,12 @@
+#
+# crimson - desktop social network client
+# ---
+# @copyright (c) 2013 Damian Bushong <katana@codebite.net>
+# @license MIT license
+# @url <https://github.com/damianb/crimson>
+# @twitter <https://twitter.com/burningcrimson>
+#
+
 {EventEmitter} = require 'events'
 debug = (require 'debug')('director')
 
@@ -5,7 +14,7 @@ async = require 'async'
 
 #
 # the director class handles all user accounts and dispatching user-related events
-#  todo: replace timeline calls with appropriate actions instead
+#  todo: replace timeline calls with appropriate actions instead. possibly timeline manager?
 #
 class director extends EventEmitter
 	constructor: (@accountsDb, @negotiator) ->
