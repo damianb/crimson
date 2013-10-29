@@ -16,6 +16,21 @@ timeline = require './timeline'
 #
 class navigator
 	constructor: (@director) ->
+		@activeTimeline = null
+		@timelines =
+			super:
+				home: null
+				notify: null
+			user: {}
+		# todo
+	addAccount: () ->
+		# todo
+	delAccount: () ->
+		# todo
+	changeTimeline: () ->
+		# change what timeline we're focusing on!
+		# must change active timeline. will have to deactivate the prior active timeline however (if there was one).
+
 		# todo
 
 module.exports = navigator

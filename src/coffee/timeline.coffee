@@ -11,6 +11,7 @@ debug = (require 'debug')('timeline')
 
 class timeline
 	constructor: () ->
+		@active = false
 		# todo
 
 module.exports = timeline
