@@ -52,6 +52,9 @@ angular.module('crimson', [])
 		#  events...special situation. unique index by event.id_str ? event.eventType?
 		db
 	)
+	.factory('broadcast', ->
+		# todo
+	)
 	.factory('negotiator', ->
 		new negotiator()
 	)

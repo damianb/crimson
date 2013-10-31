@@ -27,7 +27,7 @@ class navigator
 		# todo
 	delAccount: () ->
 		# todo
-	changeTimeline: () ->
+	changeFocus: () ->
 		# change what timeline we're focusing on!
 		# must change active timeline. will have to deactivate the prior active timeline however (if there was one).
 
