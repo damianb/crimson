@@ -25,6 +25,8 @@ global.Array::remove = Array::remove = (from, to) ->
 	@length = if from < 0 then @length + from else from
 	@push.apply @, rest
 
+# better than using Array::filter because it's short-circuit - we waste less time once we have our hits.
+# please also note, this use OR logic. only one of the supplied params must be present in the array.
 global.Array::has = Array::has = (entries...) ->
 	hasEntries = true
 	process = =>
@@ -41,8 +43,8 @@ global.Date::format = Date::format = (mask, utc) ->
 
 # global muckery...yuck. ;_;
 
-# this must only be done AFTER jq has loaded...
-global.$ = $
+# this must only be done AFTER jq has loaded...if it's not there, just skip it.
+if $? then global.$ = $
 global.gui = gui = require 'nw.gui'
 
 # crit logging

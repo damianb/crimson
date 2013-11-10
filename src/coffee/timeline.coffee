@@ -10,33 +10,69 @@
 {EventEmitter} = require 'events'
 debug = (require 'debug')('timeline')
 
+#
+# Timeline object, holds events in a single array if active (for hookup to Angular)
+#
 class timeline
-	constructor: (@stream, @type) ->
+	constructor: (@stream, @filter, @eventDb, @type) ->
 		@active = false
 		if !timeline.timelineEvents[@type]?
 			throw new Error 'Unrecognized timeline type provided'
 		@data = []
 	focus: (fn) ->
-		# todo query events database (or API) to obtain latest events
+		# todo query events database (or use API queries) to obtain latest events.
+		# ...API queries should likely happen during initial connection stages though
+		#     - prepopulation of these columns' data is vital!
+		# build our query based on timeline event types, etc.
+		query =
+			eventType:
+				$in: timeline.timelineEvents
 
-		@active = true
+		# only use an ownerId if we're not using a ^super timeline
+		if !@isSuper then query.ownerId = @user.id
+
+		@eventDb.find query, (err, docs) =>
+			docs.sort (a,b) ->
+				if a.eventTime > b.eventTime then 1 else if b.eventTime > a.eventTime then -1 else 0
+			docs.forEach (doc) ->
+				@insert doc
+			@active = true
+			fn null, docs.length
 	blur: (fn) ->
 		@data = []
 		@active = false
 
-		# safe to decouple timeline from view now
+		# it's safe to decouple timeline from view now
+		fn null
 	insert: (entry, fn) ->
 		# short-circuit. if we're not active, ignore the event.
 		if !@active
 			fn false
 			return
 
-		fn null, @data.push entry
+		if entry.eventType.has 'tweet.new'
+			entry.type = 'tweet'
+			# override type to be retweet if it is such
+			if entry.eventType.has 'retweet.new'
+				entry.type 'retweet'
+		else if entry.eventType.has 'dm.new'
+			entry.type = 'dm'
+		else if entry.eventType.has 'favorite.new'
+			entry.type = 'favorite'
+		else if entry.eventType.has 'follower.new'
+			entry.type = 'follower'
+
+		# todo apply filters?
+
+		# note, entries should be handled properly on insertion. they may not all be tweets!
+		# ( S-SENPAI, THAT'T NOT A TWEET! ///// )
+		fn? null, @data.push entry
 	remove: (condition, expect, fn) ->
 		# short-circuit. if we're not active, ignore the event.
 		if !@active
 			fn false
 			return
+		debug "looking for data to remove from angular view data - entry.#{condition} = #{expect}"
 
 		(@data.map (val, index) ->
 			if val.condition is expect then return index
