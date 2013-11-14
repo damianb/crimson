@@ -15,14 +15,14 @@ timeline = require './timeline'
 #  Name inspired by the Guild Navigators of the Dune verse.
 #
 class navigator
-	constructor: (@director) ->
+	constructor: (@director, @compost) ->
 		@activeTimeline = null
 		@timelines =
 			super:
 				home: null
 				notify: null
 			user: {}
-		# todo
+		# todo make initial active timeline the @timelines.super.home timeline by default
 	addAccount: () ->
 		# todo
 	delAccount: () ->

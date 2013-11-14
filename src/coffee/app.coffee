@@ -11,10 +11,19 @@ controllers = require './assets/js/crimson/controllers'
 negotiator = require './assets/js/crimson/negotiator'
 director = require './assets/js/crimson/director'
 
+{EventEmitter} = require 'events'
 debug = (require 'debug')('app')
 nedb = require 'nedb'
 path = require 'path'
-{ gui, $ } = global
+{gui, $} = global
+
+compost = require './compost'
+director = require './director'
+filter = require './filter'
+navigator = require './navigator'
+negotiator = require './negotiator'
+
+
 
 angular.module('crimson', [])
 	.factory('gui', ->
@@ -52,15 +61,27 @@ angular.module('crimson', [])
 		#  events...special situation. unique index by event.id_str ? event.eventType?
 		db
 	)
-	.factory('broadcast', ->
-		# todo
+	.factory('errorDb', ->
+		# this database serves to store errors, warnings, and other notable bits of information that we encounter during runtime.
+		db = new nedb { autoload: true, nodeWebkitAppName: 'crimson', filename: 'error.db' }
 	)
+	.factory('broadcast', ->
+		new EventEmitter()
+	)
+	.factory('compost', ['errorDb', (db) ->
+		new compost db
+	])
 	.factory('negotiator', ->
 		new negotiator()
 	)
-	.factory('filter', ['preferencesDb', 'eventsDb', (db, events) ->
-		new filter db, events
+	.factory('filter', ['preferencesDb', 'eventsDb', (db, evdb) ->
+		new filter db, evdb
 	])
-	.factory('users', ['accountsDb', 'negotiator', (db, neg) ->
-		new director db, neg
+	# user director, manages our users (active, inactive, etc.)
+	.factory('director', ['accountsDb', 'navigator', 'negotiator', (db, nav, neg) ->
+		new director db, nav, neg
 	])
+	.factory('navigator', ['director', 'compost', (dtor, cpost) ->
+		new navigator dtor, cpost
+	])
+

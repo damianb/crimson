@@ -16,7 +16,7 @@ async = require 'async'
 #  todo: replace timeline calls with appropriate actions instead. possibly timeline manager?
 #
 class director extends EventEmitter
-	constructor: (@accountsDb, @negotiator) ->
+	constructor: (@accountsDb, @navigator, @negotiator) ->
 		@users = {}
 		super()
 
@@ -51,7 +51,7 @@ class director extends EventEmitter
 			friends: []
 			blocked: []
 		# todo replace with timeline manager object?
-		@timelines.user[user.id] = {}
+		@navigator.timelines.init user
 		@users[user.id] = user
 
 		async.waterfall [
@@ -68,20 +68,21 @@ class director extends EventEmitter
 			(cb) =>
 				# we don't want to init the stream until now, due to...stuff.
 				user.stream = new stream user
-				user.stream.on '__destroy', =>
+				user.stream.on '__destroy', (user) =>
 					# clean up the timelines reference here quickly when we have a __destroy emitted
-					@timelines.user[user.id] = undefined
+					@navigator.delAccount user
 					@users[user.id] = undefined
 				cb null
 			(cb) =>
-				# todo init timelines (ALL OF THE TIMELINES! :DDDDD)
-				@timelines.user[user.id] =
-					home: new timeline 'home', user
-					mentions: new timeline 'mentions', user
-					events: new timeline 'events', user
+				# order the timeline navigator to init base timelines...
+				@navigator.addAccount user
+#					home: new timeline 'home', user
+#					mentions: new timeline 'mentions', user
+#					events: new timeline 'events', user
 				cb null
 			(cb) =>
 				# initial api calls to populate timelines...
+				# todo: maybe this should be something in @navigator?
 				cb null
 		], (err) =>
 			if err

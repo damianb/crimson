@@ -9,15 +9,22 @@
 
 {EventEmitter} = require 'events'
 debug = (require 'debug')('timeline')
+async = require 'async'
+twitter = require 'twitter-text'
 
 #
 # Timeline object, holds events in a single array if active (for hookup to Angular)
 #
 class timeline
-	constructor: (@stream, @filter, @eventDb, @type) ->
+	constructor: (@user, @filter, @eventDb, @type) ->
 		@active = false
 		if !timeline.timelineEvents[@type]?
 			throw new Error 'Unrecognized timeline type provided'
+
+		# if we're a super timeline...
+		@isSuper = !!(@type is 'superhome' or @type is 'supernotify')
+		{@stream} = @user
+
 		@data = []
 	focus: (fn) ->
 		# todo query events database (or use API queries) to obtain latest events.
@@ -67,6 +74,86 @@ class timeline
 		# note, entries should be handled properly on insertion. they may not all be tweets!
 		# ( S-SENPAI, THAT'T NOT A TWEET! ///// )
 		fn? null, @data.push entry
+	prime: (fn) ->
+		# fetches more data from the API according to timeline type.
+		switch @type
+			when 'home'
+				# todo
+			when 'mentions'
+				# todo
+			when 'messages'
+				# todo reduce redundant redundancy
+				async.parallel {
+					receivedMessages: (callback) =>
+						opts =
+							count: 50
+							include_entities: true
+						@user.api.get 'direct_messages', opts, callback
+					,
+					sentMessages: (callback) =>
+						opts =
+							count: 50
+							include_entities: true
+						@user.api.get 'direct_messages/sent', opts, callback
+				}, (err, res) =>
+					# insert all results into events db - assuming they're not already in there.
+					{receivedMessages, sentMessages} = res
+					if receivedMessages.length
+						receivedMessages.forEach (event) =>
+							types = ['dm.new', 'dm.received']
+							event.text = twitter.autoLink event.text, { urlEntities: event.entities.urls }
+							query =
+								event: event
+							updateQuery =
+								$set:
+									eventTime: Date.now()
+								$addToSet:
+									ownerId: @user.id
+									eventType: { $each: types }
+
+							@eventDb.update query, updateQuery, { upsert: true }, (err, numReplaced, upsert) =>
+								if err
+									debug 'timeline.prime (receivedMessages) nedb err: ' + err
+									throw err
+
+								# until we know exactly what the hell the _id was that was modified with the update query,
+								# we have to use this. ref: https://github.com/louischatriot/nedb/issues/72
+								@eventsDb.findOne { 'event.direct_message.id_str': event.direct_message.id_str }, (err, doc) =>
+									if err
+										debug 'timeline.prime (receivedMessages) nedb err: ' + err
+										throw err
+									@data.push doc
+					if sentMessages.length
+						sentMessages.forEach (event) =>
+							types = ['dm.new', 'dm.sent']
+							event.text = twitter.autoLink event.text, { urlEntities: event.entities.urls }
+							query =
+								event: event
+							updateQuery =
+								$set:
+									eventTime: Date.now()
+								$addToSet:
+									ownerId: @user.id
+									eventType: { $each: types }
+
+							@eventDb.update query, updateQuery, { upsert: true }, (err, numReplaced, upsert) =>
+								if err
+									debug 'timeline.prime (sentMessages) nedb err: ' + err
+									throw err
+
+								# until we know exactly what the hell the _id was that was modified with the update query,
+								# we have to use this. ref: https://github.com/louischatriot/nedb/issues/72
+								@eventsDb.findOne { 'event.direct_message.id_str': event.direct_message.id_str }, (err, doc) =>
+									if err
+										debug 'timeline.prime (sentMessages) nedb err: ' + err
+										throw err
+									@data.push doc
+			when 'events'
+				# todo
+			else
+				# probably a super timeline, we don't want to do -anything- in this case.
+				fn? null
+
 	remove: (condition, expect, fn) ->
 		# short-circuit. if we're not active, ignore the event.
 		if !@active
