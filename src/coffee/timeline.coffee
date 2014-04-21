@@ -13,7 +13,7 @@ async = require 'async'
 twitter = require 'twitter-text'
 
 #
-# Timeline object, holds events in a single array if active (for hookup to Angular)
+# Timeline object, holds events in a single array if active
 #
 class timeline
 	constructor: (@user, @filter, @eventDb, @type) ->
