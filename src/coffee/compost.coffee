@@ -17,5 +17,4 @@ debug = (require 'debug')('compost')
 #
 class compost extends EventEmitter
 	constructor: (@errorDb) ->
-		# initialize our very own nedb instance for error tracking.
 		super()
