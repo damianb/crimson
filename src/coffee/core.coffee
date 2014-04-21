@@ -44,3 +44,5 @@ class Core extends EventEmitter
 		@filter = new filter @, @db.preferences, @db.events
 		@navigator = new navigator @
 		@director = new director @, @db.accounts
+
+		super()
