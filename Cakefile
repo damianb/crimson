@@ -97,8 +97,6 @@ buildCommands =
 				"copy /Y #{path.normalize('src/' + file)} #{path.normalize(buildDir + '/assets/' + file)}"
 			else
 				"cp src/#{file} #{buildDir}/assets/#{file}"
-		controllers: ->
-			"coffee #{coffeeOpts} -j #{path.normalize(buildDir+'/assets/js/#{appName}/controllers.js')} src/coffee/controllers.coffee src/coffee/controller/"
 		rootcopy: (file) ->
 			if isWindows
 				"copy /Y #{path.normalize('src/buildroot/'+file)} #{path.normalize(buildDir+'/'+file)}"
@@ -153,7 +151,6 @@ task 'build', 'run all build tasks', ->
 		'less'
 		#'jade'
 		'coffee'
-		'controllers'
 		#'uglify'
 		'copy'
 	], build, (err) ->
@@ -186,7 +183,6 @@ task 'build:builddirs', 'prepares build dir\'s structure', -> build 'builddir'
 task 'build:jade', 'build jade files into html', -> build 'jade'
 task 'build:less', 'build less files into css', -> build 'less'
 task 'build:coffee', 'build coffeescript files into js', -> build 'coffee'
-task 'build:controllers', 'build controllers', -> build 'controllers'
 #task 'build:uglify', 'uglify/minify js files', -> build 'uglify'
 task 'build:copy', 'copy necessary files to build dir', -> build 'copy'
 task 'build:rootcopy', 'copy necessary files to build root dir', -> build 'rootcopy'
