@@ -50,3 +50,4 @@ to run the application, cd to project directory and launch the build directory w
 * settings menus
 * navigation icons
 * logo
+* keybase integration, gpg?   https://keybase.io/_/api/1.0/user/autocomplete.json?q=
